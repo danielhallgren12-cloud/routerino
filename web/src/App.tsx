@@ -1,0 +1,317 @@
+import { useState, useEffect, useRef } from 'react'
+import { MapContainer, TileLayer, Marker, Polyline, Popup, useMapEvents } from 'react-leaflet'
+import L from 'leaflet'
+import 'leaflet/dist/leaflet.css'
+
+interface Hop {
+  hop: number
+  ip: string
+  hostname?: string
+  isp?: string
+  country?: string
+  city?: string
+  lat?: number
+  lng?: number
+  rtt?: number
+}
+
+interface TraceResponse {
+  id: string
+  destination: string
+  hops: Hop[]
+  created_at: string
+}
+
+const themes = {
+  neon: { color: '#00d4ff', lineColor: '#ff00aa' },
+  retro: { color: '#ff6b35', lineColor: '#f7c59f' },
+  minimal: { color: '#ffffff', lineColor: '#888888' }
+}
+
+type Theme = 'neon' | 'retro' | 'minimal'
+
+function MapEvents({ onZoomChange }: { onZoomChange: (zoom: number) => void }) {
+  const map = useMapEvents({
+    zoomend: () => {
+      onZoomChange(map.getZoom())
+    },
+  })
+  useEffect(() => {
+    onZoomChange(map.getZoom())
+  }, [])
+  return null
+}
+
+function App() {
+  const [destination, setDestination] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [traceData, setTraceData] = useState<TraceResponse | null>(null)
+  const [theme, setTheme] = useState<Theme>('neon')
+  const [zoomLevel, setZoomLevel] = useState(2)
+
+  const runTrace = async () => {
+    if (!destination.trim()) return
+    
+    setLoading(true)
+    setError('')
+    
+    try {
+      const response = await fetch('/api/v1/trace', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ destination: destination.trim(), max_hops: 15 })
+      })
+      
+      if (!response.ok) {
+        throw new Error('Trace failed')
+      }
+      
+      const data = await response.json()
+      setTraceData(data)
+    } catch (err) {
+      setError('Failed to run traceroute. Please try again.')
+      console.error(err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const getValidHops = (): Hop[] => {
+    if (!traceData) return []
+    return traceData.hops.filter(h => h.ip && h.ip !== '*')
+  }
+
+  const validHops = getValidHops()
+  const routeCoords = validHops.map(h => [h.lat!, h.lng!] as [number, number])
+
+  const getHopGroup = () => {
+    const groups: { [key: string]: { hops: number[], lat: number, lng: number } } = {}
+    
+    validHops.forEach(hop => {
+      const cityKey = hop.city && hop.country ? `${hop.city},${hop.country}` : `${hop.lat},${hop.lng}`
+      
+      if (!groups[cityKey]) {
+        groups[cityKey] = { hops: [], lat: hop.lat!, lng: hop.lng! }
+      }
+      groups[cityKey].hops.push(hop.hop)
+    })
+    
+    return groups
+  }
+
+  const hopGroups = getHopGroup()
+
+  const getMarkerLabel = (lat: number, lng: number) => {
+    const cityKey = Object.keys(hopGroups).find(key => {
+      const group = hopGroups[key]
+      return group.lat === lat && group.lng === lng
+    })
+    
+    if (cityKey) {
+      const hops = hopGroups[cityKey].hops
+      if (hops.length > 1) {
+        return hops.sort((a, b) => a - b).join(',')
+      }
+      return hops[0].toString()
+    }
+    return ''
+  }
+
+  const shouldCombineMarkers = (lat1: number, lng1: number, lat2: number, lng2: number) => {
+    const latDiff = Math.abs(lat1 - lat2)
+    const lngDiff = Math.abs(lng1 - lng2)
+    return latDiff < 0.1 && lngDiff < 0.1
+  }
+
+  const customIcon = (label: string) => L.divIcon({
+    className: 'custom-marker',
+    html: `<div style="
+      width: auto;
+      min-width: 24px;
+      height: 24px;
+      padding: 0 6px;
+      background: linear-gradient(135deg, ${themes[theme].color}, ${themes[theme].lineColor});
+      border-radius: 12px;
+      border: 2px solid white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: bold;
+      color: black;
+      white-space: nowrap;
+    ">${label}</div>`,
+    iconSize: [30, 24],
+    iconAnchor: [15, 12]
+  })
+
+  return (
+    <div className="app">
+      <header className="header">
+        <h1>RouteCanvas</h1>
+      </header>
+
+      <main className="main">
+        <div className="input-section">
+          <input
+            type="text"
+            placeholder="Enter destination (e.g., google.com)"
+            value={destination}
+            onChange={(e) => setDestination(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && runTrace()}
+          />
+          <button onClick={runTrace} disabled={loading || !destination.trim()}>
+            {loading ? 'Tracing...' : 'Trace Route'}
+          </button>
+        </div>
+
+        {error && <div className="error">{error}</div>}
+
+        {traceData && (
+          <div className="theme-selector">
+            {(['neon', 'retro', 'minimal'] as Theme[]).map(t => (
+              <button
+                key={t}
+                className={`theme-button ${theme === t ? 'active' : ''}`}
+                onClick={() => setTheme(t)}
+              >
+                {t.charAt(0).toUpperCase() + t.slice(1)}
+              </button>
+            ))}
+          </div>
+        )}
+
+        <div className="map-container" style={{ height: '500px' }}>
+          {loading && (
+            <div className="loading">Running traceroute...</div>
+          )}
+          
+          {!loading && traceData && validHops.length > 0 && (
+            <MapContainer
+              center={[20, 0]}
+              zoom={2}
+              style={{ height: '500px', width: '100%' }}
+            >
+              <MapEvents onZoomChange={setZoomLevel} />
+              <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+              
+              {(() => {
+                const cityGroups: { [key: string]: Hop[] } = {}
+                
+                validHops.forEach(hop => {
+                  const cityKey = hop.city && hop.country ? `${hop.city},${hop.country}` : `${hop.lat},${hop.lng}`
+                  if (!cityGroups[cityKey]) {
+                    cityGroups[cityKey] = []
+                  }
+                  cityGroups[cityKey].push(hop)
+                })
+                
+                const renderedHops = new Set<number>()
+                
+                return Object.values(cityGroups).map(cityHops => {
+                  const isSameLocation = cityHops.length > 1 && cityHops.every(h => 
+                    Math.abs(h.lat! - cityHops[0].lat!) < 0.01 && Math.abs(h.lng! - cityHops[0].lng!) < 0.01
+                  )
+                  
+                  const shouldCombine = zoomLevel < 5 || isSameLocation
+                  
+                  if (shouldCombine) {
+                    const hopNums = cityHops.map(h => h.hop).sort((a, b) => a - b)
+                    const label = hopNums.join(',')
+                    const hop = cityHops[0]
+                    hopNums.forEach(n => renderedHops.add(n))
+                    
+                    return (
+                      <Marker
+                        key={`combined-${label}`}
+                        position={[hop.lat!, hop.lng!]}
+                        icon={customIcon(label)}
+                      >
+                        <Popup>
+                          <div style={{ color: '#000' }}>
+                            <strong>Hops {label}</strong><br />
+                            {cityHops.map(h => (
+                              <div key={h.hop}>
+                                Hop {h.hop}: {h.ip}<br />
+                                {h.city && <>{h.city}, {h.country}</>}
+                                {h.rtt && <><br />RTT: {h.rtt}ms</>}
+                                <hr style={{ margin: '4px 0' }} />
+                              </div>
+                            ))}
+                          </div>
+                        </Popup>
+                      </Marker>
+                    )
+                  }
+                  
+                  return cityHops.map(hop => {
+                    if (renderedHops.has(hop.hop)) return null
+                    renderedHops.add(hop.hop)
+                    
+                    return (
+                      <Marker
+                        key={`single-${hop.hop}`}
+                        position={[hop.lat!, hop.lng!]}
+                        icon={customIcon(hop.hop.toString())}
+                      >
+                        <Popup>
+                          <div style={{ color: '#000' }}>
+                            <strong>Hop {hop.hop}</strong><br />
+                            IP: {hop.ip}<br />
+                            {hop.city && <>{hop.city}, {hop.country}</>}
+                            {hop.rtt && <><br />RTT: {hop.rtt}ms</>}
+                          </div>
+                        </Popup>
+                      </Marker>
+                    )
+                  })
+                })
+              })()}
+               
+              <Polyline
+                positions={routeCoords}
+                color={themes[theme].lineColor}
+                weight={3}
+                opacity={0.8}
+                dashArray={theme === 'retro' ? '10, 10' : undefined}
+              />
+            </MapContainer>
+          )}
+          
+          {!loading && traceData && validHops.length === 0 && (
+            <div className="loading">No map data. Showing route details below...</div>
+          )}
+          
+          {!loading && !traceData && (
+            <div className="loading">Enter a destination to trace your route</div>
+          )}
+        </div>
+
+        {traceData && traceData.hops.length > 0 && (
+          <div className="hop-list">
+            <h3>Route Details</h3>
+            {traceData.hops.map(hop => (
+              <div key={hop.hop} className="hop-item">
+                <div className="hop-number">{hop.hop}</div>
+                <div className="hop-details">
+                  <div className="ip">{hop.ip}</div>
+                  {hop.hostname && <div className="hostname">{hop.hostname}</div>}
+                  {(hop.city || hop.country) && (
+                    <div className="location">{[hop.city, hop.country].filter(Boolean).join(', ')}</div>
+                  )}
+                </div>
+                {hop.rtt && <div className="hop-rtt">{hop.rtt}ms</div>}
+              </div>
+            ))}
+          </div>
+        )}
+      </main>
+    </div>
+  )
+}
+
+export default App
