@@ -49,6 +49,8 @@ function App() {
   const [traceData, setTraceData] = useState<TraceResponse | null>(null)
   const [theme, setTheme] = useState<Theme>('neon')
   const [zoomLevel, setZoomLevel] = useState(2)
+  const [selectedHop, setSelectedHop] = useState<Hop | null>(null)
+  const mapRef = useRef<L.Map | null>(null)
 
   const runTrace = async () => {
     if (!destination.trim()) return
@@ -76,6 +78,12 @@ function App() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    if (selectedHop && selectedHop.lat && selectedHop.lng && mapRef.current) {
+      mapRef.current.flyTo([selectedHop.lat, selectedHop.lng], 8)
+    }
+  }, [selectedHop])
 
   const getValidHops = (): Hop[] => {
     if (!traceData) return []
@@ -189,6 +197,7 @@ function App() {
           
           {!loading && traceData && validHops.length > 0 && (
             <MapContainer
+              ref={mapRef}
               center={[20, 0]}
               zoom={2}
               style={{ height: '500px', width: '100%' }}
@@ -230,6 +239,12 @@ function App() {
                         key={`combined-${label}`}
                         position={[hop.lat!, hop.lng!]}
                         icon={customIcon(label)}
+                        eventHandlers={{
+                          click: () => {
+                            mapRef.current?.flyTo([hop.lat!, hop.lng!], 8)
+                            setSelectedHop(hop)
+                          }
+                        }}
                       >
                         <Popup>
                           <div style={{ color: '#000' }}>
@@ -257,6 +272,12 @@ function App() {
                         key={`single-${hop.hop}`}
                         position={[hop.lat!, hop.lng!]}
                         icon={customIcon(hop.hop.toString())}
+                        eventHandlers={{
+                          click: () => {
+                            mapRef.current?.flyTo([hop.lat!, hop.lng!], 8)
+                            setSelectedHop(hop)
+                          }
+                        }}
                       >
                         <Popup>
                           <div style={{ color: '#000' }}>
@@ -295,7 +316,17 @@ function App() {
           <div className="hop-list">
             <h3>Route Details</h3>
             {traceData.hops.map(hop => (
-              <div key={hop.hop} className="hop-item">
+              <div 
+                key={hop.hop} 
+                className="hop-item"
+                onClick={() => {
+                  if (hop.lat && hop.lng) {
+                    mapRef.current?.flyTo([hop.lat, hop.lng], 8)
+                    setSelectedHop(hop)
+                  }
+                }}
+                style={{ cursor: hop.lat && hop.lng ? 'pointer' : 'default' }}
+              >
                 <div className="hop-number">{hop.hop}</div>
                 <div className="hop-details">
                   <div className="ip">{hop.ip}</div>
