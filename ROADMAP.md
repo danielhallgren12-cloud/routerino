@@ -124,13 +124,25 @@ This roadmap outlines the development phases for RouteCanvas, from initial demo 
 
 ### Week 10-11: Print-on-Demand
 
+**Vision:** Route art that creates emotional connection - "This is MY digital journey"
+
+Why it works:
+- **Start point:** User's home location = personal
+- **End point:** User's search destination (brand/company they like) = personal  
+- **The journey:** The actual route their packets take = unique to that moment
+
+**Implementation:**
+
 - [ ] Integrate print-on-demand API
 - [ ] Product selection (poster, T-shirt, canvas)
 - [ ] Order processing
 - [ ] Payment integration
+- [ ] High-res image export (300 DPI required for print)
+- [ ] Custom text overlay: "From [City] to [Destination]"
+- [ ] Multiple background color options
 
 **Deliverables:**
-- Users can order printed products
+- Users can order printed products with their route art
 
 ### Week 12+: Gamification and Advanced Features
 
@@ -204,6 +216,20 @@ These features were identified by comparing with other traceroute tools (NextTra
 ### Medium Priority
 
 - [ ] **Export as image** - Save route visualization as PNG
+  - High-resolution export (300 DPI for print quality)
+  - Custom title overlay: "From [User City] to [Destination]"
+  - Include route metadata (hop count, avg latency)
+  - Attribution overlay
+  
+- [ ] **Route art styles** - Different visual aesthetics
+  - Dark/neon (cyberpunk vibe)
+  - Watercolor/artistic
+  - Minimalist/infographic
+  
+- [ ] **Home location emphasis** - Highlight user's starting point
+  - Special marker for user's location
+  - Custom icon or highlight color
+  
 - [ ] **Continuous ping mode** - Monitor latency continuously
 - [ ] **Multiple destination comparison** - Compare routes side-by-side
 
@@ -214,6 +240,37 @@ These features were identified by comparing with other traceroute tools (NextTra
 - [ ] Route animation (traveling icon)
 - [ ] IPv6 support
 - [ ] Historical route comparison
+
+---
+
+## Route Art Vision
+
+**The Core Concept:** Transform traceroutes into personal, shareable art that creates emotional connection.
+
+### Why Route Art Works
+
+| Element | Why It's Special |
+|---------|------------------|
+| **Start point** | User's location (home town) = deeply personal |
+| **End point** | User's search destination (brand/company they care about) = meaningful |
+| **The journey** | Actual packet path = unique to that moment in time |
+
+This creates: **"This is MY digital journey from MY home to what I care about"**
+
+### For Print-on-Demand Success
+
+Users will want to buy prints because:
+1. It's **personal** - shows their location
+2. It's **unique** - their packet route is different from everyone else's
+3. It's **educational** - shows how the internet actually works
+4. It's **art** - beautiful visualization they can display
+
+### Implementation Priorities
+
+1. **High-res export** - 300 DPI minimum for print quality
+2. **Custom overlays** - Title text user can customize
+3. **Home location emphasis** - Make starting point stand out
+4. **Multiple styles** - Different visual aesthetics for different tastes
 
 ---
 
@@ -252,4 +309,6 @@ Be transparent about what RouteCanvas can and cannot do:
 
 ---
 
-*Last updated: 2026-03-04*
+*Last updated: 2026-03-05*
+
+## Additional Documentation

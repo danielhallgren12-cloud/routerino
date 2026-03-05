@@ -4,12 +4,14 @@
 
 **RouteCanvas** is a creative network visualization tool that transforms traceroutes into animated journeys and shareable art. Users enter a destination (domain or IP), and RouteCanvas displays the path their packets take across the internet as a visual journey between cities, with the option to apply artistic themes and export the result as art.
 
+**The Vision:** Transform traceroutes into personal route art that creates emotional connection - "This is MY digital journey from MY home to what I care about"
+
 ## 2. Core Concept
 
 - **Visual Traceroute**: Transform standard traceroute output into an animated journey on a world map
-- **Route Art**: Apply artistic themes (neon, sketch, retro, etc.) to create unique shareable images
-- **Network Fingerprint**: Each route creates a unique visual "fingerprint" of that connection
-- **Social Sharing**: Gallery to share and browse routes from the community
+- **Route Art**: Apply artistic themes (neon, retro, minimal) to create unique shareable images
+- **Personal Connection**: Emphasize user's home location as start point + their search destination as end point
+- **Print-on-Demand**: High-quality exports for ordering prints (posters, canvases)
 
 ## 3. Target Users
 
@@ -17,39 +19,44 @@
 - Tech enthusiasts curious about internet infrastructure
 - Social media users who enjoy unique digital art
 - Educators teaching networking concepts
+- People who want personalized, meaningful wall art
 
 ## 4. Goals for This Project
 
 1. **Educational**: Help users understand how their data travels across the internet
 2. **Creative**: Provide a unique artistic outlet through route visualization
 3. **Portfolio-worthy**: Demonstrate full-stack development skills for IT career
-4. **Practical**: Potentially generate side income through print-on-demand products
+4. **Practical**: Generate side income through print-on-demand products
 
 ---
 
 ## 5. Features
 
-### Phase 1 - Core (MVP)
+### Phase 1 - Core (MVP) ✅ COMPLETED
+
+| Feature | Status |
+|---------|--------|
+| Destination Input | ✅ Complete |
+| Traceroute Execution | ✅ Complete |
+| Map Visualization | ✅ Complete |
+| Color-coded latency | ✅ Complete |
+| ASN tracking | ✅ Complete |
+| Art themes: Neon, Retro, Minimal | ✅ Complete |
+| Image Export | 🔄 Next |
+
+### Phase 2 - Engagement (Planned)
 
 | Feature | Description |
 |---------|-------------|
-| Destination Input | Enter domain or IP address to trace |
-| Traceroute Execution | Run traceroute via backend, return hop data |
-| Map Visualization | Display hops on interactive world map |
-| Animated Journey | Show packet travel animation between hops |
-| Art themes: Neon, Themes | Apply visual Sketch, Retro, Watercolor |
-| Image Export | Download route visualization as PNG image |
-
-### Phase 2 - Engagement
-
-| Feature | Description |
-|---------|-------------|
-| Preset Destinations | One-click trace to popular targets (Google DNS, Cloudflare, Netflix, etc.) |
-| Network Fingerprint | Generate unique signature for each route |
+| High-res Export | 300 DPI for print quality |
+| Custom title overlay | "From [City] to [Destination]" |
+| Home location emphasis | Special marker for user's starting point |
+| Route art styles | Dark/neon, watercolor, minimalist |
+| Preset Destinations | One-click trace to popular targets |
 | Route History | Save and view past traces |
 | User Accounts | Basic authentication for personal route collection |
 
-### Phase 3 - Social
+### Phase 3 - Social (Planned)
 
 | Feature | Description |
 |---------|-------------|
@@ -58,7 +65,7 @@
 | User Profiles | Display user's route collection and stats |
 | Share Routes | Easy share to social media |
 
-### Phase 4 - Expansion
+### Phase 4 - Expansion (Planned)
 
 | Feature | Description |
 |---------|-------------|
@@ -69,65 +76,26 @@
 
 ---
 
-## 6. Demo Scope (Current Phase)
+## 6. The Route Art Vision
 
-For the initial demo, we will build:
+### Why Route Art Creates Emotional Connection
 
-**Input**: Destination (domain or IP)  
-**Process**: 
-1. Backend runs traceroute to destination
-2. Returns hop data (IP, hostname, ISP, location, latency)
-3. Frontend visualizes on map with animation
+| Element | Why It's Special |
+|---------|------------------|
+| **Start point** | User's location (home town) = deeply personal |
+| **End point** | User's search destination (brand/company they care about) = meaningful |
+| **The journey** | Actual packet path = unique to that moment in time |
 
-**Output**:
-- Interactive map showing hop locations
-- Animated visualization of packet journey
-- Theme selection (Neon, Sketch, Retro)
-- Export as PNG image
+This creates: **"This is MY digital journey from MY home to what I care about"**
 
----
+### For Print-on-Demand Success
 
-## 7. User Flow (Demo)
-
-```
-+-----------+    +-----------+    +-----------+    +-----------+
-|   Enter     |-->|   Run       |-->|   View      |-->|   Export    |
-| Destination |    |  Traceroute |    |   Art       |    |   Image     |
-+-----------+    +-----------+    +-----------+    +-----------+
-      |                  |                  |                  |
-      v                  v                  v                  v
-  "google.com"      [hop data]         [animated map]      [PNG file]
-```
+Users will want to buy prints because:
+1. It's **personal** - shows their location
+2. It's **unique** - their packet route is different from everyone else's
+3. It's **educational** - shows how the internet actually works
+4. It's **art** - beautiful visualization they can display
 
 ---
 
-## 8. Technical Requirements
-
-- Cross-platform: Mobile app (React Native) + Web (React)
-- Backend: Python + FastAPI for traceroute execution
-- Maps: Leaflet + OpenStreetMap (free, no API keys)
-- Image generation: html2canvas or similar
-
----
-
-## 9. Success Criteria (Demo)
-
-- [ ] User can enter any domain or IP
-- [ ] Traceroute completes and returns hop data
-- [ ] Hops displayed on map with correct geographic locations
-- [ ] Packet animation plays smoothly
-- [ ] At least 3 art themes available
-- [ ] Image export works and produces valid PNG
-
----
-
-## 10. Future Considerations
-
-- Print-on-demand integration (Redbubble, Printful API)
-- Real-time monitoring features
-- Network comparison tools
-- Advanced gamification system
-
----
-
-*Last updated: 2026-03-04*
+*Last updated: 2026-03-05*
