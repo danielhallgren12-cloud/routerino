@@ -22,7 +22,7 @@ def get_geoip_batch(ips: List[str]) -> Dict[str, Dict]:
         return results
     
     try:
-        batch_data = [{"query": ip, "fields": "lat,lon,city,countryCode,isp"} for ip in valid_ips]
+        batch_data = [{"query": ip, "fields": "lat,lon,city,countryCode,isp,as,asname"} for ip in valid_ips]
         
         response = requests.post(
             "http://ip-api.com/batch",
@@ -36,17 +36,22 @@ def get_geoip_batch(ips: List[str]) -> Dict[str, Dict]:
                 if i < len(valid_ips):
                     ip = valid_ips[i]
                     if item.get("lat"):
+                        as_number = item.get("as", "")
+                        as_name = item.get("asname", "")
+                        asn = f"{as_number} - {as_name}" if as_number else ""
+                        
                         geo_data = {
                             "country": item.get("countryCode", ""),
                             "city": item.get("city", ""),
                             "lat": item.get("lat"),
                             "lng": item.get("lon"),
-                            "isp": item.get("isp", "")
+                            "isp": item.get("isp", ""),
+                            "asn": asn
                         }
                         geo_cache[ip] = geo_data
                         results[ip] = geo_data
                     else:
-                        results[ip] = {"country": "", "city": "", "lat": None, "lng": None, "isp": ""}
+                        results[ip] = {"country": "", "city": "", "lat": None, "lng": None, "isp": "", "asn": ""}
     
     except Exception:
         pass
@@ -112,6 +117,7 @@ def run_traceroute(destination: str, max_hops: int = 30) -> List[Dict]:
                     "ip": ip_val,
                     "hostname": hostname,
                     "isp": None,
+                    "asn": None,
                     "country": None,
                     "city": None,
                     "lat": None,
@@ -124,6 +130,7 @@ def run_traceroute(destination: str, max_hops: int = 30) -> List[Dict]:
                     "ip": "*",
                     "hostname": hostname,
                     "isp": None,
+                    "asn": None,
                     "country": None,
                     "city": None,
                     "lat": None,
@@ -141,6 +148,7 @@ def run_traceroute(destination: str, max_hops: int = 30) -> List[Dict]:
                 if ip in geo_results:
                     geo = geo_results[ip]
                     hop["isp"] = geo.get("isp")
+                    hop["asn"] = geo.get("asn")
                     hop["country"] = geo.get("country")
                     hop["city"] = geo.get("city")
                     hop["lat"] = geo.get("lat")

@@ -8,6 +8,7 @@ interface Hop {
   ip: string
   hostname?: string
   isp?: string
+  asn?: string
   country?: string
   city?: string
   lat?: number
@@ -260,6 +261,7 @@ function App() {
                               <div key={h.hop}>
                                 Hop {h.hop}: {h.ip}<br />
                                 {h.city && <>{h.city}, {h.country}</>}
+                                {h.asn && <><br />{h.asn}</>}
                                 {h.rtt && (
                                     <>
                                       <br />RTT: <span style={{ color: getLatencyColor(h.rtt) }}>{h.rtt}ms</span>
@@ -295,6 +297,7 @@ function App() {
                             <strong>Hop {hop.hop}</strong><br />
                             IP: {hop.ip}<br />
                             {hop.city && <>{hop.city}, {hop.country}</>}
+                            {hop.asn && <><br />{hop.asn}</>}
                             {hop.rtt && (
                                     <>
                                       <br />RTT: <span style={{ color: getLatencyColor(hop.rtt) }}>{hop.rtt}ms</span>
@@ -355,6 +358,7 @@ function App() {
                 <div className="hop-details">
                   <div className="ip">{hop.ip}</div>
                   {hop.hostname && <div className="hostname">{hop.hostname}</div>}
+                  {hop.asn && <div className="asn">{hop.asn}</div>}
                   {(hop.city || hop.country) && (
                     <div className="location">{[hop.city, hop.country].filter(Boolean).join(', ')}</div>
                   )}

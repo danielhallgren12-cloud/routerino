@@ -10,6 +10,7 @@ class Hop(BaseModel):
     ip: str
     hostname: Optional[str] = None
     isp: Optional[str] = None
+    asn: Optional[str] = None
     country: Optional[str] = None
     city: Optional[str] = None
     lat: Optional[float] = None

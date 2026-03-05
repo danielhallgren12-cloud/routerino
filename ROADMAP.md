@@ -194,9 +194,10 @@ These features were identified by comparing with other traceroute tools (NextTra
   - Red: > 150ms (slow)
   - Applied to: route lines, popup RTT, route details RTT
 
-- [ ] **ASN tracking** - Show Autonomous System numbers along route
-  - Add ASN lookup to GeoIP service
-  - Display AS number + organization (e.g., "AS15169 - Google LLC")
+- [x] **ASN tracking** - Show Autonomous System numbers along route
+  - Shows "AS15169 - Google LLC" format
+  - Displayed in popup and route details
+  - Uses ip-api.com batch API
 
 - [ ] **City-level accuracy** - More precise geolocation
 

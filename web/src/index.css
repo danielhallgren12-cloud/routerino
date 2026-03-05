@@ -177,7 +177,13 @@ body {
 
 .hop-details .hostname {
   color: var(--text-muted);
-  font-size: 0.875rem;
+  font-size: 0.75rem;
+}
+
+.hop-details .asn {
+  color: #a78bfa;
+  font-size: 0.7rem;
+  font-family: monospace;
 }
 
 .hop-details .location {
