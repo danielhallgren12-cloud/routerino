@@ -53,6 +53,7 @@ function MapEvents({ onZoomChange }: { onZoomChange: (zoom: number) => void }) {
 function App() {
   const [destination, setDestination] = useState('')
   const [loading, setLoading] = useState(false)
+  const [loadingDots, setLoadingDots] = useState(0)
   const [error, setError] = useState('')
   const [traceData, setTraceData] = useState<TraceResponse | null>(null)
   const [theme, setTheme] = useState<Theme>('neon')
@@ -92,6 +93,17 @@ function App() {
       mapRef.current.flyTo([selectedHop.lat, selectedHop.lng], 8)
     }
   }, [selectedHop])
+
+  useEffect(() => {
+    if (!loading) {
+      setLoadingDots(0)
+      return
+    }
+    const interval = setInterval(() => {
+      setLoadingDots(prev => (prev + 1) % 3)
+    }, 400)
+    return () => clearInterval(interval)
+  }, [loading])
 
   const getValidHops = (): Hop[] => {
     if (!traceData) return []
@@ -178,8 +190,9 @@ function App() {
             onKeyDown={(e) => e.key === 'Enter' && runTrace()}
           />
           <button onClick={runTrace} disabled={loading || !destination.trim()}>
-            {loading ? 'Tracing...' : 'Trace Route'}
+            {loading ? `Tracing${'.'.repeat(loadingDots + 1)}` : 'Trace Route'}
           </button>
+          {loading && <div className="loading-note">A search takes approx 10-20 sec</div>}
         </div>
 
         {error && <div className="error">{error}</div>}
@@ -198,180 +211,184 @@ function App() {
           </div>
         )}
 
-        <div className="map-container" style={{ height: '500px' }}>
-          {loading && (
-            <div className="loading">Running traceroute...</div>
-          )}
-          
-          {!loading && traceData && validHops.length > 0 && (
-            <MapContainer
-              ref={mapRef}
-              center={[20, 0]}
-              zoom={2}
-              style={{ height: '500px', width: '100%' }}
-            >
-              <MapEvents onZoomChange={setZoomLevel} />
-              <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              />
-              
-              {(() => {
-                const cityGroups: { [key: string]: Hop[] } = {}
+        <div className="content-columns">
+          <div className="map-container">
+            {loading && (
+              <div className="loading">Running traceroute...</div>
+            )}
+            
+            {!loading && traceData && validHops.length > 0 && (
+              <MapContainer
+                ref={mapRef}
+                center={[20, 0]}
+                zoom={2}
+                style={{ height: '100%', width: '100%' }}
+              >
+                <MapEvents onZoomChange={setZoomLevel} />
+                <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
                 
-                validHops.forEach(hop => {
-                  const cityKey = hop.city && hop.country ? `${hop.city},${hop.country}` : `${hop.lat},${hop.lng}`
-                  if (!cityGroups[cityKey]) {
-                    cityGroups[cityKey] = []
-                  }
-                  cityGroups[cityKey].push(hop)
-                })
-                
-                const renderedHops = new Set<number>()
-                
-                return Object.values(cityGroups).map(cityHops => {
-                  const isSameLocation = cityHops.length > 1 && cityHops.every(h => 
-                    Math.abs(h.lat! - cityHops[0].lat!) < 0.01 && Math.abs(h.lng! - cityHops[0].lng!) < 0.01
-                  )
+                {(() => {
+                  const cityGroups: { [key: string]: Hop[] } = {}
                   
-                  const shouldCombine = zoomLevel < 5 || isSameLocation
+                  validHops.forEach(hop => {
+                    const cityKey = hop.city && hop.country ? `${hop.city},${hop.country}` : `${hop.lat},${hop.lng}`
+                    if (!cityGroups[cityKey]) {
+                      cityGroups[cityKey] = []
+                    }
+                    cityGroups[cityKey].push(hop)
+                  })
                   
-                  if (shouldCombine) {
-                    const hopNums = cityHops.map(h => h.hop).sort((a, b) => a - b)
-                    const label = hopNums.join(',')
-                    const hop = cityHops[0]
-                    hopNums.forEach(n => renderedHops.add(n))
+                  const renderedHops = new Set<number>()
+                  
+                  return Object.values(cityGroups).map(cityHops => {
+                    const isSameLocation = cityHops.length > 1 && cityHops.every(h => 
+                      Math.abs(h.lat! - cityHops[0].lat!) < 0.01 && Math.abs(h.lng! - cityHops[0].lng!) < 0.01
+                    )
                     
-                    return (
-                      <Marker
-                        key={`combined-${label}`}
-                        position={[hop.lat!, hop.lng!]}
-                        icon={customIcon(label)}
-                        eventHandlers={{
-                          click: () => {
-                            mapRef.current?.flyTo([hop.lat!, hop.lng!], 8)
-                            setSelectedHop(hop)
-                          }
-                        }}
-                      >
-                        <Popup>
-                          <div style={{ color: '#000' }}>
-                            <strong>Hops {label}</strong><br />
-                            {cityHops.map(h => (
-                              <div key={h.hop}>
-                                Hop {h.hop}: {h.ip}<br />
-                                {h.city && <>{h.city}, {h.country}</>}
-                                {h.asn && <><br />{h.asn}</>}
-                                {h.rtt && (
+                    const shouldCombine = zoomLevel < 5 || isSameLocation
+                    
+                    if (shouldCombine) {
+                      const hopNums = cityHops.map(h => h.hop).sort((a, b) => a - b)
+                      const label = hopNums.join(',')
+                      const hop = cityHops[0]
+                      hopNums.forEach(n => renderedHops.add(n))
+                      
+                      return (
+                        <Marker
+                          key={`combined-${label}`}
+                          position={[hop.lat!, hop.lng!]}
+                          icon={customIcon(label)}
+                          eventHandlers={{
+                            click: () => {
+                              mapRef.current?.flyTo([hop.lat!, hop.lng!], 8)
+                              setSelectedHop(hop)
+                            }
+                          }}
+                        >
+                          <Popup>
+                            <div style={{ color: '#000' }}>
+                              <strong>Hops {label}</strong><br />
+                              {cityHops.map(h => (
+                                <div key={h.hop}>
+                                  Hop {h.hop}: {h.ip}<br />
+                                  {h.city && <>{h.city}, {h.country}</>}
+                                  {h.asn && <><br />{h.asn}</>}
+                                  {h.rtt && (
                                     <>
                                       <br />RTT: <span style={{ color: getLatencyColor(h.rtt) }}>{h.rtt}ms</span>
                                     </>
                                   )}
-                                <hr style={{ margin: '4px 0' }} />
-                              </div>
-                            ))}
-                          </div>
-                        </Popup>
-                      </Marker>
-                    )
-                  }
-                  
-                  return cityHops.map(hop => {
-                    if (renderedHops.has(hop.hop)) return null
-                    renderedHops.add(hop.hop)
+                                  <hr style={{ margin: '4px 0' }} />
+                                </div>
+                              ))}
+                            </div>
+                          </Popup>
+                        </Marker>
+                      )
+                    }
                     
-                    return (
-                      <Marker
-                        key={`single-${hop.hop}`}
-                        position={[hop.lat!, hop.lng!]}
-                        icon={customIcon(hop.hop.toString())}
-                        eventHandlers={{
-                          click: () => {
-                            mapRef.current?.flyTo([hop.lat!, hop.lng!], 8)
-                            setSelectedHop(hop)
-                          }
-                        }}
-                      >
-                        <Popup>
-                          <div style={{ color: '#000' }}>
-                            <strong>Hop {hop.hop}</strong><br />
-                            IP: {hop.ip}<br />
-                            {hop.city && <>{hop.city}, {hop.country}</>}
-                            {hop.asn && <><br />{hop.asn}</>}
-                            {hop.rtt && (
-                                    <>
-                                      <br />RTT: <span style={{ color: getLatencyColor(hop.rtt) }}>{hop.rtt}ms</span>
-                                    </>
-                                  )}
-                          </div>
-                        </Popup>
-                      </Marker>
-                    )
+                    return cityHops.map(hop => {
+                      if (renderedHops.has(hop.hop)) return null
+                      renderedHops.add(hop.hop)
+                      
+                      return (
+                        <Marker
+                          key={`single-${hop.hop}`}
+                          position={[hop.lat!, hop.lng!]}
+                          icon={customIcon(hop.hop.toString())}
+                          eventHandlers={{
+                            click: () => {
+                              mapRef.current?.flyTo([hop.lat!, hop.lng!], 8)
+                              setSelectedHop(hop)
+                            }
+                          }}
+                        >
+                          <Popup>
+                            <div style={{ color: '#000' }}>
+                              <strong>Hop {hop.hop}</strong><br />
+                              IP: {hop.ip}<br />
+                              {hop.city && <>{hop.city}, {hop.country}</>}
+                              {hop.asn && <><br />{hop.asn}</>}
+                              {hop.rtt && (
+                                <>
+                                  <br />RTT: <span style={{ color: getLatencyColor(hop.rtt) }}>{hop.rtt}ms</span>
+                                </>
+                              )}
+                            </div>
+                          </Popup>
+                        </Marker>
+                      )
+                    })
                   })
-                })
-              })()}
+                })()}
                
-              {routeCoords.slice(0, -1).map((start, i) => {
-                const end = routeCoords[i + 1]
-                const hopRtt = validHops[i + 1]?.rtt
-                const segmentColor = getLatencyColor(hopRtt)
+                {routeCoords.slice(0, -1).map((start, i) => {
+                  const end = routeCoords[i + 1]
+                  const hopRtt = validHops[i + 1]?.rtt
+                  const segmentColor = getLatencyColor(hopRtt)
 
-                return (
-                  <Polyline
-                    key={i}
-                    positions={[start, end]}
-                    color={segmentColor}
-                    weight={3}
-                    opacity={0.8}
-                    dashArray={theme === 'retro' ? '10, 10' : undefined}
-                  />
-                )
-              })}
-            </MapContainer>
-          )}
-          
-          {!loading && traceData && validHops.length === 0 && (
-            <div className="loading">No map data. Showing route details below...</div>
-          )}
-          
-          {!loading && !traceData && (
-            <div className="loading">Enter a destination to trace your route</div>
+                  return (
+                    <Polyline
+                      key={i}
+                      positions={[start, end]}
+                      color={segmentColor}
+                      weight={3}
+                      opacity={0.8}
+                      dashArray={theme === 'retro' ? '10, 10' : undefined}
+                    />
+                  )
+                })}
+              </MapContainer>
+            )}
+            
+            {!loading && traceData && validHops.length === 0 && (
+              <div className="loading">No map data. Showing route details below...</div>
+            )}
+            
+            {!loading && !traceData && (
+              <div className="loading">Enter a destination to trace your route</div>
+            )}
+          </div>
+
+          {traceData && traceData.hops.length > 0 && (
+            <div className="hop-list">
+              <h3>Route Details</h3>
+              {traceData.hops.map(hop => (
+                <div 
+                  key={hop.hop} 
+                  className="hop-item"
+                  onClick={() => {
+                    if (hop.lat && hop.lng) {
+                      mapRef.current?.flyTo([hop.lat, hop.lng], 8)
+                      setSelectedHop(hop)
+                    }
+                  }}
+                  style={{ cursor: hop.lat && hop.lng ? 'pointer' : 'default' }}
+                >
+                  <div className="hop-number">{hop.hop}</div>
+                  <div className="hop-details">
+                    <div className="ip">{hop.ip}</div>
+                    {hop.hostname && <div className="hostname">{hop.hostname}</div>}
+                    {hop.asn && <div className="asn">{hop.asn}</div>}
+                    {(hop.city || hop.country) && (
+                      <div className="location-row">
+                        <span className="location">{[hop.city, hop.country].filter(Boolean).join(', ')}</span>
+                        {hop.rtt && (
+                          <span className="hop-rtt" style={{ color: getLatencyColor(hop.rtt) }}>
+                            {hop.rtt}ms
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
         </div>
-
-        {traceData && traceData.hops.length > 0 && (
-          <div className="hop-list">
-            <h3>Route Details</h3>
-            {traceData.hops.map(hop => (
-              <div 
-                key={hop.hop} 
-                className="hop-item"
-                onClick={() => {
-                  if (hop.lat && hop.lng) {
-                    mapRef.current?.flyTo([hop.lat, hop.lng], 8)
-                    setSelectedHop(hop)
-                  }
-                }}
-                style={{ cursor: hop.lat && hop.lng ? 'pointer' : 'default' }}
-              >
-                <div className="hop-number">{hop.hop}</div>
-                <div className="hop-details">
-                  <div className="ip">{hop.ip}</div>
-                  {hop.hostname && <div className="hostname">{hop.hostname}</div>}
-                  {hop.asn && <div className="asn">{hop.asn}</div>}
-                  {(hop.city || hop.country) && (
-                    <div className="location">{[hop.city, hop.country].filter(Boolean).join(', ')}</div>
-                  )}
-                </div>
-                {hop.rtt && (
-                  <div className="hop-rtt" style={{ color: getLatencyColor(hop.rtt) }}>
-                    {hop.rtt}ms
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
       </main>
     </div>
   )
