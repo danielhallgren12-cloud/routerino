@@ -188,10 +188,11 @@ These features were identified by comparing with other traceroute tools (NextTra
 
 ### High Priority
 
-- [ ] **Color-coded latency** - Green/yellow/red markers based on RTT
+- [x] **Color-coded latency** - Green/yellow/red markers based on RTT
   - Green: < 50ms (fast)
   - Yellow: 50-150ms (moderate)
   - Red: > 150ms (slow)
+  - Applied to: route lines, popup RTT, route details RTT
 
 - [ ] **ASN tracking** - Show Autonomous System numbers along route
   - Add ASN lookup to GeoIP service

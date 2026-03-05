@@ -22,6 +22,13 @@ interface TraceResponse {
   created_at: string
 }
 
+const getLatencyColor = (rtt?: number) => {
+  if (!rtt) return '#888888'
+  if (rtt < 50) return '#22c55e'
+  if (rtt <= 150) return '#eab308'
+  return '#ef4444'
+}
+
 const themes = {
   neon: { color: '#00d4ff', lineColor: '#ff00aa' },
   retro: { color: '#ff6b35', lineColor: '#f7c59f' },
@@ -253,7 +260,11 @@ function App() {
                               <div key={h.hop}>
                                 Hop {h.hop}: {h.ip}<br />
                                 {h.city && <>{h.city}, {h.country}</>}
-                                {h.rtt && <><br />RTT: {h.rtt}ms</>}
+                                {h.rtt && (
+                                    <>
+                                      <br />RTT: <span style={{ color: getLatencyColor(h.rtt) }}>{h.rtt}ms</span>
+                                    </>
+                                  )}
                                 <hr style={{ margin: '4px 0' }} />
                               </div>
                             ))}
@@ -284,7 +295,11 @@ function App() {
                             <strong>Hop {hop.hop}</strong><br />
                             IP: {hop.ip}<br />
                             {hop.city && <>{hop.city}, {hop.country}</>}
-                            {hop.rtt && <><br />RTT: {hop.rtt}ms</>}
+                            {hop.rtt && (
+                                    <>
+                                      <br />RTT: <span style={{ color: getLatencyColor(hop.rtt) }}>{hop.rtt}ms</span>
+                                    </>
+                                  )}
                           </div>
                         </Popup>
                       </Marker>
@@ -293,13 +308,22 @@ function App() {
                 })
               })()}
                
-              <Polyline
-                positions={routeCoords}
-                color={themes[theme].lineColor}
-                weight={3}
-                opacity={0.8}
-                dashArray={theme === 'retro' ? '10, 10' : undefined}
-              />
+              {routeCoords.slice(0, -1).map((start, i) => {
+                const end = routeCoords[i + 1]
+                const hopRtt = validHops[i + 1]?.rtt
+                const segmentColor = getLatencyColor(hopRtt)
+
+                return (
+                  <Polyline
+                    key={i}
+                    positions={[start, end]}
+                    color={segmentColor}
+                    weight={3}
+                    opacity={0.8}
+                    dashArray={theme === 'retro' ? '10, 10' : undefined}
+                  />
+                )
+              })}
             </MapContainer>
           )}
           
@@ -335,7 +359,11 @@ function App() {
                     <div className="location">{[hop.city, hop.country].filter(Boolean).join(', ')}</div>
                   )}
                 </div>
-                {hop.rtt && <div className="hop-rtt">{hop.rtt}ms</div>}
+                {hop.rtt && (
+                  <div className="hop-rtt" style={{ color: getLatencyColor(hop.rtt) }}>
+                    {hop.rtt}ms
+                  </div>
+                )}
               </div>
             ))}
           </div>
