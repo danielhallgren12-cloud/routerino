@@ -182,4 +182,72 @@ This roadmap outlines the development phases for RouteCanvas, from initial demo 
 
 ---
 
+## Future Improvements - High Priority
+
+These features were identified by comparing with other traceroute tools (NextTrace, Trippy, VisualRoute):
+
+### High Priority
+
+- [ ] **Color-coded latency** - Green/yellow/red markers based on RTT
+  - Green: < 50ms (fast)
+  - Yellow: 50-150ms (moderate)
+  - Red: > 150ms (slow)
+
+- [ ] **ASN tracking** - Show Autonomous System numbers along route
+  - Add ASN lookup to GeoIP service
+  - Display AS number + organization (e.g., "AS15169 - Google LLC")
+
+- [ ] **City-level accuracy** - More precise geolocation
+
+### Medium Priority
+
+- [ ] **Export as image** - Save route visualization as PNG
+- [ ] **Continuous ping mode** - Monitor latency continuously
+- [ ] **Multiple destination comparison** - Compare routes side-by-side
+
+### Lower Priority / Future Ideas
+
+- [ ] Faster probing (parallel probes like NextTrace)
+- [ ] WHOIS integration
+- [ ] Route animation (traveling icon)
+- [ ] IPv6 support
+- [ ] Historical route comparison
+
+---
+
+## Honest Limitations
+
+Be transparent about what RouteCanvas can and cannot do:
+
+### Same Limitations as ALL Traceroute Tools
+
+| Limitation | Explanation |
+|------------|-------------|
+| **Timeout hops** | Cannot show hops that return `*` (no response) |
+| **Internal routing** | Cannot see company internal network infrastructure |
+| **Exact path** | Only shows responding hops - true path may differ |
+| **Dynamic routes** | BGP routes change constantly - each trace is a snapshot |
+
+### RouteCanvas Advantages
+
+| Feature | Advantage |
+|---------|-----------|
+| **Visual map** | Clear geographic visualization |
+| **Art themes** | Unique creative angle - no other tool does this |
+| **Animated journey** | Educational + engaging |
+| **Speed** | Batch GeoIP = ~15 seconds for 15 hops |
+
+---
+
+## How RouteCanvas Differs from Other Tools
+
+| Feature | Other Tools | RouteCanvas |
+|---------|-------------|-------------|
+| Route visualization | Basic maps | Animated journey + Art themes |
+| Creative output | None | Route art generation |
+| Styling | Standard | Multiple themes (neon, retro, minimal) |
+| Speed | Varies | Batch GeoIP = fast |
+
+---
+
 *Last updated: 2026-03-04*
