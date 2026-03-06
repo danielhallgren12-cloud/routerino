@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { MapContainer, TileLayer, Marker, Polyline, Popup, useMapEvents } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import html2canvas from 'html2canvas'
 
 interface Hop {
   hop: number
@@ -85,6 +86,27 @@ function App() {
       console.error(err)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const exportImage = async () => {
+    const mapElement = document.querySelector('.leaflet-container') as HTMLElement
+    if (!mapElement) return
+
+    try {
+      const canvas = await html2canvas(mapElement, {
+        useCORS: true,
+        scale: 2,
+        backgroundColor: '#0a0a0f'
+      })
+      
+      const link = document.createElement('a')
+      link.download = `route-to-${destination.replace(/[^a-z0-9]/gi, '-')}-${Date.now()}.png`
+      link.href = canvas.toDataURL('image/png')
+      link.click()
+    } catch (err) {
+      console.error('Export failed:', err)
+      setError('Failed to export image. Please try again.')
     }
   }
 
@@ -192,6 +214,11 @@ function App() {
           <button onClick={runTrace} disabled={loading || !destination.trim()}>
             {loading ? `Tracing${'.'.repeat(loadingDots + 1)}` : 'Trace Route'}
           </button>
+          {traceData && validHops.length > 0 && (
+            <button onClick={exportImage} className="export-button">
+              📸 Export Image
+            </button>
+          )}
           {loading && <div className="loading-note">A search takes approx 10-20 sec</div>}
         </div>
 

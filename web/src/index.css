@@ -139,6 +139,22 @@ body {
   padding-left: 0.25rem;
 }
 
+.export-button {
+  padding: 0.75rem 1rem;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+.export-button:hover {
+  transform: translateY(-2px);
+}
+
 .map-container {
   flex: 1;
   min-height: 400px;
