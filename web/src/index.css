@@ -155,10 +155,6 @@ body {
   transform: translateY(-2px);
 }
 
-.leaflet-tile-pane {
-  filter: drop-shadow(0 0 2px rgba(0, 212, 255, 0.3));
-}
-
 .map-container {
   flex: 1;
   min-height: 400px;
