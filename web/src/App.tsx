@@ -237,16 +237,16 @@ function App() {
     html: `<div style="
       width: 26px;
       height: 26px;
-      background: #ff00aa;
+      background: #00d4ff;
       border-radius: 50% 50% 50% 0;
       transform: rotate(-45deg);
       border: 2px solid white;
-      box-shadow: 0 0 8px #ff00aa, 0 0 16px #ff00aa;
+      box-shadow: 0 0 8px #00d4ff, 0 0 16px #00d4ff;
       display: flex;
       align-items: center;
       justify-content: center;
     ">
-      <div style="transform: rotate(45deg); color: white; font-size: 11px;">📍</div>
+      <div style="transform: rotate(45deg); color: #0a0a0f; font-size: 11px;">📍</div>
     </div>`,
     iconSize: [26, 26],
     iconAnchor: [13, 26]
@@ -432,7 +432,7 @@ function App() {
                       [userLocation.lat, userLocation.lng],
                       [validHops[0].lat!, validHops[0].lng!]
                     ]}
-                    color="#ff00aa"
+                    color="#00d4ff"
                     weight={2}
                     opacity={0.6}
                     dashArray="10, 10"
