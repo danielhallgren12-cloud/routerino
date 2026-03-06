@@ -60,6 +60,7 @@ function App() {
   const [theme, setTheme] = useState<Theme>('neon')
   const [zoomLevel, setZoomLevel] = useState(2)
   const [selectedHop, setSelectedHop] = useState<Hop | null>(null)
+  const [userLocation, setUserLocation] = useState<{lat: number, lng: number, city?: string, country?: string} | null>(null)
   const mapRef = useRef<L.Map | null>(null)
 
   const runTrace = async () => {
@@ -126,6 +127,41 @@ function App() {
     }, 400)
     return () => clearInterval(interval)
   }, [loading])
+
+  useEffect(() => {
+    if (!navigator.geolocation) return
+    
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords
+        try {
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+          )
+          const data = await response.json()
+          const address = data.address
+          const city = address.city || address.town || address.village || address.municipality || address.county || 'Unknown'
+          const country = address.country_code?.toUpperCase() || ''
+          setUserLocation({
+            lat: latitude,
+            lng: longitude,
+            city: city,
+            country: country
+          })
+        } catch {
+          setUserLocation({
+            lat: latitude,
+            lng: longitude,
+            city: 'Unknown',
+            country: ''
+          })
+        }
+      },
+      () => {
+        // User denied or error - no location
+      }
+    )
+  }, [])
 
   const getValidHops = (): Hop[] => {
     if (!traceData) return []
@@ -196,6 +232,26 @@ function App() {
     iconAnchor: [15, 12]
   })
 
+  const homeIcon = L.divIcon({
+    className: 'home-marker',
+    html: `<div style="
+      width: 26px;
+      height: 26px;
+      background: #ff00aa;
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      border: 2px solid white;
+      box-shadow: 0 0 8px #ff00aa, 0 0 16px #ff00aa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    ">
+      <div style="transform: rotate(45deg); color: white; font-size: 11px;">📍</div>
+    </div>`,
+    iconSize: [26, 26],
+    iconAnchor: [13, 26]
+  })
+
   return (
     <div className="app">
       <header className="header">
@@ -220,6 +276,7 @@ function App() {
             </button>
           )}
           {loading && <div className="loading-note">A search takes approx 10-20 sec</div>}
+          <div className="privacy-note">🔒 Your location is only used to show where your packets start. We don't store it.</div>
         </div>
 
         {error && <div className="error">{error}</div>}
@@ -351,8 +408,8 @@ function App() {
                     })
                   })
                 })()}
-               
-                {routeCoords.slice(0, -1).map((start, i) => {
+
+                {routeCoords.length > 1 && routeCoords.slice(0, -1).map((start, i) => {
                   const end = routeCoords[i + 1]
                   const hopRtt = validHops[i + 1]?.rtt
                   const segmentColor = getLatencyColor(hopRtt)
@@ -368,6 +425,39 @@ function App() {
                     />
                   )
                 })}
+
+                {userLocation && validHops.length > 0 && validHops[0] && (
+                  <Polyline
+                    positions={[
+                      [userLocation.lat, userLocation.lng],
+                      [validHops[0].lat!, validHops[0].lng!]
+                    ]}
+                    color="#ff00aa"
+                    weight={2}
+                    opacity={0.6}
+                    dashArray="10, 10"
+                  />
+                )}
+
+                {userLocation && (
+                  <Marker
+                    position={[userLocation.lat, userLocation.lng]}
+                    icon={homeIcon}
+                    eventHandlers={{
+                      click: () => {
+                        mapRef.current?.flyTo([userLocation.lat, userLocation.lng], 10)
+                        setSelectedHop({ lat: userLocation.lat, lng: userLocation.lng, hop: 0, ip: 'You' } as Hop)
+                      }
+                    }}
+                  >
+                    <Popup>
+                      <div style={{ color: '#000' }}>
+                        <strong>📍 Your Location</strong><br />
+                        {userLocation.city}, {userLocation.country}
+                      </div>
+                    </Popup>
+                  </Marker>
+                )}
               </MapContainer>
             )}
             
@@ -383,6 +473,20 @@ function App() {
           {traceData && traceData.hops.length > 0 && (
             <div className="hop-list">
               <h3>Route Details</h3>
+              {userLocation && (
+                <div 
+                  className="user-location-header"
+                  onClick={() => {
+                    if (userLocation) {
+                      mapRef.current?.flyTo([userLocation.lat, userLocation.lng], 10)
+                      setSelectedHop({ lat: userLocation.lat, lng: userLocation.lng, hop: 0, ip: 'You' } as Hop)
+                    }
+                  }}
+                  style={{ cursor: 'pointer' }}
+                >
+                  📍 Your Location: {userLocation.city}, {userLocation.country}
+                </div>
+              )}
               {traceData.hops.map(hop => (
                 <div 
                   key={hop.hop} 
