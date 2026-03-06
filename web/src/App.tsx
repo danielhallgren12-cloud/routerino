@@ -217,43 +217,100 @@ function App() {
     }
   }, [animationHop, animationProgress])
 
-  // Animation effect
+  // Calculate distance between two points in km
+  const getDistance = (lat1: number, lng1: number, lat2: number, lng2: number) => {
+    const R = 6371 // Earth's radius in km
+    const dLat = (lat2 - lat1) * Math.PI / 180
+    const dLng = (lng2 - lng1) * Math.PI / 180
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLng/2) * Math.sin(dLng/2)
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+    return R * c
+  }
+
+  // Get hop times based on distance
+  const getHopTime = (fromLat: number, fromLng: number, toLat: number, toLng: number, speed: number) => {
+    const distance = getDistance(fromLat, fromLng, toLat, toLng)
+    // Speed: slow=5000ms per 1000km, medium=2500ms per 1000km, fast=1000ms per 1000km
+    const baseTime = speed === 0.25 ? 5000 : speed === 0.5 ? 2500 : 1000
+    return Math.max(1000, (distance / 1000) * baseTime) // Minimum 1000ms
+  }
+
+  // Animation effect with distance-based timing
   useEffect(() => {
-    if (!isPlaying || validHops.length === 0) return
+    if (!isPlaying || validHops.length === 0 || !userLocation) return
     
-    const hopTime = 1500 / animationSpeed
-    const progressTime = 50 // Update position every 50ms for smooth animation
-    
+    let currentHopIndex = -1 // -1 = home to first hop, 0 = first hop to second, etc.
     let progress = 0
     
-    const progressInterval = setInterval(() => {
-      progress += progressTime / hopTime
+    // Fly to first hop at start
+    if (mapRef.current) {
+      mapRef.current.flyTo([validHops[0].lat!, validHops[0].lng!], 6, { duration: 1 })
+    }
+    
+    const animate = () => {
+      // Get current segment coordinates
+      let fromLat: number, fromLng: number, toLat: number, toLng: number
+      
+      if (currentHopIndex === -1) {
+        // Home to first hop
+        fromLat = userLocation.lat
+        fromLng = userLocation.lng
+        toLat = validHops[0].lat!
+        toLng = validHops[0].lng!
+      } else if (currentHopIndex < validHops.length - 1) {
+        // Between hop N and N+1
+        fromLat = validHops[currentHopIndex].lat!
+        fromLng = validHops[currentHopIndex].lng!
+        toLat = validHops[currentHopIndex + 1].lat!
+        toLng = validHops[currentHopIndex + 1].lng!
+      } else {
+        // Done - at last hop
+        setIsPlaying(false)
+        return
+      }
+      
+      const segmentTime = getHopTime(fromLat, fromLng, toLat, toLng, animationSpeed)
+      const progressTime = 50
+      
+      progress += progressTime / segmentTime
       
       if (progress >= 1) {
+        // Move to next segment
         progress = 0
-        setAnimationHop(prev => {
-          if (prev < validHops.length - 1) {
-            return prev + 1
-          } else {
-            setIsPlaying(false)
-            return prev
-          }
-        })
-      } else {
-        setAnimationProgress(progress)
+        currentHopIndex++
+        
+        if (currentHopIndex >= validHops.length - 1) {
+          // Reached the end
+          setAnimationHop(validHops.length - 1)
+          setIsPlaying(false)
+          return
+        }
+        
+        // Fly to next hop
+        const nextHop = validHops[currentHopIndex + 1]
+        if (nextHop && mapRef.current) {
+          const flyDuration = getHopTime(
+            validHops[currentHopIndex].lat!,
+            validHops[currentHopIndex].lng!,
+            nextHop.lat!,
+            nextHop.lng!,
+            animationSpeed
+          ) / 1000
+          mapRef.current.flyTo([nextHop.lat!, nextHop.lng!], 6, { duration: Math.max(1, flyDuration * 0.8) })
+        }
+        
+        setAnimationHop(currentHopIndex)
       }
-    }, progressTime)
+      
+      setAnimationProgress(progress)
+    }
     
-    return () => clearInterval(progressInterval)
-  }, [isPlaying, animationSpeed, validHops.length])
-
-  // Smooth camera following the packet
-  useEffect(() => {
-    if (!packetPosition || !mapRef.current) return
+    const intervalId = setInterval(animate, 50)
     
-    // Smooth pan to follow packet
-    mapRef.current.panTo(packetPosition, { animate: true, duration: 0.3 })
-  }, [packetPosition])
+    return () => clearInterval(intervalId)
+  }, [isPlaying, animationSpeed, validHops.length, userLocation])
 
   useEffect(() => {
     if (animationHop >= 0) {
@@ -333,28 +390,16 @@ function App() {
   const packetIcon = L.divIcon({
     className: 'packet-marker',
     html: `<div style="
-      width: 24px;
-      height: 18px;
-      background: white;
-      border-radius: 2px;
-      border: 2px solid #00d4ff;
-      box-shadow: 0 0 8px #00d4ff, 0 0 16px #00d4ff;
-      position: relative;
-    ">
-      <div style="
-        position: absolute;
-        top: 2px;
-        left: 2px;
-        right: 2px;
-        bottom: 6px;
-        border-bottom: 2px solid #00d4ff;
-        border-left: 2px solid transparent;
-        border-right: 2px solid transparent;
-        border-top: 2px solid transparent;
-      "></div>
-    </div>`,
-    iconSize: [24, 18],
-    iconAnchor: [12, 9]
+      width: 28px;
+      height: 28px;
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-shadow: 0 0 10px #00d4ff, 0 0 20px #00d4ff;
+    ">📨</div>`,
+    iconSize: [28, 28],
+    iconAnchor: [14, 14]
   })
 
   return (
@@ -415,9 +460,9 @@ function App() {
             </div>
             <div className="speed-controls">
               <span>Speed:</span>
-              <button className={animationSpeed === 0.5 ? 'active' : ''} onClick={() => setAnimationSpeed(0.5)}>Slow</button>
-              <button className={animationSpeed === 1 ? 'active' : ''} onClick={() => setAnimationSpeed(1)}>Med</button>
-              <button className={animationSpeed === 2 ? 'active' : ''} onClick={() => setAnimationSpeed(2)}>Fast</button>
+              <button className={animationSpeed === 0.25 ? 'active' : ''} onClick={() => setAnimationSpeed(0.25)}>Slow</button>
+              <button className={animationSpeed === 0.5 ? 'active' : ''} onClick={() => setAnimationSpeed(0.5)}>Med</button>
+              <button className={animationSpeed === 1 ? 'active' : ''} onClick={() => setAnimationSpeed(1)}>Fast</button>
             </div>
           </div>
         )}
