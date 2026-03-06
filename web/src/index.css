@@ -176,6 +176,70 @@ body {
   transform: translateY(-2px);
 }
 
+.animation-controls {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 0.75rem;
+  background: var(--bg-card);
+  border-bottom: 1px solid #333;
+  flex-wrap: wrap;
+}
+
+.playback-controls, .speed-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.playback-controls button {
+  padding: 0.4rem 0.6rem;
+  background: var(--bg-dark);
+  border: 1px solid #444;
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.playback-controls button:hover:not(:disabled) {
+  border-color: var(--primary);
+  background: rgba(0, 212, 255, 0.1);
+}
+
+.playback-controls button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.speed-controls span {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  margin-right: 0.25rem;
+}
+
+.speed-controls button {
+  padding: 0.3rem 0.6rem;
+  background: var(--bg-dark);
+  border: 1px solid #444;
+  border-radius: 4px;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.speed-controls button:hover {
+  border-color: var(--primary);
+}
+
+.speed-controls button.active {
+  background: var(--primary);
+  color: var(--bg-dark);
+  border-color: var(--primary);
+}
+
 .map-container {
   flex: 1;
   min-height: 400px;

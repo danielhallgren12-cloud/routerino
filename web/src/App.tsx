@@ -61,6 +61,12 @@ function App() {
   const [zoomLevel, setZoomLevel] = useState(2)
   const [selectedHop, setSelectedHop] = useState<Hop | null>(null)
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number, city?: string, country?: string} | null>(null)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [animationHop, setAnimationHop] = useState(-1)
+  const [animationProgress, setAnimationProgress] = useState(0) // 0-1 between hops
+  const [animationSpeed, setAnimationSpeed] = useState(1)
+  const [showPacket, setShowPacket] = useState(false)
+  const [packetPosition, setPacketPosition] = useState<[number, number] | null>(null)
   const mapRef = useRef<L.Map | null>(null)
 
   const runTrace = async () => {
@@ -68,6 +74,9 @@ function App() {
     
     setLoading(true)
     setError('')
+    setAnimationHop(-1)
+    setIsPlaying(false)
+    setShowPacket(false)
     
     try {
       const response = await fetch('/api/v1/trace', {
@@ -158,17 +167,108 @@ function App() {
         }
       },
       () => {
-        // User denied or error - no location
+        // User denied or error
       }
     )
   }, [])
 
-  const getValidHops = (): Hop[] => {
-    if (!traceData) return []
-    return traceData.hops.filter(h => h.ip && h.ip !== '*')
+  // Define validHops first
+  const validHops = traceData ? traceData.hops.filter(h => h.ip && h.ip !== '*') : []
+
+  // Calculate packet position between current and next hop
+  const getPacketPosition = (): [number, number] | null => {
+    if (animationHop === -1 && userLocation && validHops.length > 0) {
+      // Starting from home to first hop
+      const startLat = userLocation.lat
+      const startLng = userLocation.lng
+      const endLat = validHops[0].lat!
+      const endLng = validHops[0].lng!
+      return [
+        startLat + (endLat - startLat) * animationProgress,
+        startLng + (endLng - startLng) * animationProgress
+      ]
+    }
+    
+    if (animationHop >= 0 && animationHop < validHops.length - 1) {
+      // Between hop N and N+1
+      const startLat = validHops[animationHop].lat!
+      const startLng = validHops[animationHop].lng!
+      const endLat = validHops[animationHop + 1].lat!
+      const endLng = validHops[animationHop + 1].lng!
+      return [
+        startLat + (endLat - startLat) * animationProgress,
+        startLng + (endLng - startLng) * animationProgress
+      ]
+    }
+    
+    if (animationHop >= 0 && animationHop < validHops.length) {
+      // At a hop
+      return [validHops[animationHop].lat!, validHops[animationHop].lng!]
+    }
+    
+    return null
   }
 
-  const validHops = getValidHops()
+  // Update packet position when animation changes
+  useEffect(() => {
+    const pos = getPacketPosition()
+    if (pos) {
+      setPacketPosition(pos)
+    }
+  }, [animationHop, animationProgress])
+
+  // Animation effect
+  useEffect(() => {
+    if (!isPlaying || validHops.length === 0) return
+    
+    const hopTime = 1500 / animationSpeed
+    const progressTime = 50 // Update position every 50ms for smooth animation
+    
+    let progress = 0
+    
+    const progressInterval = setInterval(() => {
+      progress += progressTime / hopTime
+      
+      if (progress >= 1) {
+        progress = 0
+        setAnimationHop(prev => {
+          if (prev < validHops.length - 1) {
+            return prev + 1
+          } else {
+            setIsPlaying(false)
+            return prev
+          }
+        })
+      } else {
+        setAnimationProgress(progress)
+      }
+    }, progressTime)
+    
+    return () => clearInterval(progressInterval)
+  }, [isPlaying, animationSpeed, validHops.length])
+
+  // Smooth camera following the packet
+  useEffect(() => {
+    if (!packetPosition || !mapRef.current) return
+    
+    // Smooth pan to follow packet
+    mapRef.current.panTo(packetPosition, { animate: true, duration: 0.3 })
+  }, [packetPosition])
+
+  useEffect(() => {
+    if (animationHop >= 0) {
+      setShowPacket(true)
+    }
+  }, [animationHop])
+
+  useEffect(() => {
+    if (traceData) {
+      setAnimationHop(-1)
+      setIsPlaying(false)
+      setShowPacket(false)
+    }
+  }, [traceData])
+
   const routeCoords = validHops.map(h => [h.lat!, h.lng!] as [number, number])
 
   const getHopGroup = () => {
@@ -187,28 +287,6 @@ function App() {
   }
 
   const hopGroups = getHopGroup()
-
-  const getMarkerLabel = (lat: number, lng: number) => {
-    const cityKey = Object.keys(hopGroups).find(key => {
-      const group = hopGroups[key]
-      return group.lat === lat && group.lng === lng
-    })
-    
-    if (cityKey) {
-      const hops = hopGroups[cityKey].hops
-      if (hops.length > 1) {
-        return hops.sort((a, b) => a - b).join(',')
-      }
-      return hops[0].toString()
-    }
-    return ''
-  }
-
-  const shouldCombineMarkers = (lat1: number, lng1: number, lat2: number, lng2: number) => {
-    const latDiff = Math.abs(lat1 - lat2)
-    const lngDiff = Math.abs(lng1 - lng2)
-    return latDiff < 0.1 && lngDiff < 0.1
-  }
 
   const customIcon = (label: string) => L.divIcon({
     className: 'custom-marker',
@@ -252,6 +330,33 @@ function App() {
     iconAnchor: [13, 26]
   })
 
+  const packetIcon = L.divIcon({
+    className: 'packet-marker',
+    html: `<div style="
+      width: 24px;
+      height: 18px;
+      background: white;
+      border-radius: 2px;
+      border: 2px solid #00d4ff;
+      box-shadow: 0 0 8px #00d4ff, 0 0 16px #00d4ff;
+      position: relative;
+    ">
+      <div style="
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        right: 2px;
+        bottom: 6px;
+        border-bottom: 2px solid #00d4ff;
+        border-left: 2px solid transparent;
+        border-right: 2px solid transparent;
+        border-top: 2px solid transparent;
+      "></div>
+    </div>`,
+    iconSize: [24, 18],
+    iconAnchor: [12, 9]
+  })
+
   return (
     <div className="app">
       <header className="header">
@@ -292,6 +397,28 @@ function App() {
                 {t.charAt(0).toUpperCase() + t.slice(1)}
               </button>
             ))}
+          </div>
+        )}
+
+        {traceData && validHops.length > 0 && (
+          <div className="animation-controls">
+            <div className="playback-controls">
+              <button onClick={() => { setAnimationHop(-1); setIsPlaying(false); }} title="Reset">🔄</button>
+              <button onClick={() => { 
+                setIsPlaying(!isPlaying); 
+                if (animationHop >= validHops.length - 1) setAnimationHop(-1);
+              }} title={isPlaying ? 'Pause' : 'Play'}>
+                {isPlaying ? '⏸️' : '▶️'}
+              </button>
+              <button onClick={() => setAnimationHop(Math.max(-1, animationHop - 1))} title="Previous" disabled={animationHop <= -1}>⏮️</button>
+              <button onClick={() => setAnimationHop(Math.min(validHops.length - 1, animationHop + 1))} title="Next" disabled={animationHop >= validHops.length - 1}>⏭️</button>
+            </div>
+            <div className="speed-controls">
+              <span>Speed:</span>
+              <button className={animationSpeed === 0.5 ? 'active' : ''} onClick={() => setAnimationSpeed(0.5)}>Slow</button>
+              <button className={animationSpeed === 1 ? 'active' : ''} onClick={() => setAnimationSpeed(1)}>Med</button>
+              <button className={animationSpeed === 2 ? 'active' : ''} onClick={() => setAnimationSpeed(2)}>Fast</button>
+            </div>
           </div>
         )}
 
@@ -454,6 +581,47 @@ function App() {
                       <div style={{ color: '#000' }}>
                         <strong>📍 Your Location</strong><br />
                         {userLocation.city}, {userLocation.country}
+                      </div>
+                    </Popup>
+                  </Marker>
+                )}
+
+                {showPacket && userLocation && animationHop === -1 && packetPosition && (
+                  <Marker
+                    position={packetPosition}
+                    icon={packetIcon}
+                    zIndexOffset={1000}
+                  >
+                    <Popup>
+                      <div style={{ color: '#000' }}>
+                        <strong>Packet Starting</strong><br />
+                        From: {userLocation.city}, {userLocation.country}
+                      </div>
+                    </Popup>
+                  </Marker>
+                )}
+
+                {showPacket && animationHop >= 0 && validHops[animationHop] && packetPosition && (
+                  <Marker
+                    position={packetPosition}
+                    icon={packetIcon}
+                    zIndexOffset={1000}
+                    eventHandlers={{
+                      click: () => {
+                        setSelectedHop(validHops[animationHop])
+                      }
+                    }}
+                  >
+                    <Popup>
+                      <div style={{ color: '#000' }}>
+                        <strong>Hop {validHops[animationHop].hop}</strong><br />
+                        IP: {validHops[animationHop].ip}<br />
+                        {validHops[animationHop].city && <>{validHops[animationHop].city}, {validHops[animationHop].country}</>}
+                        {validHops[animationHop].rtt && (
+                          <>
+                            <br />RTT: <span style={{ color: getLatencyColor(validHops[animationHop].rtt) }}>{validHops[animationHop].rtt}ms</span>
+                          </>
+                        )}
                       </div>
                     </Popup>
                   </Marker>
