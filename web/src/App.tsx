@@ -432,8 +432,8 @@ function App() {
                       [userLocation.lat, userLocation.lng],
                       [validHops[0].lat!, validHops[0].lng!]
                     ]}
-                    color="#c084fc"
-                    weight={2}
+                    color="#ff69b4"
+                    weight={3}
                     opacity={0.9}
                     dashArray="10, 10"
                   />
