@@ -3,6 +3,9 @@ import { MapContainer, TileLayer, Marker, Polyline, Popup, useMapEvents } from '
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import html2canvas from 'html2canvas'
+import { AuthProvider, useAuth } from './auth/AuthContext'
+import { LoginForm, RegisterForm } from './auth/forms'
+import { routesApi } from './auth/api'
 
 interface Hop {
   hop: number
@@ -52,6 +55,7 @@ function MapEvents({ onZoomChange }: { onZoomChange: (zoom: number) => void }) {
 }
 
 function App() {
+  const { user, token, logout, isAuthenticated } = useAuth()
   const [destination, setDestination] = useState('')
   const [loading, setLoading] = useState(false)
   const [loadingDots, setLoadingDots] = useState(0)
@@ -67,6 +71,11 @@ function App() {
   const [animationSpeed, setAnimationSpeed] = useState(1)
   const [showPacket, setShowPacket] = useState(false)
   const [packetPosition, setPacketPosition] = useState<[number, number] | null>(null)
+  const [showAuthModal, setShowAuthModal] = useState(false)
+  const [authMode, setAuthMode] = useState<'login' | 'register'>('login')
+  const [savedRoutes, setSavedRoutes] = useState<{id: number, destination: string, created_at: string}[]>([])
+  const [showRoutes, setShowRoutes] = useState(false)
+  const [saveMessage, setSaveMessage] = useState('')
   const animationRef = useRef<{ cancel: boolean }>({ cancel: false })
   const mapRef = useRef<L.Map | null>(null)
 
@@ -118,6 +127,49 @@ function App() {
     } catch (err) {
       console.error('Export failed:', err)
       setError('Failed to export image. Please try again.')
+    }
+  }
+
+  const saveRoute = async () => {
+    if (!traceData || !token) return
+    
+    try {
+      const hopsData = JSON.stringify(traceData.hops)
+      await routesApi.saveRoute(token, traceData.destination, hopsData)
+      setSaveMessage('Route saved!')
+      setTimeout(() => setSaveMessage(''), 3000)
+    } catch (err) {
+      setError('Failed to save route')
+    }
+  }
+
+  const loadSavedRoutes = async () => {
+    if (!token) return
+    
+    try {
+      const routes = await routesApi.getRoutes(token)
+      setSavedRoutes(routes)
+      setShowRoutes(true)
+    } catch (err) {
+      setError('Failed to load routes')
+    }
+  }
+
+  const loadRoute = (route: {id: number, destination: string}) => {
+    // This would require fetching the route details - for now just set destination
+    setDestination(route.destination)
+    setShowRoutes(false)
+    runTrace()
+  }
+
+  const deleteSavedRoute = async (routeId: number) => {
+    if (!token) return
+    
+    try {
+      await routesApi.deleteRoute(token, routeId)
+      setSavedRoutes(savedRoutes.filter(r => r.id !== routeId))
+    } catch (err) {
+      setError('Failed to delete route')
     }
   }
 
@@ -400,6 +452,20 @@ function App() {
     <div className="app">
       <header className="header">
         <h1>RouteCanvas</h1>
+        <div className="header-auth">
+          {isAuthenticated ? (
+            <>
+              <span className="user-greeting">Welcome, {user?.username}!</span>
+              <button onClick={loadSavedRoutes}>📁 My Routes</button>
+              <button onClick={logout}>Logout</button>
+            </>
+          ) : (
+            <>
+              <button onClick={() => { setAuthMode('login'); setShowAuthModal(true); }}>Login</button>
+              <button onClick={() => { setAuthMode('register'); setShowAuthModal(true); }}>Register</button>
+            </>
+          )}
+        </div>
       </header>
 
       <main className="main">
@@ -415,29 +481,23 @@ function App() {
             {loading ? `Tracing${'.'.repeat(loadingDots + 1)}` : 'Trace Route'}
           </button>
           {traceData && validHops.length > 0 && (
-            <button onClick={exportImage} className="export-button">
-              📸 Export Image
-            </button>
+            <>
+              <button onClick={exportImage} className="export-button">
+                📸 Export Image
+              </button>
+              {isAuthenticated && (
+                <button onClick={saveRoute} className="save-button">
+                  💾 Save Route
+                </button>
+              )}
+              {saveMessage && <span className="save-message">{saveMessage}</span>}
+            </>
           )}
           {loading && <div className="loading-note">A search takes approx 10-20 sec</div>}
           <div className="privacy-note">🔒 Your location is only used to show where your packets start. We don't store it.</div>
         </div>
 
         {error && <div className="error">{error}</div>}
-
-        {traceData && (
-          <div className="theme-selector">
-            {(['neon', 'retro', 'minimal'] as Theme[]).map(t => (
-              <button
-                key={t}
-                className={`theme-button ${theme === t ? 'active' : ''}`}
-                onClick={() => setTheme(t)}
-              >
-                {t.charAt(0).toUpperCase() + t.slice(1)}
-              </button>
-            ))}
-          </div>
-        )}
 
         {traceData && validHops.length > 0 && (
           <div className="animation-controls">
@@ -457,6 +517,18 @@ function App() {
               <button className={animationSpeed === 0.25 ? 'active' : ''} onClick={() => setAnimationSpeed(0.25)}>Slow</button>
               <button className={animationSpeed === 0.5 ? 'active' : ''} onClick={() => setAnimationSpeed(0.5)}>Med</button>
               <button className={animationSpeed === 1 ? 'active' : ''} onClick={() => setAnimationSpeed(1)}>Fast</button>
+            </div>
+            <div className="theme-controls">
+              <span>Theme:</span>
+              {(['neon', 'retro', 'minimal'] as Theme[]).map(t => (
+                <button
+                  key={t}
+                  className={`theme-button ${theme === t ? 'active' : ''}`}
+                  onClick={() => setTheme(t)}
+                >
+                  {t.charAt(0).toUpperCase() + t.slice(1)}
+                </button>
+              ))}
             </div>
           </div>
         )}
@@ -727,6 +799,54 @@ function App() {
             </div>
           )}
         </div>
+
+        {/* Auth Modal */}
+        {showAuthModal && (
+          <div className="modal-overlay" onClick={() => setShowAuthModal(false)}>
+            <div className="modal" onClick={e => e.stopPropagation()}>
+              <button className="modal-close" onClick={() => setShowAuthModal(false)}>×</button>
+              {authMode === 'login' ? (
+                <LoginForm onClose={() => setShowAuthModal(false)} />
+              ) : (
+                <RegisterForm onClose={() => setShowAuthModal(false)} />
+              )}
+              <div className="auth-switch">
+                {authMode === 'login' ? (
+                  <p>Don't have an account? <button onClick={() => setAuthMode('register')}>Register</button></p>
+                ) : (
+                  <p>Already have an account? <button onClick={() => setAuthMode('login')}>Login</button></p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Saved Routes Modal */}
+        {showRoutes && (
+          <div className="modal-overlay" onClick={() => setShowRoutes(false)}>
+            <div className="modal routes-modal" onClick={e => e.stopPropagation()}>
+              <button className="modal-close" onClick={() => setShowRoutes(false)}>×</button>
+              <h3>My Saved Routes</h3>
+              {savedRoutes.length === 0 ? (
+                <p>No saved routes yet.</p>
+              ) : (
+                <ul className="routes-list">
+                  {savedRoutes.map(route => (
+                    <li key={route.id}>
+                      <span onClick={() => loadRoute(route)} className="route-destination">
+                        {route.destination}
+                      </span>
+                      <span className="route-date">
+                        {new Date(route.created_at).toLocaleDateString()}
+                      </span>
+                      <button onClick={() => deleteSavedRoute(route.id)} className="delete-route">🗑️</button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        )}
       </main>
     </div>
   )

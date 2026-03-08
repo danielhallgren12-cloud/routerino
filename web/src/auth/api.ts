@@ -1,0 +1,100 @@
+const API_URL = 'http://localhost:8000/api/v1'
+
+export interface User {
+  id: number
+  username: string
+  email: string
+  created_at: string
+}
+
+export interface LoginResponse {
+  access_token: string
+  token_type: string
+}
+
+export const authApi = {
+  async register(username: string, email: string, password: string): Promise<User> {
+    const response = await fetch(`${API_URL}/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, email, password }),
+    })
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.detail || 'Registration failed')
+    }
+    return response.json()
+  },
+
+  async login(email: string, password: string): Promise<LoginResponse> {
+    const formData = new URLSearchParams()
+    formData.append('username', email)
+    formData.append('password', password)
+    
+    const response = await fetch(`${API_URL}/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: formData,
+    })
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.detail || 'Login failed')
+    }
+    return response.json()
+  },
+
+  async getMe(token: string): Promise<User> {
+    const response = await fetch(`${API_URL}/me`, {
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+    })
+    if (!response.ok) {
+      throw new Error('Failed to get user info')
+    }
+    return response.json()
+  },
+}
+
+export const routesApi = {
+  async getRoutes(token: string) {
+    const response = await fetch(`${API_URL}/routes`, {
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+      },
+    })
+    if (!response.ok) {
+      throw new Error('Failed to get routes')
+    }
+    return response.json()
+  },
+
+  async saveRoute(token: string, destination: string, hopsData: string) {
+    const response = await fetch(`${API_URL}/routes`, {
+      method: 'POST',
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ destination, hops_data: hopsData }),
+    })
+    if (!response.ok) {
+      throw new Error('Failed to save route')
+    }
+    return response.json()
+  },
+
+  async deleteRoute(token: string, routeId: number) {
+    const response = await fetch(`${API_URL}/routes/${routeId}`, {
+      method: 'DELETE',
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+      },
+    })
+    if (!response.ok) {
+      throw new Error('Failed to delete route')
+    }
+    return response.json()
+  },
+}

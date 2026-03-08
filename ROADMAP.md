@@ -247,6 +247,26 @@ These features were identified by comparing with other traceroute tools (NextTra
   - GeoIP resolution progress
   - Clearer "working" feedback vs stuck/failed states
 
+### User System
+
+**Status:** Next implementation phase
+
+**Features to implement:**
+- [ ] User registration (email + password)
+- [ ] User login with JWT authentication
+- [ ] Save route to account
+- [ ] View route history
+- [ ] Delete saved routes (future)
+- [ ] Share routes publicly (future)
+- [ ] User profiles with stats (future)
+- [ ] Social login: Google + Facebook (future)
+
+**Tech stack:**
+- Database: SQLite
+- ORM: SQLAlchemy
+- Auth: JWT (JSON Web Tokens)
+- Password hashing: bcrypt
+
 ### Lower Priority / Future Ideas
 
 - [ ] Faster probing (parallel probes like NextTrace)
