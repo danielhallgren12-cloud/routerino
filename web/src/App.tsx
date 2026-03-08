@@ -63,10 +63,11 @@ function App() {
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number, city?: string, country?: string} | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [animationHop, setAnimationHop] = useState(-1)
-  const [animationProgress, setAnimationProgress] = useState(0) // 0-1 between hops
+  const [animationProgress, setAnimationProgress] = useState(0)
   const [animationSpeed, setAnimationSpeed] = useState(1)
   const [showPacket, setShowPacket] = useState(false)
   const [packetPosition, setPacketPosition] = useState<[number, number] | null>(null)
+  const animationRef = useRef<{ cancel: boolean }>({ cancel: false })
   const mapRef = useRef<L.Map | null>(null)
 
   const runTrace = async () => {
@@ -175,48 +176,6 @@ function App() {
   // Define validHops first
   const validHops = traceData ? traceData.hops.filter(h => h.ip && h.ip !== '*') : []
 
-  // Calculate packet position between current and next hop
-  const getPacketPosition = (): [number, number] | null => {
-    if (animationHop === -1 && userLocation && validHops.length > 0) {
-      // Starting from home to first hop
-      const startLat = userLocation.lat
-      const startLng = userLocation.lng
-      const endLat = validHops[0].lat!
-      const endLng = validHops[0].lng!
-      return [
-        startLat + (endLat - startLat) * animationProgress,
-        startLng + (endLng - startLng) * animationProgress
-      ]
-    }
-    
-    if (animationHop >= 0 && animationHop < validHops.length - 1) {
-      // Between hop N and N+1
-      const startLat = validHops[animationHop].lat!
-      const startLng = validHops[animationHop].lng!
-      const endLat = validHops[animationHop + 1].lat!
-      const endLng = validHops[animationHop + 1].lng!
-      return [
-        startLat + (endLat - startLat) * animationProgress,
-        startLng + (endLng - startLng) * animationProgress
-      ]
-    }
-    
-    if (animationHop >= 0 && animationHop < validHops.length) {
-      // At a hop
-      return [validHops[animationHop].lat!, validHops[animationHop].lng!]
-    }
-    
-    return null
-  }
-
-  // Update packet position when animation changes
-  useEffect(() => {
-    const pos = getPacketPosition()
-    if (pos) {
-      setPacketPosition(pos)
-    }
-  }, [animationHop, animationProgress])
-
   // Calculate distance between two points in km
   const getDistance = (lat1: number, lng1: number, lat2: number, lng2: number) => {
     const R = 6371 // Earth's radius in km
@@ -229,94 +188,129 @@ function App() {
     return R * c
   }
 
-  // Get hop times based on distance
-  const getHopTime = (fromLat: number, fromLng: number, toLat: number, toLng: number, speed: number) => {
-    const distance = getDistance(fromLat, fromLng, toLat, toLng)
-    // Speed: slow=5000ms per 1000km, medium=2500ms per 1000km, fast=1000ms per 1000km
-    const baseTime = speed === 0.25 ? 5000 : speed === 0.5 ? 2500 : 1000
-    return Math.max(1000, (distance / 1000) * baseTime) // Minimum 1000ms
-  }
-
-  // Animation effect with distance-based timing
+  // New hop-by-hop animation system
   useEffect(() => {
     if (!isPlaying || validHops.length === 0 || !userLocation) return
-    
-    let currentHopIndex = -1 // -1 = home to first hop, 0 = first hop to second, etc.
-    let progress = 0
-    
-    // Fly to first hop at start
-    if (mapRef.current) {
-      mapRef.current.flyTo([validHops[0].lat!, validHops[0].lng!], 6, { duration: 1 })
-    }
-    
-    const animate = () => {
-      // Get current segment coordinates
+
+    animationRef.current.cancel = false
+
+    // Speed affects travel time: slow=4000ms, medium=2500ms, fast=1500ms
+    const baseTravelTime = animationSpeed === 0.25 ? 4000 : animationSpeed === 0.5 ? 2500 : 1500
+    const arrivePause = 400
+
+    const animateHop = async (hopIndex: number) => {
+      if (animationRef.current.cancel) return
+
       let fromLat: number, fromLng: number, toLat: number, toLng: number
-      
-      if (currentHopIndex === -1) {
-        // Home to first hop
+
+      if (hopIndex === -1) {
         fromLat = userLocation.lat
         fromLng = userLocation.lng
         toLat = validHops[0].lat!
         toLng = validHops[0].lng!
-      } else if (currentHopIndex < validHops.length - 1) {
-        // Between hop N and N+1
-        fromLat = validHops[currentHopIndex].lat!
-        fromLng = validHops[currentHopIndex].lng!
-        toLat = validHops[currentHopIndex + 1].lat!
-        toLng = validHops[currentHopIndex + 1].lng!
+      } else if (hopIndex < validHops.length - 1) {
+        fromLat = validHops[hopIndex].lat!
+        fromLng = validHops[hopIndex].lng!
+        toLat = validHops[hopIndex + 1].lat!
+        toLng = validHops[hopIndex + 1].lng!
       } else {
-        // Done - at last hop
         setIsPlaying(false)
         return
       }
-      
-      const segmentTime = getHopTime(fromLat, fromLng, toLat, toLng, animationSpeed)
-      const progressTime = 50
-      
-      progress += progressTime / segmentTime
-      
-      if (progress >= 1) {
-        // Move to next segment
-        progress = 0
-        currentHopIndex++
+
+      // Show packet at start position first
+      setAnimationHop(hopIndex)
+      setPacketPosition([fromLat, fromLng])
+      setShowPacket(true)
+
+      if (hopIndex === -1) {
+        // FIRST HOP: Camera flies first, then envelope moves
+        if (mapRef.current) {
+          mapRef.current.flyTo([toLat, toLng], 6, { duration: 1.2 })
+        }
         
-        if (currentHopIndex >= validHops.length - 1) {
-          // Reached the end
-          setAnimationHop(validHops.length - 1)
-          setIsPlaying(false)
+        // Wait for camera to finish flying
+        await new Promise(r => setTimeout(r, 1200))
+        
+        if (animationRef.current.cancel) return
+      } else {
+        // SUBSEQUENT HOPS: Envelope travels first, camera follows after a bit
+        
+        // Start envelope traveling immediately
+        const travelTime = baseTravelTime
+        const startTime = Date.now()
+
+        const travelInterval = setInterval(() => {
+          if (animationRef.current.cancel) {
+            clearInterval(travelInterval)
+            return
+          }
+
+          const elapsed = Date.now() - startTime
+          const progress = Math.min(elapsed / travelTime, 1)
+
+          const newLat = fromLat + (toLat - fromLat) * progress
+          const newLng = fromLng + (toLng - fromLng) * progress
+          setPacketPosition([newLat, newLng])
+
+          // Start camera after envelope has traveled a bit (20% of journey)
+          if (progress >= 0.2 && mapRef.current) {
+            mapRef.current.flyTo([toLat, toLng], 6, { duration: 1.2 })
+          }
+
+          if (progress >= 1) {
+            clearInterval(travelInterval)
+            setAnimationHop(hopIndex + 1)
+            setPacketPosition([toLat, toLng])
+
+            setTimeout(() => {
+              if (!animationRef.current.cancel) {
+                animateHop(hopIndex + 1)
+              }
+            }, arrivePause)
+          }
+        }, 30)
+        
+        return
+      }
+
+      // Animate packet traveling for first hop
+      const travelTime = baseTravelTime
+      const startTime = Date.now()
+
+      const travelInterval = setInterval(() => {
+        if (animationRef.current.cancel) {
+          clearInterval(travelInterval)
           return
         }
-        
-        // Fly to next hop
-        const nextHop = validHops[currentHopIndex + 1]
-        if (nextHop && mapRef.current) {
-          const flyDuration = getHopTime(
-            validHops[currentHopIndex].lat!,
-            validHops[currentHopIndex].lng!,
-            nextHop.lat!,
-            nextHop.lng!,
-            animationSpeed
-          ) / 1000
-          mapRef.current.flyTo([nextHop.lat!, nextHop.lng!], 6, { duration: Math.max(1, flyDuration * 0.8) })
-        }
-        
-        setAnimationHop(currentHopIndex)
-      }
-      
-      setAnimationProgress(progress)
-    }
-    
-    const intervalId = setInterval(animate, 50)
-    
-    return () => clearInterval(intervalId)
-  }, [isPlaying, animationSpeed, validHops.length, userLocation])
 
-  useEffect(() => {
-    if (animationHop >= 0) {
-      setShowPacket(true)
+        const elapsed = Date.now() - startTime
+        const progress = Math.min(elapsed / travelTime, 1)
+
+        const newLat = fromLat + (toLat - fromLat) * progress
+        const newLng = fromLng + (toLng - fromLng) * progress
+        setPacketPosition([newLat, newLng])
+
+        if (progress >= 1) {
+          clearInterval(travelInterval)
+          setAnimationHop(hopIndex + 1)
+          setPacketPosition([toLat, toLng])
+
+          setTimeout(() => {
+            if (!animationRef.current.cancel) {
+              animateHop(hopIndex + 1)
+            }
+          }, arrivePause)
+        }
+      }, 30)
     }
-  }, [animationHop])
+
+    animateHop(-1)
+
+    return () => {
+      animationRef.current.cancel = true
+    }
+  }, [isPlaying, animationSpeed, validHops.length, userLocation])
 
   useEffect(() => {
     if (traceData) {
@@ -448,7 +442,7 @@ function App() {
         {traceData && validHops.length > 0 && (
           <div className="animation-controls">
             <div className="playback-controls">
-              <button onClick={() => { setAnimationHop(-1); setIsPlaying(false); }} title="Reset">🔄</button>
+              <button onClick={() => { setAnimationHop(-1); setIsPlaying(false); setShowPacket(false); setPacketPosition(null); }} title="Reset">🔄</button>
               <button onClick={() => { 
                 setIsPlaying(!isPlaying); 
                 if (animationHop >= validHops.length - 1) setAnimationHop(-1);
