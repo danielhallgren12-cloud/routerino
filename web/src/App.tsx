@@ -96,13 +96,14 @@ function App() {
       })
       
       if (!response.ok) {
-        throw new Error('Trace failed')
+        const errorData = await response.json()
+        throw new Error(errorData.detail || 'Trace failed')
       }
       
       const data = await response.json()
       setTraceData(data)
     } catch (err) {
-      setError('Failed to run traceroute. Please try again.')
+      setError(err instanceof Error ? err.message : 'Trace failed - please try again')
       console.error(err)
     } finally {
       setLoading(false)
