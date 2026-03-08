@@ -237,7 +237,10 @@ These features were identified by comparing with other traceroute tools (NextTra
 
 - [ ] Faster probing (parallel probes like NextTrace)
 - [ ] WHOIS integration
-- [ ] Route animation (traveling icon)
+- [x] Route animation (traveling icon) - IMPLEMENTED 2026-03-08
+- [ ] **Animation polish: route line sync** - Fix line lag during camera flyTo
+  - Issue: Colored route lines (green/yellow/red) lag behind camera movement during animation
+  - Solution: Draw dynamic line from current hop → packet position during animation, show full route lines after animation completes
 - [ ] IPv6 support
 - [ ] Historical route comparison
 
@@ -309,6 +312,6 @@ Be transparent about what RouteCanvas can and cannot do:
 
 ---
 
-*Last updated: 2026-03-05*
+*Last updated: 2026-03-08*
 
 ## Additional Documentation
