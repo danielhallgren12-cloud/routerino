@@ -494,7 +494,28 @@ function App() {
             </>
           )}
           {loading && <div className="loading-note">A search takes approx 10-20 sec</div>}
-          <div className="privacy-note">🔒 Your location is only used to show where your packets start. We don't store it.</div>
+          <div className="preset-destinations" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem', width: '100%', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: '0.65rem', color: '#888', marginRight: '0.25rem' }}>Popular:</span>
+            {['google.com', 'cloudflare.com', 'github.com', 'amazon.com', 'facebook.com'].map(dest => (
+              <button 
+                key={dest} 
+                style={{ 
+                  padding: '0.25rem 0.5rem', 
+                  background: 'transparent', 
+                  border: '1px solid #555', 
+                  borderRadius: '4px',
+                  color: '#bbb', 
+                  fontSize: '0.7rem', 
+                  cursor: 'pointer',
+                  textTransform: 'capitalize',
+                  transition: 'all 0.2s'
+                }}
+                onClick={() => { setDestination(dest); runTrace(); }}
+              >
+                {dest.replace('.com', '')}
+              </button>
+            ))}
+          </div>
         </div>
 
         {error && <div className="error">{error}</div>}
