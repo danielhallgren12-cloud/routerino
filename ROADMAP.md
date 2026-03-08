@@ -232,6 +232,20 @@ These features were identified by comparing with other traceroute tools (NextTra
   
 - [ ] **Continuous ping mode** - Monitor latency continuously
 - [ ] **Multiple destination comparison** - Compare routes side-by-side
+- [ ] **Preset destinations** - Quick buttons for popular targets
+  - Examples: google.com, cloudflare.com, github.com, amazon.com, microsoft.com, facebook.com
+  - Also educational: major universities, government networks
+  - Benefits: Faster testing/demo, shows user how different destinations route
+- [ ] **Improved error handling** - More informative error messages
+  - GeoIP lookup failures (hops that don't resolve)
+  - Network timeouts
+  - Invalid input validation
+  - Backend unavailable errors
+  - Distinguish between: trace failures vs GeoIP failures vs network errors
+- [ ] **Enhanced loading states** - Better feedback during trace
+  - Progress indicator (hop 1/15, hop 2/15...)
+  - GeoIP resolution progress
+  - Clearer "working" feedback vs stuck/failed states
 
 ### Lower Priority / Future Ideas
 
