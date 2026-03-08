@@ -767,7 +767,43 @@ function App() {
             )}
             
             {!loading && !traceData && (
-              <div className="loading">Enter a destination to trace your route</div>
+              <div className="hero-bg">
+                <div className="hero-content">
+                  <div className="route-art-preview">
+                    <svg viewBox="0 0 400 200" className="art-svg">
+                      <defs>
+                        <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                          <stop offset="0%" stopColor="#00d4ff" stopOpacity="0.2"/>
+                          <stop offset="50%" stopColor="#ff00aa" stopOpacity="1"/>
+                          <stop offset="100%" stopColor="#00d4ff" stopOpacity="0.2"/>
+                        </linearGradient>
+                        <filter id="glow">
+                          <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                          <feMerge>
+                            <feMergeNode in="coloredBlur"/>
+                            <feMergeNode in="SourceGraphic"/>
+                          </feMerge>
+                        </filter>
+                      </defs>
+                      <path 
+                        d="M 40 150 Q 100 50, 160 100 T 260 80 T 330 60" 
+                        fill="none" 
+                        stroke="url(#lineGrad)" 
+                        strokeWidth="3"
+                        filter="url(#glow)"
+                        className="art-path"
+                      />
+                      <circle cx="40" cy="150" r="8" fill="#00d4ff" filter="url(#glow)"/>
+                      <circle cx="160" cy="100" r="6" fill="#ff00aa" filter="url(#glow)"/>
+                      <circle cx="260" cy="80" r="7" fill="#00d4ff" filter="url(#glow)"/>
+                      <circle cx="330" cy="60" r="8" fill="#00d4ff" filter="url(#glow)"/>
+                      <text x="20" y="172" fill="#666" fontSize="11">YOU</text>
+                      <text x="330" y="45" fill="#666" fontSize="11">DESTINATION</text>
+                    </svg>
+                  </div>
+                  <div className="hero-text">Enter a destination to trace your route</div>
+                </div>
+              </div>
             )}
           </div>
 

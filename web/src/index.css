@@ -317,6 +317,55 @@ body {
   color: var(--text-muted);
 }
 
+/* Empty state / Hero background */
+.hero-bg {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: 
+    radial-gradient(ellipse at 20% 80%, rgba(0, 212, 255, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(255, 0, 170, 0.08) 0%, transparent 50%),
+    linear-gradient(180deg, transparent 0%, rgba(0, 212, 255, 0.03) 100%);
+}
+
+.hero-content {
+  text-align: center;
+  padding: 2rem;
+}
+
+.route-art-preview {
+  width: 100%;
+  max-width: 500px;
+  margin-bottom: 2rem;
+}
+
+.art-svg {
+  width: 100%;
+  height: auto;
+}
+
+.art-path {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: drawPath 3s ease-out forwards;
+}
+
+@keyframes drawPath {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.hero-text {
+  color: #888;
+  font-size: 1.2rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
 .error {
   padding: 1rem;
   background: #ff444420;
