@@ -55,6 +55,8 @@
 | Preset Destinations | ✅ Complete |
 | Route History | ✅ Complete (save/view/delete) |
 | User Accounts | ✅ Complete (register/login/JWT) |
+| Dark/Light Mode | ✅ Complete (toggle in header) |
+| Latency Graph | ✅ Complete (toggle view in route details) |
 
 ### Phase 3 - Social (Planned)
 
