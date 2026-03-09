@@ -351,13 +351,14 @@ Be transparent about what RouteCanvas can and cannot do:
 - Basic image export
 - Dark/Light mode toggle
 - Latency graph with toggle view
+- Route statistics panel
 
 ### ❌ REMAINING
 
 **High Priority (Quick Wins):**
 - [x] Dark/Light theme toggle
 - [x] Latency graph (visual chart of RTT per hop)
-- Route statistics panel (hop count, total distance, avg latency)
+- [x] Route statistics panel (hop count, avg/max/min latency)
 - Mobile responsive design
 - Share routes via URL
 
