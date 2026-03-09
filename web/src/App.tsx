@@ -828,6 +828,33 @@ function App() {
 
           {traceData && traceData.hops.length > 0 && (
             <div className="hop-list">
+              {(() => {
+                const rtts = validHops.map(h => h.rtt).filter((r): r is number => r !== undefined)
+                const avgRtt = rtts.length ? Math.round(rtts.reduce((a, b) => a + b, 0) / rtts.length) : 0
+                const maxRtt = rtts.length ? Math.max(...rtts) : 0
+                const minRtt = rtts.length ? Math.min(...rtts) : 0
+                
+                return (
+                  <div className="route-stats">
+                    <div className="stat-box">
+                      <span className="stat-value">{validHops.length}</span>
+                      <span className="stat-label">Hops</span>
+                    </div>
+                    <div className="stat-box">
+                      <span className="stat-value">{avgRtt}ms</span>
+                      <span className="stat-label">Avg</span>
+                    </div>
+                    <div className="stat-box">
+                      <span className="stat-value">{maxRtt}ms</span>
+                      <span className="stat-label">Max</span>
+                    </div>
+                    <div className="stat-box">
+                      <span className="stat-value">{minRtt}ms</span>
+                      <span className="stat-label">Min</span>
+                    </div>
+                  </div>
+                )
+              })()}
               <div className="hop-list-header">
                 <h3>Route Details</h3>
                 <div className="view-toggle">
