@@ -211,55 +211,42 @@ These features were identified by comparing with other traceroute tools (NextTra
   - Displayed in popup and route details
   - Uses ip-api.com batch API
 
-- [ ] **City-level accuracy** - More precise geolocation
+- [x] ~~City-level accuracy~~ - Discarded (city is sufficient)
 
 ### Medium Priority
 
-- [ ] **Export as image** - Save route visualization as PNG
-  - High-resolution export (300 DPI for print quality)
-  - Custom title overlay: "From [User City] to [Destination]"
-  - Include route metadata (hop count, avg latency)
-  - Attribution overlay
+- [x] **Export as image** - Basic PNG export working (html2canvas)
+  - [ ] High-resolution export (300 DPI for print quality)
+  - [ ] Custom title overlay: "From [User City] to [Destination]"
+  - [ ] Attribution overlay
+
+- [x] **Route art styles** - Basic themes working (neon, retro, minimal)
+  - [ ] Watercolor/artistic themes
   
-- [ ] **Route art styles** - Different visual aesthetics
-  - Dark/neon (cyberpunk vibe)
-  - Watercolor/artistic
-  - Minimalist/infographic
-  
-- [ ] **Home location emphasis** - Highlight user's starting point
-  - Special marker for user's location
-  - Custom icon or highlight color
+- [x] **Home location emphasis** - Working (dashed hot pink line from home to first hop)
   
 - [ ] **Continuous ping mode** - Monitor latency continuously
 - [ ] **Multiple destination comparison** - Compare routes side-by-side
-- [ ] **Preset destinations** - Quick buttons for popular targets
-  - Examples: google.com, cloudflare.com, github.com, amazon.com, microsoft.com, facebook.com
-  - Also educational: major universities, government networks
-  - Benefits: Faster testing/demo, shows user how different destinations route
-- [ ] **Improved error handling** - More informative error messages
-  - GeoIP lookup failures (hops that don't resolve)
-  - Network timeouts
-  - Invalid input validation
-  - Backend unavailable errors
-  - Distinguish between: trace failures vs GeoIP failures vs network errors
-- [ ] **Enhanced loading states** - Better feedback during trace
-  - Progress indicator (hop 1/15, hop 2/15...)
-  - GeoIP resolution progress
-  - Clearer "working" feedback vs stuck/failed states
+- [x] **Preset destinations** - Working (google, cloudflare, github, etc.)
+- [x] **Improved error handling** - Specific error messages implemented
+- [x] **Enhanced loading states** - Basic cycling dots animation working
+  - [ ] Progress indicator (hop 1/15, hop 2/15...) - requires backend SSE
+  - [ ] GeoIP resolution progress
 
 ### User System
 
-**Status:** Next implementation phase
+**Status:** COMPLETED ✅
 
-**Features to implement:**
-- [ ] User registration (email + password)
-- [ ] User login with JWT authentication
-- [ ] Save route to account
-- [ ] View route history
-- [ ] Delete saved routes (future)
-- [ ] Share routes publicly (future)
-- [ ] User profiles with stats (future)
-- [ ] Social login: Google + Facebook (future)
+- [x] User registration (email + password)
+- [x] User login with JWT authentication
+- [x] Save route to account
+- [x] View route history
+- [x] Delete saved routes
+
+**Future enhancements:**
+- [ ] Share routes publicly
+- [ ] User profiles with stats
+- [ ] Social login: Google + Facebook
 
 **Tech stack:**
 - Database: SQLite
@@ -269,14 +256,12 @@ These features were identified by comparing with other traceroute tools (NextTra
 
 ### Lower Priority / Future Ideas
 
-- [ ] Faster probing (parallel probes like NextTrace)
-- [ ] WHOIS integration
-- [x] Route animation (traveling icon) - IMPLEMENTED 2026-03-08
-- [ ] **Animation polish: route line sync** - Fix line lag during camera flyTo
-  - Issue: Colored route lines (green/yellow/red) lag behind camera movement during animation
-  - Solution: Draw dynamic line from current hop → packet position during animation, show full route lines after animation completes
-- [ ] IPv6 support
-- [ ] Historical route comparison
+- [ ] **Faster probing** - Parallel probes like NextTrace
+- [ ] **WHOIS integration** - Show IP ownership details
+- [x] **Route animation** - Packet travel animation IMPLEMENTED 2026-03-08
+- [ ] **Animation polish** - Route line sync during camera flyTo
+- [ ] **IPv6 support** - Modern networking
+- [ ] **Historical route comparison** - Compare past saved routes
 
 ---
 
@@ -347,5 +332,52 @@ Be transparent about what RouteCanvas can and cannot do:
 ---
 
 *Last updated: 2026-03-08*
+
+## Current Status Summary
+
+### ✅ COMPLETED (Demo-Ready)
+- Basic traceroute execution with GeoIP
+- React frontend with Leaflet map
+- Animated journey visualization
+- Color-coded latency markers
+- ASN tracking
+- Three themes (neon, retro, minimal)
+- Two-column layout (map + route details)
+- User authentication (register/login)
+- Save/view/delete routes
+- Preset destinations
+- Error handling with specific messages
+- Artistic hero section
+- Basic image export
+
+### ❌ REMAINING
+
+**High Priority (Quick Wins):**
+- Dark/Light theme toggle
+- Latency graph (visual chart of RTT per hop)
+- Route statistics panel (hop count, total distance, avg latency)
+- Mobile responsive design
+- Share routes via URL
+
+**Medium Priority:**
+- High-resolution export (300 DPI)
+- Custom title overlay on export
+- Watercolor/artistic themes
+- Continuous ping mode
+- Multiple destination comparison
+- Enhanced loading states (progress indicator - requires backend SSE)
+- Network fingerprint (unique signature based on route patterns)
+- Mobile touch gestures (pinch zoom, drag)
+
+**Lower Priority:**
+- Animation polish (route line sync)
+- Faster probing (parallel)
+- IPv6 support
+- Historical route comparison
+- WHOIS integration
+- Keyboard shortcuts (Enter to trace, Esc to clear)
+- Video export
+
+---
 
 ## Additional Documentation

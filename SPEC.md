@@ -42,19 +42,19 @@
 | Color-coded latency | ✅ Complete |
 | ASN tracking | ✅ Complete |
 | Art themes: Neon, Retro, Minimal | ✅ Complete |
-| Image Export | 🔄 Next |
+| Image Export | ✅ Complete |
 
-### Phase 2 - Engagement (Planned)
+### Phase 2 - Engagement ✅ COMPLETED
 
 | Feature | Description |
 |---------|-------------|
-| High-res Export | 300 DPI for print quality |
-| Custom title overlay | "From [City] to [Destination]" |
-| Home location emphasis | Special marker for user's starting point |
-| Route art styles | Dark/neon, watercolor, minimalist |
-| Preset Destinations | One-click trace to popular targets |
-| Route History | Save and view past traces |
-| User Accounts | Basic authentication for personal route collection |
+| High-res Export | 🔄 Future (300 DPI) |
+| Custom title overlay | 🔄 Future |
+| Home location emphasis | ✅ Complete (dashed hot pink line) |
+| Route art styles | ✅ Basic complete, watercolor 🔄 Future |
+| Preset Destinations | ✅ Complete |
+| Route History | ✅ Complete (save/view/delete) |
+| User Accounts | ✅ Complete (register/login/JWT) |
 
 ### Phase 3 - Social (Planned)
 
@@ -98,4 +98,4 @@ Users will want to buy prints because:
 
 ---
 
-*Last updated: 2026-03-05*
+*Last updated: 2026-03-09*

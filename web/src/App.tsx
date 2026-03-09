@@ -62,6 +62,7 @@ function App() {
   const [error, setError] = useState('')
   const [traceData, setTraceData] = useState<TraceResponse | null>(null)
   const [theme, setTheme] = useState<Theme>('neon')
+  const [mode, setMode] = useState<'dark' | 'light'>('dark')
   const [zoomLevel, setZoomLevel] = useState(2)
   const [selectedHop, setSelectedHop] = useState<Hop | null>(null)
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number, city?: string, country?: string} | null>(null)
@@ -78,6 +79,12 @@ function App() {
   const [saveMessage, setSaveMessage] = useState('')
   const animationRef = useRef<{ cancel: boolean }>({ cancel: false })
   const mapRef = useRef<L.Map | null>(null)
+
+  const toggleMode = () => {
+    const newMode = mode === 'dark' ? 'light' : 'dark'
+    setMode(newMode)
+    document.documentElement.classList.toggle('light-mode', newMode === 'light')
+  }
 
   const runTrace = async () => {
     if (!destination.trim()) return
@@ -454,6 +461,14 @@ function App() {
       <header className="header">
         <h1>RouteCanvas</h1>
         <div className="header-auth">
+          <button 
+            onClick={toggleMode} 
+            className={`mode-toggle ${mode === 'light' ? 'active' : ''}`}
+            title={mode === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            aria-label={mode === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+          >
+            <span className="toggle-slider"></span>
+          </button>
           {isAuthenticated ? (
             <>
               <span className="user-greeting">Welcome, {user?.username}!</span>
@@ -571,7 +586,10 @@ function App() {
                 <MapEvents onZoomChange={setZoomLevel} />
                 <TileLayer
                   attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  url={mode === 'dark' 
+                    ? "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    : "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+                  }
                 />
                 
                 {(() => {

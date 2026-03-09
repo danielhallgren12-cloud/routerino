@@ -83,15 +83,18 @@
 
 #### Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/trace` | Run traceroute to destination |
-| GET | `/trace/{id}` | Get existing trace result |
-| GET | `/destinations/presets` | Get list of preset destinations |
-| POST | `/users/register` | Register new user |
-| POST | `/users/login` | User login |
-| GET | `/routes/public` | Get public gallery routes |
-| POST | `/routes/{id}/like` | Like a route |
+| Method | Endpoint | Description | Status |
+|--------|----------|-------------|--------|
+| POST | `/trace` | Run traceroute to destination | ✅ |
+| GET | `/destinations/presets` | Get list of preset destinations | ✅ |
+| POST | `/users/register` | Register new user | ✅ |
+| POST | `/users/login` | User login | ✅ |
+| POST | `/routes/save` | Save route to account | ✅ |
+| GET | `/routes` | Get user's saved routes | ✅ |
+| DELETE | `/routes/{id}` | Delete saved route | ✅ |
+| GET | `/trace/{id}` | Get existing trace result | 🔄 Future |
+| GET | `/routes/public` | Get public gallery routes | 🔄 Future |
+| POST | `/routes/{id}/like` | Like a route | 🔄 Future |
 
 #### Request/Response Examples
 
@@ -284,13 +287,12 @@ import MapView from 'react-native-maps';
 
 ### Art Themes
 
-| Theme | Style |
-|-------|-------|
-| Neon | Dark background, glowing cyan/magenta lines |
-| Sketch | White background, pencil-like strokes |
-| Retro | Vintage colors, scanline effects |
-| Watercolor | Soft gradients, bleeding colors |
-| Minimal | Black/white, simple lines |
+| Theme | Style | Status |
+|-------|-------|--------|
+| Neon | Dark background, glowing cyan/magenta lines | ✅ |
+| Retro | Vintage colors, scanline effects | ✅ |
+| Minimal | Black/white, simple lines | ✅ |
+| Watercolor | Soft gradients, bleeding colors | 🔄 Future |
 
 ---
 
@@ -386,4 +388,4 @@ VITE_API_URL=http://localhost:8000/api/v1
 
 ---
 
-*Last updated: 2026-03-04*
+*Last updated: 2026-03-09*
