@@ -63,6 +63,7 @@ function App() {
   const [traceData, setTraceData] = useState<TraceResponse | null>(null)
   const [theme, setTheme] = useState<Theme>('neon')
   const [mode, setMode] = useState<'dark' | 'light'>('dark')
+  const [viewMode, setViewMode] = useState<'hops' | 'graph'>('hops')
   const [zoomLevel, setZoomLevel] = useState(2)
   const [selectedHop, setSelectedHop] = useState<Hop | null>(null)
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number, city?: string, country?: string} | null>(null)
@@ -827,51 +828,99 @@ function App() {
 
           {traceData && traceData.hops.length > 0 && (
             <div className="hop-list">
-              <h3>Route Details</h3>
-              {userLocation && (
-                <div 
-                  className="user-location-header"
-                  onClick={() => {
-                    if (userLocation) {
-                      mapRef.current?.flyTo([userLocation.lat, userLocation.lng], 10)
-                      setSelectedHop({ lat: userLocation.lat, lng: userLocation.lng, hop: 0, ip: 'You' } as Hop)
-                    }
-                  }}
-                  style={{ cursor: 'pointer' }}
-                >
-                  📍 Your Location: {userLocation.city}, {userLocation.country}
+              <div className="hop-list-header">
+                <h3>Route Details</h3>
+                <div className="view-toggle">
+                  <button 
+                    className={viewMode === 'hops' ? 'active' : ''} 
+                    onClick={() => setViewMode('hops')}
+                  >
+                    Hops
+                  </button>
+                  <button 
+                    className={viewMode === 'graph' ? 'active' : ''} 
+                    onClick={() => setViewMode('graph')}
+                  >
+                    Latency
+                  </button>
                 </div>
-              )}
-              {traceData.hops.map(hop => (
-                <div 
-                  key={hop.hop} 
-                  className="hop-item"
-                  onClick={() => {
-                    if (hop.lat && hop.lng) {
-                      mapRef.current?.flyTo([hop.lat, hop.lng], 8)
-                      setSelectedHop(hop)
-                    }
-                  }}
-                  style={{ cursor: hop.lat && hop.lng ? 'pointer' : 'default' }}
-                >
-                  <div className="hop-number">{hop.hop}</div>
-                  <div className="hop-details">
-                    <div className="ip">{hop.ip}</div>
-                    {hop.hostname && <div className="hostname">{hop.hostname}</div>}
-                    {hop.asn && <div className="asn">{hop.asn}</div>}
-                    {(hop.city || hop.country) && (
-                      <div className="location-row">
-                        <span className="location">{[hop.city, hop.country].filter(Boolean).join(', ')}</span>
-                        {hop.rtt && (
-                          <span className="hop-rtt" style={{ color: getLatencyColor(hop.rtt) }}>
-                            {hop.rtt}ms
-                          </span>
+              </div>
+              {viewMode === 'hops' ? (
+                <>
+                  {userLocation && (
+                    <div 
+                      className="user-location-header"
+                      onClick={() => {
+                        if (userLocation) {
+                          mapRef.current?.flyTo([userLocation.lat, userLocation.lng], 10)
+                          setSelectedHop({ lat: userLocation.lat, lng: userLocation.lng, hop: 0, ip: 'You' } as Hop)
+                        }
+                      }}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      📍 Your Location: {userLocation.city}, {userLocation.country}
+                    </div>
+                  )}
+                  {traceData.hops.map(hop => (
+                    <div 
+                      key={hop.hop} 
+                      className="hop-item"
+                      onClick={() => {
+                        if (hop.lat && hop.lng) {
+                          mapRef.current?.flyTo([hop.lat, hop.lng], 8)
+                          setSelectedHop(hop)
+                        }
+                      }}
+                      style={{ cursor: hop.lat && hop.lng ? 'pointer' : 'default' }}
+                    >
+                      <div className="hop-number">{hop.hop}</div>
+                      <div className="hop-details">
+                        <div className="ip">{hop.ip}</div>
+                        {hop.hostname && <div className="hostname">{hop.hostname}</div>}
+                        {hop.asn && <div className="asn">{hop.asn}</div>}
+                        {(hop.city || hop.country) && (
+                          <div className="location-row">
+                            <span className="location">{[hop.city, hop.country].filter(Boolean).join(', ')}</span>
+                            {hop.rtt && (
+                              <span className="hop-rtt" style={{ color: getLatencyColor(hop.rtt) }}>
+                                {hop.rtt}ms
+                              </span>
+                            )}
+                          </div>
                         )}
                       </div>
-                    )}
-                  </div>
+                    </div>
+                  ))}
+                </>
+              ) : (
+                <div className="latency-graph">
+                  {validHops.map(hop => (
+                    <div 
+                      key={hop.hop}
+                      className="graph-row"
+                      onClick={() => {
+                        if (hop.lat && hop.lng) {
+                          mapRef.current?.flyTo([hop.lat, hop.lng], 8)
+                          setSelectedHop(hop)
+                        }
+                      }}
+                      style={{ cursor: hop.lat && hop.lng ? 'pointer' : 'default' }}
+                    >
+                      <span className="graph-hop">Hop {hop.hop}</span>
+                      <div className="graph-bar-container">
+                        <div 
+                          className="graph-bar"
+                          style={{ 
+                            width: `${Math.min((hop.rtt || 0) / 2, 100)}%`,
+                            backgroundColor: getLatencyColor(hop.rtt)
+                          }}
+                        />
+                      </div>
+                      <span className="graph-rtt" style={{ color: 'var(--text-muted)' }}>{hop.rtt ? `${hop.rtt}ms` : '-'}</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
             </div>
           )}
         </div>
