@@ -21,6 +21,7 @@ class SavedRoute(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     destination = Column(String, nullable=False)
     hops_data = Column(Text, nullable=False)  # JSON string of hops
+    share_id = Column(String, unique=True, index=True, nullable=True)  # Public share ID
     created_at = Column(DateTime, default=datetime.utcnow)
     
     user = relationship("User", back_populates="routes")

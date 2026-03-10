@@ -3,6 +3,8 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from datetime import timedelta
 from typing import List
+import secrets
+import string
 from app.database import get_db
 from app.models import User, SavedRoute
 from app.auth import verify_password, get_password_hash, create_access_token, decode_access_token
@@ -114,3 +116,35 @@ def delete_route(route_id: int, current_user: User = Depends(get_current_user), 
     db.delete(route)
     db.commit()
     return {"message": "Route deleted"}
+
+def generate_share_id(length: int = 8) -> str:
+    """Generate a random share ID"""
+    chars = string.ascii_letters + string.digits
+    return ''.join(secrets.choice(chars) for _ in range(length))
+
+@router.post("/routes/share", response_model=SavedRouteResponse)
+def share_route(route: SavedRouteCreate, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Save route and generate a public shareable link"""
+    # Generate unique share_id
+    share_id = generate_share_id()
+    while db.query(SavedRoute).filter(SavedRoute.share_id == share_id).first():
+        share_id = generate_share_id()
+    
+    db_route = SavedRoute(
+        user_id=current_user.id,
+        destination=route.destination,
+        hops_data=route.hops_data,
+        share_id=share_id
+    )
+    db.add(db_route)
+    db.commit()
+    db.refresh(db_route)
+    return db_route
+
+@router.get("/share/{share_id}")
+def get_shared_route(share_id: str, db: Session = Depends(get_db)):
+    """Get a public shared route by share_id"""
+    route = db.query(SavedRoute).filter(SavedRoute.share_id == share_id).first()
+    if not route:
+        raise HTTPException(status_code=404, detail="Shared route not found")
+    return route

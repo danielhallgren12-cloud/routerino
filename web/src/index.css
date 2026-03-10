@@ -252,8 +252,8 @@ body {
   }
   
   .input-section button {
-    padding: 0.65rem 1rem;
-    font-size: 0.9rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
   }
   
   .content-columns {
@@ -488,6 +488,93 @@ body {
   cursor: not-allowed;
   transform: none;
   filter: brightness(1.2);
+}
+
+/* More menu dropdown */
+.more-menu-container {
+  position: relative;
+}
+
+.more-button {
+  padding: 0.75rem 1.5rem;
+  background: var(--bg-dark);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.more-button:hover {
+  border-color: var(--primary);
+}
+
+.more-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.5rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.4rem;
+  z-index: 100;
+  min-width: 130px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.6rem;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: var(--text);
+  font-size: 0.85rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin: 2px 0;
+}
+
+.dropdown-item:hover {
+  background: rgba(0, 212, 255, 0.1);
+}
+
+/* Desktop/mobile visibility */
+.desktop-only {
+  display: inline-block;
+}
+
+.mobile-only {
+  display: none;
+}
+
+/* Hide share button on desktop when using dropdown */
+@media (min-width: 769px) {
+  .share-button.mobile-only,
+  .save-button.mobile-only {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none;
+  }
+  .mobile-only {
+    display: inline-block;
+  }
+  
+  .export-button,
+  .share-button.mobile-only,
+  .save-button.mobile-only {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.75rem;
+  }
 }
 
 .loading-note {
@@ -984,6 +1071,14 @@ body {
   font-weight: 600;
   cursor: pointer;
   transition: transform 0.2s, opacity 0.2s;
+}
+
+/* Make share/save smaller on desktop (min-width 769px) */
+@media (min-width: 769px) {
+  .more-dropdown .dropdown-item {
+    padding: 0.25rem 0.4rem;
+    font-size: 0.75rem;
+  }
 }
 
 .save-button:hover {

@@ -55,6 +55,7 @@ class SavedRouteCreate(BaseModel):
 class SavedRouteResponse(BaseModel):
     id: int
     destination: str
+    share_id: Optional[str] = None
     created_at: datetime
     
     class Config:

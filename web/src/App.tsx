@@ -78,6 +78,8 @@ function App() {
   const [savedRoutes, setSavedRoutes] = useState<{id: number, destination: string, created_at: string}[]>([])
   const [showRoutes, setShowRoutes] = useState(false)
   const [saveMessage, setSaveMessage] = useState('')
+  const [shareMessage, setShareMessage] = useState('')
+  const [showMoreMenu, setShowMoreMenu] = useState(false)
   const animationRef = useRef<{ cancel: boolean }>({ cancel: false })
   const mapRef = useRef<L.Map | null>(null)
 
@@ -149,6 +151,21 @@ function App() {
       setTimeout(() => setSaveMessage(''), 3000)
     } catch (err) {
       setError('Failed to save route')
+    }
+  }
+
+  const shareRoute = async () => {
+    if (!traceData || !token) return
+    
+    try {
+      const hopsData = JSON.stringify(traceData.hops)
+      const result = await routesApi.shareRoute(token, traceData.destination, hopsData)
+      const shareUrl = `${window.location.origin}/share/${result.share_id}`
+      await navigator.clipboard.writeText(shareUrl)
+      setShareMessage('Link copied!')
+      setTimeout(() => setShareMessage(''), 3000)
+    } catch (err) {
+      setError('Failed to share route')
     }
   }
 
@@ -232,6 +249,36 @@ function App() {
         // User denied or error
       }
     )
+  }, [])
+
+  // Handle shared route from URL
+  useEffect(() => {
+    const path = window.location.pathname
+    const shareMatch = path.match(/^\/share\/(.+)$/)
+    
+    if (shareMatch && shareMatch[1]) {
+      const shareId = shareMatch[1]
+      
+      const loadSharedRoute = async () => {
+        try {
+          const route = await routesApi.getSharedRoute(shareId)
+          const hops = JSON.parse(route.hops_data)
+          setTraceData({
+            id: route.id.toString(),
+            destination: route.destination,
+            hops: hops,
+            created_at: route.created_at
+          })
+          setDestination(route.destination)
+          // Clear URL without reload
+          window.history.replaceState({}, '', '/')
+        } catch (err) {
+          setError('Shared route not found or has been removed')
+        }
+      }
+      
+      loadSharedRoute()
+    }
   }, [])
 
   // Define validHops first
@@ -500,14 +547,51 @@ function App() {
           {traceData && validHops.length > 0 && (
             <>
               <button onClick={exportImage} className="export-button">
-                📸 Export Image
+                📸 Export
               </button>
-              {isAuthenticated && (
-                <button onClick={saveRoute} className="save-button">
-                  💾 Save Route
+              <div className="more-menu-container desktop-only">
+                <button 
+                  className="more-button" 
+                  onClick={() => setShowMoreMenu(!showMoreMenu)}
+                >
+                  ⋮ More
                 </button>
+                {showMoreMenu && (
+                  <div className="more-dropdown">
+                    {isAuthenticated ? (
+                      <>
+                        <button onClick={shareRoute} className="dropdown-item">
+                          🔗 Share Link
+                        </button>
+                        <button onClick={saveRoute} className="dropdown-item">
+                          💾 Save Route
+                        </button>
+                      </>
+                    ) : (
+                      <button 
+                        onClick={() => { setAuthMode('login'); setShowAuthModal(true); }} 
+                        className="dropdown-item"
+                      >
+                        Login to Share/Save
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+              {/* Mobile-only buttons */}
+              {isAuthenticated && (
+                <>
+                  <button onClick={shareRoute} className="share-button mobile-only">
+                    🔗 Share
+                  </button>
+                  <button onClick={saveRoute} className="save-button mobile-only">
+                    💾 Save
+                  </button>
+                </>
               )}
-              {saveMessage && <span className="save-message">{saveMessage}</span>}
+              {(saveMessage || shareMessage) && (
+                <span className="save-message">{saveMessage || shareMessage}</span>
+              )}
             </>
           )}
           {loading && <div className="loading-note">A search takes approx 10-20 sec</div>}

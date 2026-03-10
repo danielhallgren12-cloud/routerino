@@ -110,4 +110,27 @@ export const routesApi = {
     }
     return response.json()
   },
+
+  async shareRoute(token: string, destination: string, hopsData: string) {
+    const response = await fetch(`${API_URL}/routes/share`, {
+      method: 'POST',
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ destination, hops_data: hopsData }),
+    })
+    if (!response.ok) {
+      throw new Error('Failed to share route')
+    }
+    return response.json()
+  },
+
+  async getSharedRoute(shareId: string) {
+    const response = await fetch(`${API_URL}/share/${shareId}`)
+    if (!response.ok) {
+      throw new Error('Failed to get shared route')
+    }
+    return response.json()
+  },
 }
