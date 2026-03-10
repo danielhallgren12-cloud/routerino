@@ -153,189 +153,24 @@ Why it works:
 - [ ] Compare routes feature
 - [ ] Video export
 
-**Deliverables:**
-- Full gamification system
+**🔄 On Hold:**
+- **Historical route comparison** - Compare saved routes with current trace
+  - Status: Backend endpoint ready, frontend implementation had React state timing issues
+  - Enhancement ideas for future implementation:
+    - Gamification: "Route collection" - save routes to different targets
+    - "Route journal" - trace same target over time, see changes
+    - "Unique routes" counter - how many different paths discovered
+    - "Route streak" - trace daily, see how often route changes
+    - Simpler approach: Load saved route in dedicated comparison view (not tied to current trace)
+    - Alternative: Store comparisons as separate objects, not tied to live state
 
 ---
 
-## Milestones
+## Additional Documentation
 
-| Milestone | Description | Target |
-|-----------|-------------|--------|
-| M1 | Basic traceroute working | Week 1 |
-| M2 | Web demo complete | Week 3 |
-| M3 | User accounts live | Week 5 |
-| M4 | Public gallery | Week 7 |
-| M5 | Mobile app | Week 9 |
-| M6 | Print-on-demand | Week 11 |
-| M7 | Full launch | Week 12 |
+### Current Status Summary
 
----
-
-## Future Ideas
-
-- Real-time route monitoring
-- Network comparison tools
-- Browser extension
-- API for developers
-- White-label for ISPs
-- Educational mode with explanations
-- VR visualization
-- AR exploration of routes
-
----
-
-## Notes
-
-- Timeline is flexible based on available time
-- Prioritize MVP features first
-- Iterate based on user feedback
-- Consider open-sourcing core components
-
----
-
-## Future Improvements - High Priority
-
-These features were identified by comparing with other traceroute tools (NextTrace, Trippy, VisualRoute):
-
-### High Priority
-
-- [x] **Color-coded latency** - Green/yellow/red markers based on RTT
-  - Green: < 50ms (fast)
-  - Yellow: 50-150ms (moderate)
-  - Red: > 150ms (slow)
-  - Applied to: route lines, popup RTT, route details RTT
-
-- [x] **ASN tracking** - Show Autonomous System numbers along route
-  - Shows "AS15169 - Google LLC" format
-  - Displayed in popup and route details
-  - Uses ip-api.com batch API
-
-- [x] ~~City-level accuracy~~ - Discarded (city is sufficient)
-
-### Medium Priority
-
-- [x] **Export as image** - Basic PNG export working (html2canvas)
-  - [ ] High-resolution export (300 DPI for print quality)
-  - [ ] Custom title overlay: "From [User City] to [Destination]"
-  - [ ] Attribution overlay
-
-- [x] **Route art styles** - Basic themes working (neon, retro, minimal)
-  - [ ] Watercolor/artistic themes
-  
-- [x] **Home location emphasis** - Working (dashed hot pink line from home to first hop)
-  
-- [ ] **Continuous ping mode** - Monitor latency continuously
-- [ ] **Multiple destination comparison** - Compare routes side-by-side
-- [x] **Preset destinations** - Working (google, cloudflare, github, etc.)
-- [x] **Improved error handling** - Specific error messages implemented
-- [x] **Enhanced loading states** - Basic cycling dots animation working
-  - [ ] Progress indicator (hop 1/15, hop 2/15...) - requires backend SSE
-  - [ ] GeoIP resolution progress
-
-### User System
-
-**Status:** COMPLETED ✅
-
-- [x] User registration (email + password)
-- [x] User login with JWT authentication
-- [x] Save route to account
-- [x] View route history
-- [x] Delete saved routes
-
-**Future enhancements:**
-- [ ] Share routes publicly
-- [ ] User profiles with stats
-- [ ] Social login: Google + Facebook
-
-**Tech stack:**
-- Database: SQLite
-- ORM: SQLAlchemy
-- Auth: JWT (JSON Web Tokens)
-- Password hashing: bcrypt
-
-### Lower Priority / Future Ideas
-
-- [ ] **Faster probing** - Parallel probes like NextTrace
-- [ ] **WHOIS integration** - Show IP ownership details
-- [x] **Route animation** - Packet travel animation IMPLEMENTED 2026-03-08
-- [ ] **Animation polish** - Route line sync during camera flyTo
-- [ ] **IPv6 support** - Modern networking
-- [ ] **Historical route comparison** - Compare past saved routes
-
----
-
-## Route Art Vision
-
-**The Core Concept:** Transform traceroutes into personal, shareable art that creates emotional connection.
-
-### Why Route Art Works
-
-| Element | Why It's Special |
-|---------|------------------|
-| **Start point** | User's location (home town) = deeply personal |
-| **End point** | User's search destination (brand/company they care about) = meaningful |
-| **The journey** | Actual packet path = unique to that moment in time |
-
-This creates: **"This is MY digital journey from MY home to what I care about"**
-
-### For Print-on-Demand Success
-
-Users will want to buy prints because:
-1. It's **personal** - shows their location
-2. It's **unique** - their packet route is different from everyone else's
-3. It's **educational** - shows how the internet actually works
-4. It's **art** - beautiful visualization they can display
-
-### Implementation Priorities
-
-1. **High-res export** - 300 DPI minimum for print quality
-2. **Custom overlays** - Title text user can customize
-3. **Home location emphasis** - Make starting point stand out
-4. **Multiple styles** - Different visual aesthetics for different tastes
-
----
-
-## Honest Limitations
-
-Be transparent about what RouteCanvas can and cannot do:
-
-### Same Limitations as ALL Traceroute Tools
-
-| Limitation | Explanation |
-|------------|-------------|
-| **Timeout hops** | Cannot show hops that return `*` (no response) |
-| **Internal routing** | Cannot see company internal network infrastructure |
-| **Exact path** | Only shows responding hops - true path may differ |
-| **Dynamic routes** | BGP routes change constantly - each trace is a snapshot |
-
-### RouteCanvas Advantages
-
-| Feature | Advantage |
-|---------|-----------|
-| **Visual map** | Clear geographic visualization |
-| **Art themes** | Unique creative angle - no other tool does this |
-| **Animated journey** | Educational + engaging |
-| **Speed** | Batch GeoIP = ~15 seconds for 15 hops |
-
----
-
-## How RouteCanvas Differs from Other Tools
-
-| Feature | Other Tools | RouteCanvas |
-|---------|-------------|-------------|
-| Route visualization | Basic maps | Animated journey + Art themes |
-| Creative output | None | Route art generation |
-| Styling | Standard | Multiple themes (neon, retro, minimal) |
-| Speed | Varies | Batch GeoIP = fast |
-
----
-
-*Last updated: 2026-03-08*
-
-## Current Status Summary
-
-### ✅ COMPLETED (Demo-Ready)
+#### ✅ COMPLETED (Demo-Ready)
 - Basic traceroute execution with GeoIP
 - React frontend with Leaflet map
 - Animated journey visualization
@@ -352,45 +187,13 @@ Be transparent about what RouteCanvas can and cannot do:
 - Dark/Light mode toggle
 - Latency graph with toggle view
 - Route statistics panel
+- Mobile responsive design
 
-### ❌ REMAINING
+#### ❌ REMAINING
 
 **High Priority (Quick Wins):**
 - [x] Dark/Light theme toggle
 - [x] Latency graph (visual chart of RTT per hop)
 - [x] Route statistics panel (hop count, avg/max/min latency)
-- Mobile responsive design
+- [x] Mobile responsive design
 - Share routes via URL
-
-**Medium Priority:**
-- High-resolution export (300 DPI)
-- Custom title overlay on export
-- Watercolor/artistic themes
-- Continuous ping mode
-- Multiple destination comparison
-- Enhanced loading states (progress indicator - requires backend SSE)
-- Network fingerprint (unique signature based on route patterns)
-- Mobile touch gestures (pinch zoom, drag)
-
-**Lower Priority:**
-- Animation polish (route line sync)
-- Faster probing (parallel)
-- IPv6 support
-- WHOIS integration
-- Keyboard shortcuts (Enter to trace, Esc to clear)
-- Video export
-
-**🔄 On Hold:**
-- **Historical route comparison** - Compare saved routes with current trace
-  - Status: Backend endpoint ready, frontend implementation had React state timing issues
-  - Enhancement ideas for future implementation:
-    - Gamification: "Route collection" - save routes to different targets
-    - "Route journal" - trace same target over time, see changes
-    - "Unique routes" counter - how many different paths discovered
-    - "Route streak" - trace daily, see how often route changes
-    - Simpler approach: Load saved route in dedicated comparison view (not tied to current trace)
-    - Alternative: Store comparisons as separate objects, not tied to live state
-
----
-
-## Additional Documentation
