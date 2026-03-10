@@ -196,4 +196,4 @@ Why it works:
 - [x] Latency graph (visual chart of RTT per hop)
 - [x] Route statistics panel (hop count, avg/max/min latency)
 - [x] Mobile responsive design
-- Share routes via URL
+- [x] Share routes via URL
