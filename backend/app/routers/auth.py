@@ -99,6 +99,13 @@ def save_route(route: SavedRouteCreate, current_user: User = Depends(get_current
     db.refresh(db_route)
     return db_route
 
+@router.get("/routes/{route_id}")
+def get_route(route_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    route = db.query(SavedRoute).filter(SavedRoute.id == route_id, SavedRoute.user_id == current_user.id).first()
+    if not route:
+        raise HTTPException(status_code=404, detail="Route not found")
+    return route
+
 @router.delete("/routes/{route_id}")
 def delete_route(route_id: int, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     route = db.query(SavedRoute).filter(SavedRoute.id == route_id, SavedRoute.user_id == current_user.id).first()

@@ -376,10 +376,20 @@ Be transparent about what RouteCanvas can and cannot do:
 - Animation polish (route line sync)
 - Faster probing (parallel)
 - IPv6 support
-- Historical route comparison
 - WHOIS integration
 - Keyboard shortcuts (Enter to trace, Esc to clear)
 - Video export
+
+**🔄 On Hold:**
+- **Historical route comparison** - Compare saved routes with current trace
+  - Status: Backend endpoint ready, frontend implementation had React state timing issues
+  - Enhancement ideas for future implementation:
+    - Gamification: "Route collection" - save routes to different targets
+    - "Route journal" - trace same target over time, see changes
+    - "Unique routes" counter - how many different paths discovered
+    - "Route streak" - trace daily, see how often route changes
+    - Simpler approach: Load saved route in dedicated comparison view (not tied to current trace)
+    - Alternative: Store comparisons as separate objects, not tied to live state
 
 ---
 

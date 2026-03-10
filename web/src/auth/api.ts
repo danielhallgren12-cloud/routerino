@@ -97,4 +97,17 @@ export const routesApi = {
     }
     return response.json()
   },
+
+  async getRoute(token: string, routeId: number) {
+    const response = await fetch(`${API_URL}/routes/${routeId}`, {
+      method: 'GET',
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+      },
+    })
+    if (!response.ok) {
+      throw new Error('Failed to get route')
+    }
+    return response.json()
+  },
 }
