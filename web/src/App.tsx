@@ -61,6 +61,7 @@ function App() {
   const [loadingDots, setLoadingDots] = useState(0)
   const [error, setError] = useState('')
   const [traceData, setTraceData] = useState<TraceResponse | null>(null)
+  const [traceKey, setTraceKey] = useState(0)  // Forces complete remount
   const [theme, setTheme] = useState<Theme>('neon')
   const [mode, setMode] = useState<'dark' | 'light'>('dark')
   const [viewMode, setViewMode] = useState<'hops' | 'graph'>('hops')
@@ -89,20 +90,31 @@ function App() {
     document.documentElement.classList.toggle('light-mode', newMode === 'light')
   }
 
-  const runTrace = async () => {
-    if (!destination.trim()) return
+  const runTrace = async (destOverride?: string) => {
+    const target = destOverride?.trim() || destination.trim()
+    if (!target) return
     
     setLoading(true)
     setError('')
     setAnimationHop(-1)
     setIsPlaying(false)
     setShowPacket(false)
+    setTraceData(null)
     
     try {
       const response = await fetch('/api/v1/trace', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ destination: destination.trim(), max_hops: 15 })
+        headers: { 
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        },
+        body: JSON.stringify({ 
+          destination: target, 
+          max_hops: 15,
+          _nonce: Math.random()
+        })
       })
       
       if (!response.ok) {
@@ -611,7 +623,7 @@ function App() {
                   textTransform: 'capitalize',
                   transition: 'all 0.2s'
                 }}
-                onClick={() => { setDestination(dest); runTrace(); }}
+                onClick={() => { setDestination(dest); runTrace(dest); }}
               >
                 {dest.replace('.com', '')}
               </button>
@@ -911,7 +923,7 @@ function App() {
           </div>
 
           {traceData && traceData.hops.length > 0 && (
-            <div className="hop-list">
+            <div className="hop-list" key={traceData.id}>
               {(() => {
                 const rtts = validHops.map(h => h.rtt).filter((r): r is number => r !== undefined)
                 const avgRtt = rtts.length ? Math.round(rtts.reduce((a, b) => a + b, 0) / rtts.length) : 0

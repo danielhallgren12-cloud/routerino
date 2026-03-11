@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
 from app.routers import trace, auth
 from app.database import engine, Base
 
@@ -11,6 +13,15 @@ app = FastAPI(
     description="Backend API for RouteCanvas - Visual Traceroute Art",
     version="0.1.0"
 )
+
+# Add cache-busting middleware
+@app.middleware("http")
+async def add_no_cache_headers(request, call_next):
+    response = await call_next(request)
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
 
 app.add_middleware(
     CORSMiddleware,
