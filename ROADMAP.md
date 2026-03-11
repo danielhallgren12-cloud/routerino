@@ -72,7 +72,7 @@ This roadmap outlines the development phases for RouteCanvas, from initial demo 
 ### Week 6: Features Expansion
 
 - [ ] Preset destinations (popular targets)
-- [ ] Network fingerprint generation
+- [x] Network fingerprint generation
 - [ ] Theme customization options
 - [ ] UI/UX improvements
 
@@ -196,4 +196,4 @@ Why it works:
 - [x] Latency graph (visual chart of RTT per hop)
 - [x] Route statistics panel (hop count, avg/max/min latency)
 - [x] Mobile responsive design
-- [x] Share routes via URL
+- Share routes via URL

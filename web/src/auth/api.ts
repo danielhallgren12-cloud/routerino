@@ -133,4 +133,16 @@ export const routesApi = {
     }
     return response.json()
   },
+
+  async getUserStats(token: string) {
+    const response = await fetch(`${API_URL}/me/stats`, {
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+      },
+    })
+    if (!response.ok) {
+      throw new Error('Failed to get user stats')
+    }
+    return response.json()
+  },
 }

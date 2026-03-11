@@ -12,6 +12,15 @@ class User(Base):
     password_hash = Column(String, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     
+    # Gamification stats
+    total_traces = Column(Integer, default=0)
+    total_hops = Column(Integer, default=0)
+    unique_countries = Column(Text, default='[]')
+    unique_destinations = Column(Text, default='[]')
+    unique_ips = Column(Text, default='[]')
+    unique_asns = Column(Text, default='[]')
+    unique_fingerprints = Column(Text, default='[]')
+    
     routes = relationship("SavedRoute", back_populates="user", cascade="all, delete-orphan")
 
 class SavedRoute(Base):

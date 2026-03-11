@@ -951,6 +951,38 @@ function App() {
                   </div>
                 )
               })()}
+              {traceData.fingerprint_id && (
+                <div className="fingerprint-card">
+                  <div className="fingerprint-header">
+                    <span className="fingerprint-icon">🔐</span>
+                    <span className="fingerprint-title">Network Fingerprint</span>
+                    <span className="fingerprint-id">{traceData.fingerprint_id}</span>
+                  </div>
+                  <div className="fingerprint-route">
+                    <span className="fp-label">Route</span>
+                    <span className="fp-value">{validHops.length} hops</span>
+                  </div>
+                  <div className="fingerprint-collection">
+                    <div className="fp-stats">
+                      <div className="fp-stat">
+                        <span className="fp-stat-icon">🌐</span>
+                        <span className="fp-stat-value">{new Set(validHops.map(h => h.country).filter(Boolean)).size}</span>
+                        <span className="fp-stat-label">Countries</span>
+                      </div>
+                      <div className="fp-stat">
+                        <span className="fp-stat-icon">🏢</span>
+                        <span className="fp-stat-value">{new Set(validHops.map(h => h.asn).filter(Boolean)).size}</span>
+                        <span className="fp-stat-label">Networks</span>
+                      </div>
+                      <div className="fp-stat">
+                        <span className="fp-stat-icon">📍</span>
+                        <span className="fp-stat-value">{validHops.length}</span>
+                        <span className="fp-stat-label">Hops</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
               <div className="hop-list-header">
                 <h3>Route Details</h3>
                 <div className="view-toggle">
