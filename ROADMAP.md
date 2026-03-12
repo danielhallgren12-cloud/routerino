@@ -196,4 +196,13 @@ Why it works:
 - [x] Latency graph (visual chart of RTT per hop)
 - [x] Route statistics panel (hop count, avg/max/min latency)
 - [x] Mobile responsive design
-- Share routes via URL
+- [x] Share routes via URL
+- [x] Network fingerprint with collection tracking
+
+### Future Enhancements
+
+**Network Fingerprint (Planned):**
+- [ ] "New" indicators showing items discovered in current trace (vs already collected)
+- [ ] Inventory screen to view all collected items in detail
+- [ ] Badge system for collection milestones
+- [ ] Simple per-user rarity display (first time vs again)

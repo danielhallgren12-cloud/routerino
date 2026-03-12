@@ -17,12 +17,18 @@ def calculate_fingerprint(hops: list) -> tuple[str, str]:
     """
     asns = sorted(set(h.get('asn', '') for h in hops if h.get('asn')))
     countries = sorted(set(h.get('country', '') for h in hops if h.get('country')))
+    cities = sorted(set(h.get('city', '') for h in hops if h.get('city')))
     ips = sorted(set(h.get('ip', '') for h in hops if h.get('ip') and h.get('ip') != '*'))
+    hostnames = sorted(set(h.get('hostname', '') for h in hops if h.get('hostname')))
+    isps = sorted(set(h.get('isp', '') for h in hops if h.get('isp')))
     
     fp_data = {
         'asns': asns,
         'countries': countries,
-        'ips': ips[:10]
+        'cities': cities,
+        'ips': ips[:10],
+        'hostnames': hostnames[:10],
+        'isps': isps
     }
     fp_string = json.dumps(fp_data, sort_keys=True)
     fp_hash = hashlib.sha256(fp_string.encode()).hexdigest()[:8]

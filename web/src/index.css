@@ -903,6 +903,27 @@ body {
 .fingerprint-icon { font-size: 1rem; }
 .fingerprint-title { font-size: 0.85rem; font-weight: 600; color: var(--text); }
 .fingerprint-id { margin-left: auto; font-size: 0.9rem; font-weight: 700; color: #a78bfa; font-family: monospace; }
+.fingerprint-dest { font-size: 0.75rem; color: var(--text-muted); margin-left: 0.25rem; }
+
+.fingerprint-section {
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.fingerprint-section:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.fingerprint-section-title {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 0.35rem;
+  font-weight: 600;
+}
 
 .fingerprint-route {
   display: flex;

@@ -145,4 +145,31 @@ export const routesApi = {
     }
     return response.json()
   },
+
+  async getCollection(token: string) {
+    const response = await fetch(`${API_URL}/me/collection`, {
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+      },
+    })
+    if (!response.ok) {
+      throw new Error('Failed to get collection')
+    }
+    return response.json()
+  },
+
+  async collectRoute(token: string, destination: string, hopsData: string, fingerprintId: string) {
+    const response = await fetch(`${API_URL}/trace/collect`, {
+      method: 'POST',
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ destination, hops_data: hopsData, fingerprint_id: fingerprintId }),
+    })
+    if (!response.ok) {
+      throw new Error('Failed to collect route')
+    }
+    return response.json()
+  },
 }
