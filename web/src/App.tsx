@@ -25,6 +25,8 @@ interface TraceResponse {
   destination: string
   hops: Hop[]
   created_at: string
+  fingerprint?: string
+  fingerprint_id?: string
 }
 
 const getLatencyColor = (rtt?: number) => {
@@ -81,6 +83,17 @@ function App() {
   const [saveMessage, setSaveMessage] = useState('')
   const [shareMessage, setShareMessage] = useState('')
   const [showMoreMenu, setShowMoreMenu] = useState(false)
+  const [userCollection, setUserCollection] = useState<{
+    destinations: number
+    countries: number
+    cities: number
+    companies: number
+    ips: number
+    asns: number
+    total_traces: number
+    total_hops: number
+    fingerprints: number
+  } | null>(null)
   const animationRef = useRef<{ cancel: boolean }>({ cancel: false })
   const mapRef = useRef<L.Map | null>(null)
 
@@ -124,6 +137,17 @@ function App() {
       
       const data = await response.json()
       setTraceData(data)
+      
+      // Update collection if logged in
+      if (token && data.fingerprint_id) {
+        try {
+          const hopsData = JSON.stringify(data.hops)
+          const collection = await routesApi.collectRoute(token, data.destination, hopsData, data.fingerprint_id)
+          setUserCollection(collection)
+        } catch (err) {
+          console.error('Failed to collect route:', err)
+        }
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Trace failed - please try again')
       console.error(err)
@@ -194,10 +218,9 @@ function App() {
   }
 
   const loadRoute = (route: {id: number, destination: string}) => {
-    // This would require fetching the route details - for now just set destination
     setDestination(route.destination)
     setShowRoutes(false)
-    runTrace()
+    runTrace(route.destination)  // Pass destination directly to fix sync bug
   }
 
   const deleteSavedRoute = async (routeId: number) => {
@@ -262,6 +285,17 @@ function App() {
       }
     )
   }, [])
+
+  // Fetch collection when logged in
+  useEffect(() => {
+    if (token) {
+      routesApi.getCollection(token)
+        .then(setUserCollection)
+        .catch(err => console.error('Failed to load collection:', err))
+    } else {
+      setUserCollection(null)
+    }
+  }, [token])
 
   // Handle shared route from URL
   useEffect(() => {
@@ -924,6 +958,56 @@ function App() {
 
           {traceData && traceData.hops.length > 0 && (
             <div className="hop-list" key={traceData.id}>
+              {traceData.fingerprint_id && isAuthenticated && userCollection && (
+                <div className="fingerprint-card">
+                  <div className="fingerprint-header">
+                    <span className="fingerprint-icon">🏷️</span>
+                    <span className="fingerprint-title">Network Fingerprint</span>
+                    <span className="fingerprint-id">{traceData.fingerprint_id}</span>
+                    {traceData.destination && <span className="fingerprint-dest">({traceData.destination})</span>}
+                  </div>
+                  <div className="fingerprint-section">
+                    <div className="fingerprint-section-title">Your Collection</div>
+                    <div className="fp-stats">
+                      <div className="fp-stat">
+                        <span className="fp-stat-icon">🌆</span>
+                        <span className="fp-stat-value">{userCollection.cities}</span>
+                        <span className="fp-stat-label">Cities</span>
+                      </div>
+                      <div className="fp-stat">
+                        <span className="fp-stat-icon">🌍</span>
+                        <span className="fp-stat-value">{userCollection.countries}</span>
+                        <span className="fp-stat-label">Countries</span>
+                      </div>
+                      <div className="fp-stat">
+                        <span className="fp-stat-icon">📍</span>
+                        <span className="fp-stat-value">{userCollection.destinations}</span>
+                        <span className="fp-stat-label">Destinations</span>
+                      </div>
+                      <div className="fp-stat">
+                        <span className="fp-stat-icon">🏢</span>
+                        <span className="fp-stat-value">{userCollection.companies}</span>
+                        <span className="fp-stat-label">Companies</span>
+                      </div>
+                      <div className="fp-stat">
+                        <span className="fp-stat-icon">🔢</span>
+                        <span className="fp-stat-value">{userCollection.ips}</span>
+                        <span className="fp-stat-label">IPs</span>
+                      </div>
+                      <div className="fp-stat">
+                        <span className="fp-stat-icon">🔢</span>
+                        <span className="fp-stat-value">{userCollection.asns}</span>
+                        <span className="fp-stat-label">ASNs</span>
+                      </div>
+                      <div className="fp-stat">
+                        <span className="fp-stat-icon">🏷️</span>
+                        <span className="fp-stat-value">{userCollection.fingerprints}</span>
+                        <span className="fp-stat-label">Fingerprints</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
               {(() => {
                 const rtts = validHops.map(h => h.rtt).filter((r): r is number => r !== undefined)
                 const avgRtt = rtts.length ? Math.round(rtts.reduce((a, b) => a + b, 0) / rtts.length) : 0

@@ -884,6 +884,60 @@ body {
   margin-top: 0.15rem;
 }
 
+/* Network Fingerprint */
+.fingerprint-card {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(99, 102, 241, 0.15));
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.fingerprint-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.fingerprint-icon { font-size: 1rem; }
+.fingerprint-title { font-size: 0.85rem; font-weight: 600; color: var(--text); }
+.fingerprint-id { margin-left: auto; font-size: 0.9rem; font-weight: 700; color: #a78bfa; font-family: monospace; }
+.fingerprint-dest { font-size: 0.75rem; color: var(--text-muted); margin-left: 0.25rem; }
+
+.fingerprint-section {
+  margin-bottom: 0.5rem;
+}
+
+.fingerprint-section-title {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 0.35rem;
+  font-weight: 600;
+}
+
+.fp-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.fp-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  min-width: 50px;
+  padding: 0.35rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.fp-stat-icon { font-size: 0.8rem; margin-bottom: 0.15rem; }
+.fp-stat-value { font-size: 0.85rem; font-weight: 600; color: var(--text); }
+.fp-stat-label { font-size: 0.55rem; color: var(--text-muted); text-transform: uppercase; }
+
 /* Latency Graph */
 .latency-graph {
   display: flex;

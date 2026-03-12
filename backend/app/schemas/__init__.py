@@ -23,6 +23,8 @@ class TraceResponse(BaseModel):
     destination: str
     hops: List[Hop]
     created_at: str
+    fingerprint: Optional[str] = None
+    fingerprint_id: Optional[str] = None
 
 # Auth schemas
 class UserCreate(BaseModel):
