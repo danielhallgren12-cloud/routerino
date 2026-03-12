@@ -76,7 +76,7 @@ This roadmap outlines the development phases for RouteCanvas, from initial demo 
 - [ ] Theme customization options
 - [ ] Watercolor/artistic themes (for beautiful exports)
 - [ ] UI/UX improvements
-- [ ] Mobile touch gestures (pinch zoom)
+- [x] Mobile touch gestures (pinch zoom, double-tap to zoom)
 - [ ] Animation polish (route line sync)
 - [ ] Faster probing (parallel)
 - [ ] IPv6 support

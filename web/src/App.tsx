@@ -49,6 +49,11 @@ function MapEvents({ onZoomChange }: { onZoomChange: (zoom: number) => void }) {
     zoomend: () => {
       onZoomChange(map.getZoom())
     },
+    dblclick: (e) => {
+      e.originalEvent.preventDefault()
+      e.originalEvent.stopPropagation()
+      map.setZoom(map.getZoom() + 1, { center: e.latlng })
+    },
   })
   useEffect(() => {
     onZoomChange(map.getZoom())
@@ -239,6 +244,8 @@ function App() {
       mapRef.current.flyTo([selectedHop.lat, selectedHop.lng], 8)
     }
   }, [selectedHop])
+
+
 
   useEffect(() => {
     if (!loading) {
@@ -713,6 +720,12 @@ function App() {
                 center={[20, 0]}
                 zoom={2}
                 style={{ height: '100%', width: '100%' }}
+                zoomControl={true}
+                doubleClickZoom={false}
+                scrollWheelZoom={true}
+                touchZoom={true}
+                dragging={true}
+                preferCanvas={true}
               >
                 <MapEvents onZoomChange={setZoomLevel} />
                 <TileLayer
