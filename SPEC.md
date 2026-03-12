@@ -57,6 +57,7 @@
 | User Accounts | ✅ Complete (register/login/JWT) |
 | Dark/Light Mode | ✅ Complete (toggle in header) |
 | Latency Graph | ✅ Complete (toggle view in route details) |
+| Network Fingerprint | ✅ Complete (collection tracking: Cities, Countries, Destinations, Companies, IPs, ASNs, Fingerprints) |
 
 ### Phase 3 - Social (Planned)
 
@@ -100,4 +101,4 @@ Users will want to buy prints because:
 
 ---
 
-*Last updated: 2026-03-09*
+*Last updated: 2026-03-12*

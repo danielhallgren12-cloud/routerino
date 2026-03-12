@@ -86,15 +86,16 @@
 | Method | Endpoint | Description | Status |
 |--------|----------|-------------|--------|
 | POST | `/trace` | Run traceroute to destination | ✅ |
-| GET | `/destinations/presets` | Get list of preset destinations | ✅ |
-| POST | `/users/register` | Register new user | ✅ |
-| POST | `/users/login` | User login | ✅ |
-| POST | `/routes/save` | Save route to account | ✅ |
-| GET | `/routes` | Get user's saved routes | ✅ |
-| DELETE | `/routes/{id}` | Delete saved route | ✅ |
-| GET | `/trace/{id}` | Get existing trace result | 🔄 Future |
-| GET | `/routes/public` | Get public gallery routes | 🔄 Future |
-| POST | `/routes/{id}/like` | Like a route | 🔄 Future |
+| POST | `/auth/register` | Register new user | ✅ |
+| POST | `/auth/login` | User login | ✅ |
+| GET | `/auth/me` | Get current user info | ✅ |
+| GET | `/auth/routes` | Get user's saved routes | ✅ |
+| POST | `/auth/routes` | Save route to account | ✅ |
+| POST | `/auth/routes/share` | Save route with public share link | ✅ |
+| DELETE | `/auth/routes/{id}` | Delete saved route | ✅ |
+| GET | `/share/{share_id}` | Get public shared route | ✅ |
+| GET | `/auth/me/collection` | Get user's collection stats | ✅ |
+| POST | `/trace/collect` | Update collection after trace (auto) | ✅ |
 
 #### Request/Response Examples
 
@@ -104,6 +105,28 @@
 {
   "destination": "google.com",
   "max_hops": 30
+}
+
+// Response
+{
+  "id": "abc123",
+  "destination": "google.com",
+  "hops": [
+    {
+      "hop": 1,
+      "ip": "192.168.1.1",
+      "hostname": "router.local",
+      "isp": "Home Network",
+      "country": "SE",
+      "city": "Stockholm",
+      "lat": 59.3293,
+      "lng": 18.0686,
+      "rtt": 1.2
+    }
+  ],
+  "created_at": "2026-03-04T12:00:00Z",
+  "fingerprint": "{...}",
+  "fingerprint_id": "#8X2K4"
 }
 
 // Response
@@ -192,26 +215,33 @@ RouteCanvas/
 
 ### Tables
 
-**routes**
+**saved_routes**
 | Column | Type | Description |
 |--------|------|-------------|
-| id | UUID | Primary key |
-| user_id | UUID | FK to users (nullable for anon) |
-| destination | VARCHAR(255) | Target domain/IP |
-| hops | JSON | Array of hop data |
-| theme | VARCHAR(50) | Applied art theme |
-| is_public | BOOLEAN | Shown in gallery? |
-| likes_count | INTEGER | Number of likes |
+| id | INTEGER | Primary key (auto-increment) |
+| user_id | INTEGER | FK to users |
+| destination | VARCHAR | Target domain/IP |
+| hops_data | TEXT | JSON string of hops |
+| share_id | VARCHAR | Unique public share ID (nullable) |
 | created_at | TIMESTAMP | Creation time |
 
 **users**
 | Column | Type | Description |
 |--------|------|-------------|
-| id | UUID | Primary key |
-| username | VARCHAR(50) | Unique username |
-| email | VARCHAR(255) | Unique email |
-| password_hash | VARCHAR(255) | Bcrypt hash |
+| id | INTEGER | Primary key (auto-increment) |
+| username | VARCHAR | Unique username |
+| email | VARCHAR | Unique email |
+| password_hash | VARCHAR | Bcrypt hash |
 | created_at | TIMESTAMP | Registration time |
+| total_traces | INTEGER | Total traces performed |
+| total_hops | INTEGER | Total hops across all traces |
+| unique_countries | TEXT | JSON array of unique countries |
+| unique_destinations | TEXT | JSON array of unique destinations |
+| unique_ips | TEXT | JSON array of unique IPs |
+| unique_asns | TEXT | JSON array of unique ASNs |
+| unique_fingerprints | TEXT | JSON array of unique fingerprints |
+| unique_cities | TEXT | JSON array of unique cities |
+| unique_companies | TEXT | JSON array of unique companies |
 
 **likes**
 | Column | Type | Description |
@@ -224,19 +254,6 @@ RouteCanvas/
 ---
 
 ## 5. Traceroute Implementation
-
-### Options for Python
-
-| Library | Pros | Cons |
-|---------|------|------|
-| **scapy** | Full control, cross-platform | Complex, requires root |
-| **subprocess (system traceroute)** | Simple | Platform-dependent (traceroute/tracert) |
-| **py-traceroute** | Pure Python | Limited features |
-| **aioscapy** | Async support | Complex setup |
-
-### Recommended Approach
-
-For MVP, use **subprocess** to call system traceroute:
 - Linux/macOS: `traceroute`
 - Windows: `tracert`
 
@@ -388,4 +405,4 @@ VITE_API_URL=http://localhost:8000/api/v1
 
 ---
 
-*Last updated: 2026-03-09*
+*Last updated: 2026-03-12*

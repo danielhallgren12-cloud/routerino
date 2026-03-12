@@ -71,7 +71,7 @@ This roadmap outlines the development phases for RouteCanvas, from initial demo 
 
 ### Week 6: Features Expansion
 
-- [ ] Preset destinations (popular targets)
+- [x] Preset destinations (popular targets)
 - [x] Network fingerprint generation
 - [ ] Theme customization options
 - [ ] UI/UX improvements
@@ -157,12 +157,16 @@ Why it works:
 - **Historical route comparison** - Compare saved routes with current trace
   - Status: Backend endpoint ready, frontend implementation had React state timing issues
   - Enhancement ideas for future implementation:
-    - Gamification: "Route collection" - save routes to different targets
     - "Route journal" - trace same target over time, see changes
-    - "Unique routes" counter - how many different paths discovered
     - "Route streak" - trace daily, see how often route changes
     - Simpler approach: Load saved route in dedicated comparison view (not tied to current trace)
     - Alternative: Store comparisons as separate objects, not tied to live state
+
+**✅ COMPLETED (Phase 2):**
+- **Network fingerprint with collection tracking**
+  - Cities, Countries, Destinations, Companies, IPs, ASNs, Fingerprints
+  - Collection updates after every search (logged-in users)
+  - Fingerprint ID shows unique route signature
 
 ---
 
@@ -199,9 +203,9 @@ Why it works:
 - [x] Share routes via URL
 - [x] Network fingerprint with collection tracking
 
-### Future Enhancements
+### Future Enhancements (Network Fingerprint)
 
-**Network Fingerprint (Planned):**
+**Planned:**
 - [ ] "New" indicators showing items discovered in current trace (vs already collected)
 - [ ] Inventory screen to view all collected items in detail
 - [ ] Badge system for collection milestones
