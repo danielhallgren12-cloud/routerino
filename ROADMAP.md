@@ -74,11 +74,19 @@ This roadmap outlines the development phases for RouteCanvas, from initial demo 
 - [x] Preset destinations (popular targets)
 - [x] Network fingerprint generation
 - [ ] Theme customization options
+- [ ] Watercolor/artistic themes (for beautiful exports)
 - [ ] UI/UX improvements
+- [ ] Mobile touch gestures (pinch zoom)
+- [ ] Animation polish (route line sync)
+- [ ] Faster probing (parallel)
+- [ ] IPv6 support
+- [ ] WHOIS integration
 
 **Deliverables:**
 - Preset destinations working
 - Network fingerprint feature
+- Better mobile experience
+- Improved animation
 
 ---
 
@@ -133,16 +141,19 @@ Why it works:
 
 **Implementation:**
 
+- [ ] Beautiful artistic themes (required for social/print appeal)
+- [ ] High-res image export (300 DPI required for print)
+- [ ] Custom text overlay: "From [City] to [Destination]"
+- [ ] Multiple background color options
+- [ ] Shareable export layouts (cards, posters)
 - [ ] Integrate print-on-demand API
 - [ ] Product selection (poster, T-shirt, canvas)
 - [ ] Order processing
 - [ ] Payment integration
-- [ ] High-res image export (300 DPI required for print)
-- [ ] Custom text overlay: "From [City] to [Destination]"
-- [ ] Multiple background color options
 
 **Deliverables:**
 - Users can order printed products with their route art
+- Export looks professional and shareable
 
 ### Week 12+: Gamification and Advanced Features
 
