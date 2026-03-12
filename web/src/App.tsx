@@ -131,7 +131,7 @@ function App() {
         },
         body: JSON.stringify({ 
           destination: target, 
-          max_hops: 15,
+          max_hops: 20,
           ip_version: ipVersion,
           _nonce: Math.random()
         })
@@ -336,8 +336,15 @@ function App() {
     }
   }, [])
 
-  // Define validHops first
-  const validHops = traceData ? traceData.hops.filter(h => h.ip && h.ip !== '*') : []
+  // Define validHops (hops with geolocation for map)
+  const validHops = traceData ? traceData.hops.filter(h => h.ip && h.ip !== '*' && h.lat != null && h.lng != null) : []
+  
+  // Define allHops (all hops including those without geolocation)
+  const allHops = traceData ? traceData.hops.filter(h => h.ip && h.ip !== '*') : []
+  
+  // console.log('validHops (with geo):', validHops.length)
+  // console.log('allHops (all):', allHops.length)
+  // console.log('allHops sample:', allHops.map(h => ({ hop: h.hop, ip: h.ip, lat: h.lat })))
 
   // Calculate distance between two points in km
   const getDistance = (lat1: number, lng1: number, lat2: number, lng2: number) => {
@@ -659,7 +666,7 @@ function App() {
               )}
             </>
           )}
-          {loading && <div className="loading-note">A search takes approx 10-20 sec</div>}
+          {loading && <div className="loading-note">A search takes approx 8-15 sec</div>}
           <div className="preset-destinations" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem', width: '100%', flexWrap: 'wrap' }}>
             <span style={{ fontSize: '0.65rem', color: '#888', marginRight: '0.25rem' }}>Popular:</span>
             {['google.com', 'cloudflare.com', 'github.com', 'amazon.com', 'facebook.com'].map(dest => (
@@ -1034,7 +1041,7 @@ function App() {
                 </div>
               )}
               {(() => {
-                const rtts = validHops.map(h => h.rtt).filter((r): r is number => r !== undefined)
+                const rtts = allHops.map(h => h.rtt).filter((r): r is number => r !== undefined)
                 const avgRtt = rtts.length ? Math.round(rtts.reduce((a, b) => a + b, 0) / rtts.length) : 0
                 const maxRtt = rtts.length ? Math.max(...rtts) : 0
                 const minRtt = rtts.length ? Math.min(...rtts) : 0
@@ -1042,7 +1049,7 @@ function App() {
                 return (
                   <div className="route-stats">
                     <div className="stat-box">
-                      <span className="stat-value">{validHops.length}</span>
+                      <span className="stat-value">{allHops.length}</span>
                       <span className="stat-label">Hops</span>
                     </div>
                     <div className="stat-box">
@@ -1093,10 +1100,10 @@ function App() {
                       📍 Your Location: {userLocation.city}, {userLocation.country}
                     </div>
                   )}
-                  {traceData.hops.map(hop => (
+                  {allHops.map(hop => (
                     <div 
                       key={hop.hop} 
-                      className="hop-item"
+                      className={`hop-item ${hop.ip === '*' ? 'hop-timeout' : (!hop.lat ? 'hop-no-geo' : '')}`}
                       onClick={() => {
                         if (hop.lat && hop.lng) {
                           mapRef.current?.flyTo([hop.lat, hop.lng], 8)
@@ -1126,7 +1133,7 @@ function App() {
                 </>
               ) : (
                 <div className="latency-graph">
-                  {validHops.map(hop => (
+                  {allHops.map(hop => (
                     <div 
                       key={hop.hop}
                       className="graph-row"

@@ -73,9 +73,9 @@ def run_traceroute(destination: str, max_hops: int = 30, ip_version: str = "ipv4
     
     try:
         if system == "Windows":
-            cmd = ["tracert", ip_flag, "-h", str(max_hops), "-w", "300", "-d", destination]
+            cmd = ["tracert", ip_flag, "-h", "20", "-w", "200", "-d", destination]
         else:
-            cmd = ["traceroute", ip_flag, "-m", str(max_hops), "-n", destination]
+            cmd = ["traceroute", ip_flag, "-m", "20", "-n", destination]
         
         result = subprocess.run(
             cmd,
@@ -166,4 +166,4 @@ def run_traceroute(destination: str, max_hops: int = 30, ip_version: str = "ipv4
     except Exception as e:
         pass
     
-    return [h for h in hops if h.get("ip") and h.get("ip") != "*" and h.get("lat")]
+    return [h for h in hops if h.get("ip") and h.get("ip") != "*"]
