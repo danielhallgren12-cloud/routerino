@@ -134,18 +134,6 @@ export const routesApi = {
     return response.json()
   },
 
-  async getUserStats(token: string) {
-    const response = await fetch(`${API_URL}/me/stats`, {
-      headers: { 
-        'Authorization': `Bearer ${token}`,
-      },
-    })
-    if (!response.ok) {
-      throw new Error('Failed to get user stats')
-    }
-    return response.json()
-  },
-
   async getCollection(token: string) {
     const response = await fetch(`${API_URL}/me/collection`, {
       headers: { 
@@ -159,7 +147,7 @@ export const routesApi = {
   },
 
   async collectRoute(token: string, destination: string, hopsData: string, fingerprintId: string) {
-    const response = await fetch(`${API_URL}/auth/trace/collect`, {
+    const response = await fetch(`${API_URL}/trace/collect`, {
       method: 'POST',
       headers: { 
         'Authorization': `Bearer ${token}`,

@@ -907,14 +907,6 @@ body {
 
 .fingerprint-section {
   margin-bottom: 0.5rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid rgba(139, 92, 246, 0.2);
-}
-
-.fingerprint-section:last-child {
-  margin-bottom: 0;
-  padding-bottom: 0;
-  border-bottom: none;
 }
 
 .fingerprint-section-title {
@@ -925,24 +917,10 @@ body {
   font-weight: 600;
 }
 
-.fingerprint-route {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.35rem 0;
-  border-bottom: 1px solid rgba(139, 92, 246, 0.2);
-  margin-bottom: 0.5rem;
-}
-
-.fp-label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; }
-.fp-value { font-size: 0.8rem; color: var(--text); }
-
-.fingerprint-collection { padding-top: 0.25rem; }
-
 .fp-stats {
   display: flex;
-  gap: 0.5rem;
-  margin-top: 0.35rem;
+  flex-wrap: wrap;
+  gap: 0.35rem;
 }
 
 .fp-stat {
@@ -950,7 +928,8 @@ body {
   flex-direction: column;
   align-items: center;
   flex: 1;
-  padding: 0.25rem;
+  min-width: 50px;
+  padding: 0.35rem;
   background: rgba(0, 0, 0, 0.2);
   border-radius: 4px;
 }

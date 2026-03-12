@@ -90,7 +90,6 @@ function App() {
     companies: number
     ips: number
     asns: number
-    hostnames: number
     total_traces: number
     total_hops: number
     fingerprints: number
@@ -139,6 +138,7 @@ function App() {
       const data = await response.json()
       setTraceData(data)
       
+      // Update collection if logged in
       if (token && data.fingerprint_id) {
         try {
           const hopsData = JSON.stringify(data.hops)
@@ -218,10 +218,9 @@ function App() {
   }
 
   const loadRoute = (route: {id: number, destination: string}) => {
-    // This would require fetching the route details - for now just set destination
     setDestination(route.destination)
     setShowRoutes(false)
-    runTrace()
+    runTrace(route.destination)  // Pass destination directly to fix sync bug
   }
 
   const deleteSavedRoute = async (routeId: number) => {
@@ -959,7 +958,7 @@ function App() {
 
           {traceData && traceData.hops.length > 0 && (
             <div className="hop-list" key={traceData.id}>
-              {traceData.fingerprint_id && (
+              {traceData.fingerprint_id && isAuthenticated && userCollection && (
                 <div className="fingerprint-card">
                   <div className="fingerprint-header">
                     <span className="fingerprint-icon">🏷️</span>
@@ -967,95 +966,46 @@ function App() {
                     <span className="fingerprint-id">{traceData.fingerprint_id}</span>
                     {traceData.destination && <span className="fingerprint-dest">({traceData.destination})</span>}
                   </div>
-                  
                   <div className="fingerprint-section">
                     <div className="fingerprint-section-title">Your Collection</div>
                     <div className="fp-stats">
                       <div className="fp-stat">
                         <span className="fp-stat-icon">🌆</span>
-                        <span className="fp-stat-value">{new Set(validHops.map(h => h.city).filter(Boolean)).size}</span>
+                        <span className="fp-stat-value">{userCollection.cities}</span>
                         <span className="fp-stat-label">Cities</span>
                       </div>
                       <div className="fp-stat">
                         <span className="fp-stat-icon">🌍</span>
-                        <span className="fp-stat-value">{new Set(validHops.map(h => h.country).filter(Boolean)).size}</span>
+                        <span className="fp-stat-value">{userCollection.countries}</span>
                         <span className="fp-stat-label">Countries</span>
                       </div>
                       <div className="fp-stat">
                         <span className="fp-stat-icon">📍</span>
-                        <span className="fp-stat-value">{new Set(validHops.map(h => h.ip).filter(Boolean)).size}</span>
-                        <span className="fp-stat-label">IPs</span>
+                        <span className="fp-stat-value">{userCollection.destinations}</span>
+                        <span className="fp-stat-label">Destinations</span>
                       </div>
                       <div className="fp-stat">
                         <span className="fp-stat-icon">🏢</span>
-                        <span className="fp-stat-value">{new Set(validHops.map(h => h.isp).filter(Boolean)).size}</span>
+                        <span className="fp-stat-value">{userCollection.companies}</span>
                         <span className="fp-stat-label">Companies</span>
                       </div>
                       <div className="fp-stat">
                         <span className="fp-stat-icon">🔢</span>
-                        <span className="fp-stat-value">{new Set(validHops.map(h => h.asn).filter(Boolean)).size}</span>
+                        <span className="fp-stat-value">{userCollection.ips}</span>
+                        <span className="fp-stat-label">IPs</span>
+                      </div>
+                      <div className="fp-stat">
+                        <span className="fp-stat-icon">🔢</span>
+                        <span className="fp-stat-value">{userCollection.asns}</span>
                         <span className="fp-stat-label">ASNs</span>
                       </div>
                       <div className="fp-stat">
-                        <span className="fp-stat-icon">💻</span>
-                        <span className="fp-stat-value">{new Set(validHops.map(h => h.hostname).filter(Boolean)).size}</span>
-                        <span className="fp-stat-label">Hostnames</span>
+                        <span className="fp-stat-icon">🏷️</span>
+                        <span className="fp-stat-value">{userCollection.fingerprints}</span>
+                        <span className="fp-stat-label">Fingerprints</span>
                       </div>
                     </div>
                   </div>
-                  
-                  {isAuthenticated && userCollection && (
-                    <div className="fingerprint-section">
-                      <div className="fingerprint-section-title">Your Collection</div>
-                      <div className="fp-stats">
-                        <div className="fp-stat">
-                          <span className="fp-stat-icon">🌍</span>
-                          <span className="fp-stat-value">{userCollection.countries}</span>
-                          <span className="fp-stat-label">Countries</span>
-                        </div>
-                        <div className="fp-stat">
-                          <span className="fp-stat-icon">📍</span>
-                          <span className="fp-stat-value">{userCollection.destinations}</span>
-                          <span className="fp-stat-label">Destinations</span>
-                        </div>
-                        <div className="fp-stat">
-                          <span className="fp-stat-icon">🏢</span>
-                          <span className="fp-stat-value">{userCollection.companies}</span>
-                          <span className="fp-stat-label">Companies</span>
-                        </div>
-                        <div className="fp-stat">
-                          <span className="fp-stat-icon">🔢</span>
-                          <span className="fp-stat-value">{userCollection.ips}</span>
-                          <span className="fp-stat-label">IPs</span>
-                        </div>
-                        <div className="fp-stat">
-                          <span className="fp-stat-icon">🔢</span>
-                          <span className="fp-stat-value">{userCollection.asns}</span>
-                          <span className="fp-stat-label">ASNs</span>
-                        </div>
-                        <div className="fp-stat">
-                          <span className="fp-stat-icon">💻</span>
-                          <span className="fp-stat-value">{userCollection.hostnames}</span>
-                          <span className="fp-stat-label">Hostnames</span>
-                        </div>
-                        <div className="fp-stat">
-                          <span className="fp-stat-icon">🔄</span>
-                          <span className="fp-stat-value">{userCollection.total_traces}</span>
-                          <span className="fp-stat-label">Traces</span>
-                        </div>
-                        <div className="fp-stat">
-                          <span className="fp-stat-icon">📊</span>
-                          <span className="fp-stat-value">{userCollection.total_hops}</span>
-                          <span className="fp-stat-label">Hops</span>
-                        </div>
-                        <div className="fp-stat">
-                          <span className="fp-stat-icon">🏷️</span>
-                          <span className="fp-stat-value">{userCollection.fingerprints}</span>
-                          <span className="fp-stat-label">Fingerprints</span>
-                        </div>
-                      </div>
-                    </div>
-                  )}
                 </div>
               )}
               {(() => {

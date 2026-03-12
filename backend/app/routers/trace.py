@@ -11,24 +11,15 @@ from app.services import traceroute
 router = APIRouter()
 
 def calculate_fingerprint(hops: list) -> tuple[str, str]:
-    """Calculate a unique fingerprint for this route.
-    Returns (fingerprint_string, fingerprint_id)
-    fingerprint_id is a short 5-char code like #8X2K4
-    """
+    """Calculate a unique fingerprint for this route."""
     asns = sorted(set(h.get('asn', '') for h in hops if h.get('asn')))
     countries = sorted(set(h.get('country', '') for h in hops if h.get('country')))
-    cities = sorted(set(h.get('city', '') for h in hops if h.get('city')))
     ips = sorted(set(h.get('ip', '') for h in hops if h.get('ip') and h.get('ip') != '*'))
-    hostnames = sorted(set(h.get('hostname', '') for h in hops if h.get('hostname')))
-    isps = sorted(set(h.get('isp', '') for h in hops if h.get('isp')))
     
     fp_data = {
         'asns': asns,
         'countries': countries,
-        'cities': cities,
-        'ips': ips[:10],
-        'hostnames': hostnames[:10],
-        'isps': isps
+        'ips': ips[:10]
     }
     fp_string = json.dumps(fp_data, sort_keys=True)
     fp_hash = hashlib.sha256(fp_string.encode()).hexdigest()[:8]
@@ -43,6 +34,7 @@ async def trace_route(request: TraceRequest):
     if not request.destination:
         raise HTTPException(status_code=400, detail="Destination is required")
     
+    # Validate hostname format
     try:
         socket.gethostbyname(request.destination)
     except socket.gaierror:
@@ -63,7 +55,6 @@ async def trace_route(request: TraceRequest):
         raise HTTPException(status_code=404, detail="No route found - destination may be unreachable")
     
     trace_id = str(uuid.uuid4())
-    
     fp_string, fp_id = calculate_fingerprint(hops)
     
     response = TraceResponse(
