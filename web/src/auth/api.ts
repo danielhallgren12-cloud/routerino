@@ -159,7 +159,7 @@ export const routesApi = {
   },
 
   async collectRoute(token: string, destination: string, hopsData: string, fingerprintId: string) {
-    const response = await fetch(`${API_URL}/trace/collect`, {
+    const response = await fetch(`${API_URL}/auth/trace/collect`, {
       method: 'POST',
       headers: { 
         'Authorization': `Bearer ${token}`,
