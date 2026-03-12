@@ -79,7 +79,7 @@ This roadmap outlines the development phases for RouteCanvas, from initial demo 
 - [x] Mobile touch gestures (pinch zoom, double-tap to zoom)
 - [ ] Animation polish (route line sync)
 - [ ] Faster probing (parallel)
-- [ ] IPv6 support
+- [x] IPv6 support
 - [ ] WHOIS integration
 
 **Deliverables:**

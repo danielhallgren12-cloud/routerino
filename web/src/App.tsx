@@ -71,6 +71,7 @@ function App() {
   const [traceKey, setTraceKey] = useState(0)  // Forces complete remount
   const [theme, setTheme] = useState<Theme>('neon')
   const [mode, setMode] = useState<'dark' | 'light'>('dark')
+  const [ipVersion, setIpVersion] = useState<'ipv4' | 'ipv6'>('ipv4')
   const [viewMode, setViewMode] = useState<'hops' | 'graph'>('hops')
   const [zoomLevel, setZoomLevel] = useState(2)
   const [selectedHop, setSelectedHop] = useState<Hop | null>(null)
@@ -131,6 +132,7 @@ function App() {
         body: JSON.stringify({ 
           destination: target, 
           max_hops: 15,
+          ip_version: ipVersion,
           _nonce: Math.random()
         })
       })
@@ -568,6 +570,16 @@ function App() {
             title={mode === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
             aria-label={mode === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
           >
+            <span className="toggle-slider"></span>
+          </button>
+          <button 
+            onClick={() => setIpVersion(ipVersion === 'ipv4' ? 'ipv6' : 'ipv4')} 
+            className={`ip-toggle ${ipVersion === 'ipv6' ? 'active' : ''}`}
+            title={ipVersion === 'ipv4' ? 'Switch to IPv6' : 'Switch to IPv4'}
+            aria-label={ipVersion === 'ipv4' ? 'Switch to IPv6' : 'Switch to IPv4'}
+          >
+            <span className="ip-label ipv4-label">IPv4</span>
+            <span className="ip-label ipv6-label" style={{ paddingLeft: '6px' }}>IPv6</span>
             <span className="toggle-slider"></span>
           </button>
           {isAuthenticated ? (

@@ -160,6 +160,91 @@ body {
   background: #999;
 }
 
+.header-auth .ip-toggle {
+  position: relative;
+  width: 90px;
+  height: 26px;
+  padding: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 13px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  opacity: 0.85;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+}
+
+.header-auth .ip-toggle:hover {
+  opacity: 1;
+  border-color: #555;
+}
+
+.ip-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: all 0.3s ease;
+  z-index: 1;
+  min-width: 32px;
+  text-align: center;
+}
+
+.ipv6-label {
+  padding-left: 8px;
+}
+
+.ip-toggle.active .ipv4-label {
+  color: var(--text-muted);
+}
+
+.ip-toggle.active .ipv6-label {
+  color: #fff;
+}
+
+.ip-toggle.active .toggle-slider {
+  left: 46px;
+}
+
+.ip-toggle:not(.active) .ipv4-label {
+  color: #fff;
+}
+
+.ip-toggle:not(.active) .ipv6-label {
+  color: var(--text-muted);
+}
+
+.ip-toggle .toggle-slider {
+  width: 42px;
+  height: 18px;
+  left: 2px;
+  background: var(--text-muted);
+  border-radius: 9px;
+}
+
+.ip-toggle .toggle-slider::before {
+  display: none;
+}
+
+:root.light-mode .ip-toggle:not(.active) .ipv4-label {
+  color: #333;
+}
+
+:root.light-mode .ip-toggle .ipv6-label,
+:root.light-mode .ip-toggle .ipv4-label {
+  color: #666;
+}
+
+:root.light-mode .ip-toggle.active .ipv6-label {
+  color: #fff;
+}
+
+:root.light-mode .header-auth .ip-toggle:hover {
+  border-color: #aaa;
+}
+
 .header-auth .user-greeting {
   color: var(--primary);
   font-size: 0.9rem;

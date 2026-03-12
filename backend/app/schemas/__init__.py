@@ -5,6 +5,7 @@ from datetime import datetime
 class TraceRequest(BaseModel):
     destination: str
     max_hops: int = 30
+    ip_version: Optional[str] = "ipv4"
 
 class Hop(BaseModel):
     hop: int

@@ -45,7 +45,8 @@ async def trace_route(request: TraceRequest):
         raise HTTPException(status_code=503, detail=f"Network error - {str(e)}")
     
     try:
-        hops = traceroute.run_traceroute(request.destination, request.max_hops)
+        ip_version = request.ip_version or "ipv4"
+        hops = traceroute.run_traceroute(request.destination, request.max_hops, ip_version)
     except subprocess.TimeoutExpired:
         raise HTTPException(status_code=504, detail="Trace timed out - try again")
     except Exception as e:

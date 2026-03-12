@@ -58,18 +58,24 @@ def get_geoip_batch(ips: List[str]) -> Dict[str, Dict]:
     
     return results
 
-def run_traceroute(destination: str, max_hops: int = 30) -> List[Dict]:
+def run_traceroute(destination: str, max_hops: int = 30, ip_version: str = "ipv4") -> List[Dict]:
     """Run traceroute to destination and return hop data."""
     hops = []
     ip_list = []
     
     system = platform.system()
     
+    # Set IP version flag
+    if ip_version == "ipv6":
+        ip_flag = "-6"
+    else:
+        ip_flag = "-4"
+    
     try:
         if system == "Windows":
-            cmd = ["tracert", "-4", "-h", str(max_hops), "-w", "300", "-d", destination]
+            cmd = ["tracert", ip_flag, "-h", str(max_hops), "-w", "300", "-d", destination]
         else:
-            cmd = ["traceroute", "-4", "-m", str(max_hops), "-n", destination]
+            cmd = ["traceroute", ip_flag, "-m", str(max_hops), "-n", destination]
         
         result = subprocess.run(
             cmd,
@@ -93,7 +99,8 @@ def run_traceroute(destination: str, max_hops: int = 30) -> List[Dict]:
             
             hop_num = int(parts[0])
             
-            ip_match = re.search(r"\[?(\d+\.\d+\.\d+\.\d+)\]?", line)
+            # Match IPv4 or IPv6 addresses
+            ip_match = re.search(r"\[?((?:[a-fA-F0-9]{1,4}:){1,7}[a-fA-F0-9:]+|\d+\.\d+\.\d+\.\d+)\]?", line)
             ip = ip_match.group(1) if ip_match else None
             
             if ip and ip != "*":
