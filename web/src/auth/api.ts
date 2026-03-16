@@ -146,6 +146,18 @@ export const routesApi = {
     return response.json()
   },
 
+  async getCollectionCategory(token: string, category: string) {
+    const response = await fetch(`${API_URL}/me/collection/${category}`, {
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+      },
+    })
+    if (!response.ok) {
+      throw new Error('Failed to get collection category')
+    }
+    return response.json()
+  },
+
   async collectRoute(token: string, destination: string, hopsData: string, fingerprintId: string) {
     const response = await fetch(`${API_URL}/trace/collect`, {
       method: 'POST',

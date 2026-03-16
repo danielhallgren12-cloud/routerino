@@ -41,17 +41,34 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
 
 @router.get("/me/collection")
 def get_user_collection(current_user: User = Depends(get_current_user)):
-    """Get user's complete collection stats"""
+    """Get user's complete collection stats with arrays"""
+    destinations = json.loads(current_user.unique_destinations or '[]')
+    countries = json.loads(current_user.unique_countries or '[]')
+    cities = json.loads(current_user.unique_cities or '[]')
+    isps = json.loads(current_user.unique_isps or '[]')
+    ips = json.loads(current_user.unique_ips or '[]')
+    asns = json.loads(current_user.unique_asns or '[]')
+    fingerprints = json.loads(current_user.unique_fingerprints or '[]')
+    
     return {
-        "destinations": len(json.loads(current_user.unique_destinations or '[]')),
-        "countries": len(json.loads(current_user.unique_countries or '[]')),
-        "cities": len(json.loads(current_user.unique_cities or '[]')),
-        "companies": len(json.loads(current_user.unique_companies or '[]')),
-        "ips": len(json.loads(current_user.unique_ips or '[]')),
-        "asns": len(json.loads(current_user.unique_asns or '[]')),
+        "destinations": len(destinations),
+        "countries": len(countries),
+        "cities": len(cities),
+        "isps": len(isps),
+        "ips": len(ips),
+        "asns": len(asns),
         "total_traces": current_user.total_traces,
         "total_hops": current_user.total_hops,
-        "fingerprints": len(json.loads(current_user.unique_fingerprints or '[]')),
+        "fingerprints": len(fingerprints),
+        "items": {
+            "destinations": destinations,
+            "countries": countries,
+            "cities": cities,
+            "isps": isps,
+            "ips": ips,
+            "asns": asns,
+            "fingerprints": fingerprints,
+        }
     }
 
 @router.post("/trace/collect")
@@ -70,10 +87,56 @@ def collect_route(collect: CollectRequest, current_user: User = Depends(get_curr
     current_countries = set(json.loads(current_user.unique_countries or '[]'))
     current_destinations = set(json.loads(current_user.unique_destinations or '[]'))
     current_cities = set(json.loads(current_user.unique_cities or '[]'))
-    current_companies = set(json.loads(current_user.unique_companies or '[]'))
+    current_isps = set(json.loads(current_user.unique_isps or '[]'))
     current_ips = set(json.loads(current_user.unique_ips or '[]'))
     current_asns = set(json.loads(current_user.unique_asns or '[]'))
     current_fingerprints = set(json.loads(current_user.unique_fingerprints or '[]'))
+    
+    # Track new discoveries
+    new_items = {
+        "destinations": [],
+        "countries": [],
+        "cities": [],
+        "isps": [],
+        "ips": [],
+        "asns": [],
+        "fingerprints": [],
+    }
+    
+    # Find new destinations
+    new_destinations = {collect.destination} - current_destinations
+    if new_destinations:
+        new_items["destinations"] = list(new_destinations)
+    
+    # Find new countries
+    new_countries = countries - current_countries
+    if new_countries:
+        new_items["countries"] = list(new_countries)
+    
+    # Find new cities
+    new_cities = cities - current_cities
+    if new_cities:
+        new_items["cities"] = list(new_cities)
+    
+    # Find new ISPs
+    new_isps = isps - current_isps
+    if new_isps:
+        new_items["isps"] = list(new_isps)
+    
+    # Find new IPs
+    new_ips = ips - current_ips
+    if new_ips:
+        new_items["ips"] = list(new_ips)
+    
+    # Find new ASNs
+    new_asns = asns - current_asns
+    if new_asns:
+        new_items["asns"] = list(new_asns)
+    
+    # Find new fingerprints
+    new_fingerprints = {collect.fingerprint_id} - current_fingerprints
+    if new_fingerprints:
+        new_items["fingerprints"] = list(new_fingerprints)
     
     # Update counts
     current_user.total_traces += 1
@@ -83,7 +146,7 @@ def collect_route(collect: CollectRequest, current_user: User = Depends(get_curr
     current_user.unique_countries = json.dumps(list(current_countries | countries))
     current_user.unique_destinations = json.dumps(list(current_destinations | {collect.destination}))
     current_user.unique_cities = json.dumps(list(current_cities | cities))
-    current_user.unique_companies = json.dumps(list(current_companies | isps))
+    current_user.unique_isps = json.dumps(list(current_isps | isps))
     current_user.unique_ips = json.dumps(list(current_ips | ips))
     current_user.unique_asns = json.dumps(list(current_asns | asns))
     current_user.unique_fingerprints = json.dumps(list(current_fingerprints | {collect.fingerprint_id}))
@@ -95,13 +158,34 @@ def collect_route(collect: CollectRequest, current_user: User = Depends(get_curr
         "destinations": len(json.loads(current_user.unique_destinations or '[]')),
         "countries": len(json.loads(current_user.unique_countries or '[]')),
         "cities": len(json.loads(current_user.unique_cities or '[]')),
-        "companies": len(json.loads(current_user.unique_companies or '[]')),
+        "isps": len(json.loads(current_user.unique_isps or '[]')),
         "ips": len(json.loads(current_user.unique_ips or '[]')),
         "asns": len(json.loads(current_user.unique_asns or '[]')),
         "total_traces": current_user.total_traces,
         "total_hops": current_user.total_hops,
         "fingerprints": len(json.loads(current_user.unique_fingerprints or '[]')),
+        "new_items": new_items,
     }
+
+@router.get("/me/collection/{category}")
+def get_collection_category(category: str, current_user: User = Depends(get_current_user)):
+    """Get items from a specific collection category"""
+    valid_categories = ["destinations", "countries", "cities", "isps", "ips", "asns", "fingerprints"]
+    if category not in valid_categories:
+        raise HTTPException(status_code=400, detail=f"Invalid category. Valid: {valid_categories}")
+    
+    field_map = {
+        "destinations": current_user.unique_destinations,
+        "countries": current_user.unique_countries,
+        "cities": current_user.unique_cities,
+        "isps": current_user.unique_isps,
+        "ips": current_user.unique_ips,
+        "asns": current_user.unique_asns,
+        "fingerprints": current_user.unique_fingerprints,
+    }
+    
+    items = json.loads(field_map.get(category, '[]'))
+    return {"category": category, "items": items, "count": len(items)}
 
 @router.post("/register", response_model=UserResponse)
 def register(user: UserCreate, db: Session = Depends(get_db)):

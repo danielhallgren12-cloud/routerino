@@ -7,6 +7,7 @@ import { AuthProvider, useAuth } from './auth/AuthContext'
 import { LoginForm, RegisterForm } from './auth/forms'
 import { routesApi } from './auth/api'
 import { ArtGenerator } from './art/ArtGenerator'
+import Inventory from './components/Inventory'
 
 interface Hop {
   hop: number
@@ -85,9 +86,14 @@ function App() {
   const [shareMessage, setShareMessage] = useState('')
   const [showMoreMenu, setShowMoreMenu] = useState(false)
   const [showArtGenerator, setShowArtGenerator] = useState(false)
+  const [showInventory, setShowInventory] = useState(false)
   const [userCollection, setUserCollection] = useState<{
-    destinations: number; countries: number; cities: number; companies: number;
+    destinations: number; countries: number; cities: number; isps: number;
     ips: number; asns: number; total_traces: number; total_hops: number; fingerprints: number;
+    items?: { destinations: string[]; countries: string[]; cities: string[]; isps: string[]; ips: string[]; asns: string[]; fingerprints: string[] };
+  } | null>(null)
+  const [newDiscoveries, setNewDiscoveries] = useState<{
+    destinations: string[]; countries: string[]; cities: string[]; isps: string[]; ips: string[]; asns: string[]; fingerprints: string[];
   } | null>(null)
   
   const animationRef = useRef<{ cancel: boolean }>({ cancel: false })
@@ -130,6 +136,9 @@ function App() {
           const hopsData = JSON.stringify(data.hops)
           const collection = await routesApi.collectRoute(token, data.destination, hopsData, data.fingerprint_id)
           setUserCollection(collection)
+          if (collection.new_items) {
+            setNewDiscoveries(collection.new_items)
+          }
         } catch (err) { console.error('Failed to collect route:', err) }
       }
     } catch (err) {
@@ -533,11 +542,26 @@ function App() {
                       <div className="fp-stat"><span className="fp-stat-icon">🌆</span><span className="fp-stat-value">{userCollection.cities}</span><span className="fp-stat-label">Cities</span></div>
                       <div className="fp-stat"><span className="fp-stat-icon">🌍</span><span className="fp-stat-value">{userCollection.countries}</span><span className="fp-stat-label">Countries</span></div>
                       <div className="fp-stat"><span className="fp-stat-icon">📍</span><span className="fp-stat-value">{userCollection.destinations}</span><span className="fp-stat-label">Destinations</span></div>
-                      <div className="fp-stat"><span className="fp-stat-icon">🏢</span><span className="fp-stat-value">{userCollection.companies}</span><span className="fp-stat-label">Companies</span></div>
+                      <div className="fp-stat"><span className="fp-stat-icon">🏢</span><span className="fp-stat-value">{userCollection.isps}</span><span className="fp-stat-label">ISPs</span></div>
                       <div className="fp-stat"><span className="fp-stat-icon">🔢</span><span className="fp-stat-value">{userCollection.ips}</span><span className="fp-stat-label">IPs</span></div>
                       <div className="fp-stat"><span className="fp-stat-icon">🔢</span><span className="fp-stat-value">{userCollection.asns}</span><span className="fp-stat-label">ASNs</span></div>
                       <div className="fp-stat"><span className="fp-stat-icon">🏷️</span><span className="fp-stat-value">{userCollection.fingerprints}</span><span className="fp-stat-label">Fingerprints</span></div>
                     </div>
+                    <button className="view-inventory-btn" onClick={() => setShowInventory(true)}>View Inventory</button>
+                  </div>
+                </div>
+              )}
+              {newDiscoveries && (newDiscoveries.destinations.length > 0 || newDiscoveries.countries.length > 0 || newDiscoveries.cities.length > 0 || newDiscoveries.isps.length > 0) && (
+                <div className="new-discoveries-card">
+                  <div className="new-discoveries-header">
+                    <span className="new-discoveries-icon">✨</span>
+                    <span className="new-discoveries-title">New Discoveries!</span>
+                  </div>
+                  <div className="new-discoveries-list">
+                    {newDiscoveries.destinations.length > 0 && <div className="discovery-item"><span className="discovery-icon">📍</span> {newDiscoveries.destinations.length} new destination{newDiscoveries.destinations.length > 1 ? 's' : ''}: {newDiscoveries.destinations.join(', ')}</div>}
+                    {newDiscoveries.countries.length > 0 && <div className="discovery-item"><span className="discovery-icon">🌍</span> {newDiscoveries.countries.length} new country{newDiscoveries.countries.length > 1 ? 's' : ''}: {newDiscoveries.countries.join(', ')}</div>}
+                    {newDiscoveries.cities.length > 0 && <div className="discovery-item"><span className="discovery-icon">🌆</span> {newDiscoveries.cities.length} new cit{newDiscoveries.cities.length > 1 ? 'ies' : 'y'}: {newDiscoveries.cities.join(', ')}</div>}
+                    {newDiscoveries.isps.length > 0 && <div className="discovery-item"><span className="discovery-icon">🏢</span> {newDiscoveries.isps.length} new ISP{newDiscoveries.isps.length > 1 ? 's' : ''}: {newDiscoveries.isps.join(', ')}</div>}
                   </div>
                 </div>
               )}
@@ -640,6 +664,14 @@ function App() {
             <button className="modal-close" onClick={() => setShowArtGenerator(false)}>×</button>
             <h3>🎨 Art Generator</h3>
             <ArtGenerator traceData={traceData} userLocation={userLocation ? { city: userLocation.city, country: userLocation.country } : null} />
+          </div>
+        </div>
+      )}
+
+      {showInventory && token && userCollection && (
+        <div className="modal-overlay" onClick={() => setShowInventory(false)}>
+          <div className="modal inventory-modal-container" onClick={e => e.stopPropagation()}>
+            <Inventory token={token} collection={userCollection} onClose={() => setShowInventory(false)} />
           </div>
         </div>
       )}

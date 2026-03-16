@@ -1349,6 +1349,194 @@ body {
   overflow-y: auto;
 }
 
+/* Inventory Modal */
+.inventory-modal-container {
+  max-width: 800px;
+  width: 95vw;
+  max-height: 85vh;
+  overflow: hidden;
+}
+
+.inventory-modal {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.5rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.inventory-modal h3 {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.inventory-stats {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.inv-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.inv-stat-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--primary);
+}
+
+.inv-stat-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.inventory-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  justify-content: center;
+}
+
+.inventory-tab {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.inventory-tab:hover {
+  border-color: var(--primary);
+  color: var(--text);
+}
+
+.inventory-tab.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--bg-dark);
+}
+
+.inventory-tab .tab-count {
+  opacity: 0.7;
+}
+
+.inventory-items {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 200px;
+}
+
+.inventory-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.inventory-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  background: var(--bg-dark);
+  border-radius: 6px;
+  border-left: 3px solid var(--primary);
+}
+
+.item-value {
+  font-family: monospace;
+  font-size: 0.875rem;
+}
+
+.item-rarity {
+  font-size: 0.7rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.inventory-loading,
+.inventory-empty {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 2rem;
+}
+
+/* View Inventory Button */
+.view-inventory-btn {
+  width: 100%;
+  padding: 0.5rem;
+  margin-top: 0.75rem;
+  background: transparent;
+  border: 1px solid var(--primary);
+  border-radius: 6px;
+  color: var(--primary);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.view-inventory-btn:hover {
+  background: var(--primary);
+  color: var(--bg-dark);
+}
+
+/* New Discoveries Card */
+.new-discoveries-card {
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(255, 0, 170, 0.1));
+  border: 1px solid var(--primary);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.new-discoveries-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.new-discoveries-icon {
+  font-size: 1.25rem;
+}
+
+.new-discoveries-title {
+  font-weight: bold;
+  color: var(--primary);
+}
+
+.new-discoveries-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.discovery-item {
+  font-size: 0.875rem;
+  color: var(--text);
+}
+
+.discovery-icon {
+  margin-right: 0.5rem;
+}
+
 /* Auth Forms */
 .auth-form h3 {
   margin-bottom: 1.5rem;

@@ -21,7 +21,7 @@ class User(Base):
     unique_asns = Column(Text, default='[]')
     unique_fingerprints = Column(Text, default='[]')
     unique_cities = Column(Text, default='[]')
-    unique_companies = Column(Text, default='[]')
+    unique_isps = Column(Text, default='[]')
     
     routes = relationship("SavedRoute", back_populates="user", cascade="all, delete-orphan")
 
