@@ -201,6 +201,8 @@ Why it works:
 - Latency graph with toggle view
 - Route statistics panel
 - Mobile responsive design
+- Art Generator with 6 styles (Geometric, Constellation, Flow, Neon, Minimal, Retro)
+- 300 DPI export for print quality
 
 #### ❌ REMAINING
 

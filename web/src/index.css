@@ -735,12 +735,25 @@ body {
 .animation-controls {
   display: flex;
   justify-content: center;
-  gap: 1.5rem;
+  align-items: center;
+  gap: 3rem;
   padding: 0.75rem;
   background: var(--bg-card);
   border-bottom: 1px solid #333;
   flex-wrap: wrap;
-  align-items: center;
+}
+
+.animation-controls .stat-box {
+  padding: 0.2rem 0.4rem;
+  min-width: auto;
+}
+
+.animation-controls .stat-value {
+  font-size: 0.8rem;
+}
+
+.animation-controls .stat-label {
+  font-size: 0.6rem;
 }
 
 .playback-controls, .speed-controls, .theme-controls {
@@ -1326,6 +1339,14 @@ body {
 
 .modal-close:hover {
   color: var(--text);
+}
+
+/* Art Generator Modal */
+.modal.art-modal {
+  max-width: 90vw;
+  width: auto;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 /* Auth Forms */
