@@ -73,15 +73,15 @@ def run_traceroute(destination: str, max_hops: int = 30, ip_version: str = "ipv4
     
     try:
         if system == "Windows":
-            # Try WSL traceroute first (TCP + no DNS = faster)
-            # Fall back to Windows tracert if WSL traceroute not available
+            # Try WSL tcptraceroute first (TCP + no DNS = faster)
+            # Fall back to Windows tracert if not available
             try:
-                # First check if WSL has traceroute installed
-                check = subprocess.run(["wsl", "which", "traceroute"], capture_output=True, text=True, timeout=5)
+                # First check if WSL has tcptraceroute installed
+                check = subprocess.run(["wsl", "which", "tcptraceroute"], capture_output=True, text=True, timeout=5)
                 if check.returncode == 0:
-                    cmd = ["wsl", "traceroute", ip_flag, "-m", "20", "-n", "-T", destination]
+                    cmd = ["wsl", "tcptraceroute", "-n", "-m20", "-w2", destination]
                 else:
-                    raise FileNotFoundError("traceroute not installed in WSL")
+                    raise FileNotFoundError("tcptraceroute not installed in WSL")
             except (subprocess.TimeoutExpired, FileNotFoundError, subprocess.SubprocessError):
                 # Fall back to Windows tracert (already optimized with -d flag)
                 cmd = ["tracert", ip_flag, "-h", "20", "-w", "200", "-d", destination]
