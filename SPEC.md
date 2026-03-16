@@ -41,23 +41,23 @@
 | Map Visualization | ✅ Complete |
 | Color-coded latency | ✅ Complete |
 | ASN tracking | ✅ Complete |
-| Art themes: Neon, Retro, Minimal | ✅ Complete |
+| Art themes: Geometric, Constellation, Flow, Neon, Minimal, Retro | ✅ Complete |
 | Image Export | ✅ Complete |
 
 ### Phase 2 - Engagement ✅ COMPLETED
 
 | Feature | Description |
 |---------|-------------|
-| High-res Export | 🔄 Future (300 DPI) |
-| Custom title overlay | 🔄 Future |
+| High-res Export | ✅ Complete (300 DPI) |
+| Custom title overlay | ✅ Complete |
 | Home location emphasis | ✅ Complete (dashed hot pink line) |
-| Route art styles | ✅ Basic complete, watercolor 🔄 Future |
+| Route art styles | ✅ Complete (6 styles: Geometric, Constellation, Flow, Neon, Minimal, Retro) |
 | Preset Destinations | ✅ Complete |
 | Route History | ✅ Complete (save/view/delete) |
 | User Accounts | ✅ Complete (register/login/JWT) |
 | Dark/Light Mode | ✅ Complete (toggle in header) |
 | Latency Graph | ✅ Complete (toggle view in route details) |
-| Network Fingerprint | ✅ Complete (collection tracking: Cities, Countries, Destinations, Companies, IPs, ASNs, Fingerprints) |
+| Network Fingerprint | ✅ Complete (collection tracking: Cities, Countries, Destinations, Companies, IPs, ASNs, Fingerprints + fingerprint_id for sharing) |
 
 ### Phase 3 - Social (Planned)
 
@@ -101,4 +101,4 @@ Users will want to buy prints because:
 
 ---
 
-*Last updated: 2026-03-12*
+*Last updated: 2026-03-16*

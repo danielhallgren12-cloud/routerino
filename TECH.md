@@ -187,6 +187,8 @@ RouteCanvas/
 |   |   +-- hooks/
 |   |   +-- services/
 |   |   +-- styles/
+|   |   +-- art/
+|   |   |   +-- ArtGenerator.tsx   # Art generator with 6 styles
 |   |   +-- App.tsx
 |   |   +-- main.tsx
 |   +-- index.html
@@ -206,6 +208,7 @@ RouteCanvas/
 +-- SPEC.md
 +-- TECH.md
 +-- ROADMAP.md
++-- ART_GENERATOR.md
 +-- README.md
 ```
 
@@ -306,10 +309,12 @@ import MapView from 'react-native-maps';
 
 | Theme | Style | Status |
 |-------|-------|--------|
+| Geometric | Clean, angular lines, circles at hop points | ✅ |
+| Constellation | Space/cosmic, glowing, curved paths | ✅ |
+| Flow | Watercolor-inspired, smooth sine-wave curves | ✅ |
 | Neon | Dark background, glowing cyan/magenta lines | ✅ |
-| Retro | Vintage colors, scanline effects | ✅ |
-| Minimal | Black/white, simple lines | ✅ |
-| Watercolor | Soft gradients, bleeding colors | 🔄 Future |
+| Minimal | Black/white, simple lines, maximum whitespace | ✅ |
+| Retro | 80s/90s synthwave, grid lines, gradient mesh | ✅ |
 
 ---
 
@@ -405,4 +410,4 @@ VITE_API_URL=http://localhost:8000/api/v1
 
 ---
 
-*Last updated: 2026-03-12*
+*Last updated: 2026-03-16*
