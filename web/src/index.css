@@ -79,6 +79,8 @@ body {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  flex-wrap: nowrap;
+  white-space: nowrap;
 }
 
 .header-auth button {
@@ -596,7 +598,8 @@ body {
   border-color: var(--primary);
 }
 
-.more-dropdown {
+.more-dropdown,
+.profile-dropdown {
   position: absolute;
   top: 100%;
   right: 0;
@@ -608,6 +611,22 @@ body {
   z-index: 100;
   min-width: 130px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.profile-menu-container {
+  position: relative;
+  display: inline-block;
+}
+
+.profile-dropdown {
+  left: 0;
+  right: auto;
+}
+
+.dropdown-divider {
+  border: none;
+  border-top: 1px solid var(--border-color);
+  margin: 0.4rem 0;
 }
 
 .dropdown-item {
@@ -1085,6 +1104,16 @@ body {
   border-radius: 4px;
 }
 
+.fp-stat.clickable {
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.fp-stat.clickable:hover {
+  background: rgba(0, 212, 255, 0.15);
+  transform: scale(1.05);
+}
+
 .fp-stat-icon { font-size: 0.8rem; margin-bottom: 0.15rem; }
 .fp-stat-value { font-size: 0.85rem; font-weight: 600; color: var(--text); }
 .fp-stat-label { font-size: 0.55rem; color: var(--text-muted); text-transform: uppercase; }
@@ -1314,6 +1343,7 @@ body {
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  padding: 1rem;
 }
 
 .modal {
@@ -1353,15 +1383,14 @@ body {
 .inventory-modal-container {
   max-width: 800px;
   width: 95vw;
-  max-height: 85vh;
-  overflow: hidden;
+  max-height: 95vh;
+  overflow-y: auto;
 }
 
 .inventory-modal {
   background: var(--bg-card);
   border-radius: 12px;
   padding: 1.5rem;
-  height: 100%;
   display: flex;
   flex-direction: column;
 }
@@ -1432,10 +1461,38 @@ body {
   opacity: 0.7;
 }
 
+.inventory-sort {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  justify-content: flex-end;
+}
+
+.inventory-sort label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.inventory-sort select {
+  padding: 0.4rem 0.6rem;
+  background: var(--bg-dark);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.inventory-sort select:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
 .inventory-items {
   flex: 1;
   overflow-y: auto;
-  min-height: 200px;
+  min-height: 150px;
 }
 
 .inventory-list {
@@ -1613,6 +1670,8 @@ body {
 /* Routes Modal */
 .routes-modal {
   max-width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
 }
 
 .routes-modal h3 {

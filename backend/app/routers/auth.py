@@ -45,7 +45,7 @@ def get_user_collection(current_user: User = Depends(get_current_user)):
     destinations = json.loads(current_user.unique_destinations or '[]')
     countries = json.loads(current_user.unique_countries or '[]')
     cities = json.loads(current_user.unique_cities or '[]')
-    isps = json.loads(current_user.unique_isps or '[]')
+    companies = json.loads(current_user.unique_companies or '[]')
     ips = json.loads(current_user.unique_ips or '[]')
     asns = json.loads(current_user.unique_asns or '[]')
     fingerprints = json.loads(current_user.unique_fingerprints or '[]')
@@ -54,7 +54,7 @@ def get_user_collection(current_user: User = Depends(get_current_user)):
         "destinations": len(destinations),
         "countries": len(countries),
         "cities": len(cities),
-        "isps": len(isps),
+        "companies": len(companies),
         "ips": len(ips),
         "asns": len(asns),
         "total_traces": current_user.total_traces,
@@ -64,7 +64,7 @@ def get_user_collection(current_user: User = Depends(get_current_user)):
             "destinations": destinations,
             "countries": countries,
             "cities": cities,
-            "isps": isps,
+            "companies": companies,
             "ips": ips,
             "asns": asns,
             "fingerprints": fingerprints,
@@ -87,7 +87,7 @@ def collect_route(collect: CollectRequest, current_user: User = Depends(get_curr
     current_countries = set(json.loads(current_user.unique_countries or '[]'))
     current_destinations = set(json.loads(current_user.unique_destinations or '[]'))
     current_cities = set(json.loads(current_user.unique_cities or '[]'))
-    current_isps = set(json.loads(current_user.unique_isps or '[]'))
+    current_companies = set(json.loads(current_user.unique_companies or '[]'))
     current_ips = set(json.loads(current_user.unique_ips or '[]'))
     current_asns = set(json.loads(current_user.unique_asns or '[]'))
     current_fingerprints = set(json.loads(current_user.unique_fingerprints or '[]'))
@@ -97,7 +97,7 @@ def collect_route(collect: CollectRequest, current_user: User = Depends(get_curr
         "destinations": [],
         "countries": [],
         "cities": [],
-        "isps": [],
+        "companies": [],
         "ips": [],
         "asns": [],
         "fingerprints": [],
@@ -118,10 +118,10 @@ def collect_route(collect: CollectRequest, current_user: User = Depends(get_curr
     if new_cities:
         new_items["cities"] = list(new_cities)
     
-    # Find new ISPs
-    new_isps = isps - current_isps
-    if new_isps:
-        new_items["isps"] = list(new_isps)
+    # Find new ISPs/companies
+    new_companies = isps - current_companies
+    if new_companies:
+        new_items["companies"] = list(new_companies)
     
     # Find new IPs
     new_ips = ips - current_ips
@@ -142,14 +142,21 @@ def collect_route(collect: CollectRequest, current_user: User = Depends(get_curr
     current_user.total_traces += 1
     current_user.total_hops += len([h for h in hops if h.get('ip') and h.get('ip') != '*'])
     
-    # Add new items to collections
-    current_user.unique_countries = json.dumps(list(current_countries | countries))
-    current_user.unique_destinations = json.dumps(list(current_destinations | {collect.destination}))
-    current_user.unique_cities = json.dumps(list(current_cities | cities))
-    current_user.unique_isps = json.dumps(list(current_isps | isps))
-    current_user.unique_ips = json.dumps(list(current_ips | ips))
-    current_user.unique_asns = json.dumps(list(current_asns | asns))
-    current_user.unique_fingerprints = json.dumps(list(current_fingerprints | {collect.fingerprint_id}))
+    # Add new items to collections (append to end to preserve discovery order)
+    def append_unique(existing_list, new_items):
+        result = list(existing_list)
+        for item in new_items:
+            if item not in result:
+                result.append(item)
+        return result
+    
+    current_user.unique_countries = json.dumps(append_unique(current_countries, countries))
+    current_user.unique_destinations = json.dumps(append_unique(current_destinations, {collect.destination}))
+    current_user.unique_cities = json.dumps(append_unique(current_cities, cities))
+    current_user.unique_companies = json.dumps(append_unique(current_companies, isps))
+    current_user.unique_ips = json.dumps(append_unique(current_ips, ips))
+    current_user.unique_asns = json.dumps(append_unique(current_asns, asns))
+    current_user.unique_fingerprints = json.dumps(append_unique(current_fingerprints, {collect.fingerprint_id}))
     
     db.commit()
     
@@ -158,7 +165,7 @@ def collect_route(collect: CollectRequest, current_user: User = Depends(get_curr
         "destinations": len(json.loads(current_user.unique_destinations or '[]')),
         "countries": len(json.loads(current_user.unique_countries or '[]')),
         "cities": len(json.loads(current_user.unique_cities or '[]')),
-        "isps": len(json.loads(current_user.unique_isps or '[]')),
+        "companies": len(json.loads(current_user.unique_companies or '[]')),
         "ips": len(json.loads(current_user.unique_ips or '[]')),
         "asns": len(json.loads(current_user.unique_asns or '[]')),
         "total_traces": current_user.total_traces,
@@ -170,7 +177,7 @@ def collect_route(collect: CollectRequest, current_user: User = Depends(get_curr
 @router.get("/me/collection/{category}")
 def get_collection_category(category: str, current_user: User = Depends(get_current_user)):
     """Get items from a specific collection category"""
-    valid_categories = ["destinations", "countries", "cities", "isps", "ips", "asns", "fingerprints"]
+    valid_categories = ["destinations", "countries", "cities", "companies", "ips", "asns", "fingerprints"]
     if category not in valid_categories:
         raise HTTPException(status_code=400, detail=f"Invalid category. Valid: {valid_categories}")
     
@@ -178,7 +185,7 @@ def get_collection_category(category: str, current_user: User = Depends(get_curr
         "destinations": current_user.unique_destinations,
         "countries": current_user.unique_countries,
         "cities": current_user.unique_cities,
-        "isps": current_user.unique_isps,
+        "companies": current_user.unique_companies,
         "ips": current_user.unique_ips,
         "asns": current_user.unique_asns,
         "fingerprints": current_user.unique_fingerprints,

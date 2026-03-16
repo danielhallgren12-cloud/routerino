@@ -85,15 +85,17 @@ function App() {
   const [saveMessage, setSaveMessage] = useState('')
   const [shareMessage, setShareMessage] = useState('')
   const [showMoreMenu, setShowMoreMenu] = useState(false)
+  const [showProfileMenu, setShowProfileMenu] = useState(false)
   const [showArtGenerator, setShowArtGenerator] = useState(false)
   const [showInventory, setShowInventory] = useState(false)
+  const [inventoryCategory, setInventoryCategory] = useState<string | null>(null)
   const [userCollection, setUserCollection] = useState<{
-    destinations: number; countries: number; cities: number; isps: number;
+    destinations: number; countries: number; cities: number; companies: number;
     ips: number; asns: number; total_traces: number; total_hops: number; fingerprints: number;
-    items?: { destinations: string[]; countries: string[]; cities: string[]; isps: string[]; ips: string[]; asns: string[]; fingerprints: string[] };
+    items?: { destinations: string[]; countries: string[]; cities: string[]; companies: string[]; ips: string[]; asns: string[]; fingerprints: string[] };
   } | null>(null)
   const [newDiscoveries, setNewDiscoveries] = useState<{
-    destinations: string[]; countries: string[]; cities: string[]; isps: string[]; ips: string[]; asns: string[]; fingerprints: string[];
+    destinations: string[]; countries: string[]; cities: string[]; companies: string[]; ips: string[]; asns: string[]; fingerprints: string[];
   } | null>(null)
   
   const animationRef = useRef<{ cancel: boolean }>({ cancel: false })
@@ -355,8 +357,17 @@ function App() {
           {isAuthenticated ? (
             <>
               <span className="user-greeting">Welcome, {user?.username}!</span>
-              <button onClick={loadSavedRoutes}>📁 My Routes</button>
-              <button onClick={logout}>Logout</button>
+              <div className="profile-menu-container">
+                <button onClick={() => setShowProfileMenu(!showProfileMenu)}>👤 Profile ▾</button>
+                {showProfileMenu && (
+                  <div className="profile-dropdown">
+                    <button onClick={() => { loadSavedRoutes(); setShowProfileMenu(false) }} className="dropdown-item">📁 My Routes</button>
+                    <button onClick={() => { setInventoryCategory(null); setShowInventory(true); setShowProfileMenu(false) }} className="dropdown-item">📦 Inventory</button>
+                    <hr className="dropdown-divider" />
+                    <button onClick={() => { logout(); setShowProfileMenu(false) }} className="dropdown-item">Logout</button>
+                  </div>
+                )}
+              </div>
             </>
           ) : (
             <>
@@ -539,19 +550,18 @@ function App() {
                   <div className="fingerprint-section">
                     <div className="fingerprint-section-title">Your Collection</div>
                     <div className="fp-stats">
-                      <div className="fp-stat"><span className="fp-stat-icon">🌆</span><span className="fp-stat-value">{userCollection.cities}</span><span className="fp-stat-label">Cities</span></div>
-                      <div className="fp-stat"><span className="fp-stat-icon">🌍</span><span className="fp-stat-value">{userCollection.countries}</span><span className="fp-stat-label">Countries</span></div>
-                      <div className="fp-stat"><span className="fp-stat-icon">📍</span><span className="fp-stat-value">{userCollection.destinations}</span><span className="fp-stat-label">Destinations</span></div>
-                      <div className="fp-stat"><span className="fp-stat-icon">🏢</span><span className="fp-stat-value">{userCollection.isps}</span><span className="fp-stat-label">ISPs</span></div>
-                      <div className="fp-stat"><span className="fp-stat-icon">🔢</span><span className="fp-stat-value">{userCollection.ips}</span><span className="fp-stat-label">IPs</span></div>
-                      <div className="fp-stat"><span className="fp-stat-icon">🔢</span><span className="fp-stat-value">{userCollection.asns}</span><span className="fp-stat-label">ASNs</span></div>
-                      <div className="fp-stat"><span className="fp-stat-icon">🏷️</span><span className="fp-stat-value">{userCollection.fingerprints}</span><span className="fp-stat-label">Fingerprints</span></div>
+                      <div className="fp-stat clickable" onClick={() => { setInventoryCategory('cities'); setShowInventory(true) }}><span className="fp-stat-icon">🌆</span><span className="fp-stat-value">{userCollection.cities}</span><span className="fp-stat-label">Cities</span></div>
+                      <div className="fp-stat clickable" onClick={() => { setInventoryCategory('countries'); setShowInventory(true) }}><span className="fp-stat-icon">🌍</span><span className="fp-stat-value">{userCollection.countries}</span><span className="fp-stat-label">Countries</span></div>
+                      <div className="fp-stat clickable" onClick={() => { setInventoryCategory('destinations'); setShowInventory(true) }}><span className="fp-stat-icon">📍</span><span className="fp-stat-value">{userCollection.destinations}</span><span className="fp-stat-label">Destinations</span></div>
+                      <div className="fp-stat clickable" onClick={() => { setInventoryCategory('companies'); setShowInventory(true) }}><span className="fp-stat-icon">🏢</span><span className="fp-stat-value">{userCollection.companies}</span><span className="fp-stat-label">Companies</span></div>
+                      <div className="fp-stat clickable" onClick={() => { setInventoryCategory('ips'); setShowInventory(true) }}><span className="fp-stat-icon">🔢</span><span className="fp-stat-value">{userCollection.ips}</span><span className="fp-stat-label">IPs</span></div>
+                      <div className="fp-stat clickable" onClick={() => { setInventoryCategory('asns'); setShowInventory(true) }}><span className="fp-stat-icon">🔢</span><span className="fp-stat-value">{userCollection.asns}</span><span className="fp-stat-label">ASNs</span></div>
+                      <div className="fp-stat clickable" onClick={() => { setInventoryCategory('fingerprints'); setShowInventory(true) }}><span className="fp-stat-icon">🏷️</span><span className="fp-stat-value">{userCollection.fingerprints}</span><span className="fp-stat-label">Fingerprints</span></div>
                     </div>
-                    <button className="view-inventory-btn" onClick={() => setShowInventory(true)}>View Inventory</button>
                   </div>
                 </div>
               )}
-              {newDiscoveries && (newDiscoveries.destinations.length > 0 || newDiscoveries.countries.length > 0 || newDiscoveries.cities.length > 0 || newDiscoveries.isps.length > 0) && (
+              {newDiscoveries && (newDiscoveries.destinations.length > 0 || newDiscoveries.countries.length > 0 || newDiscoveries.cities.length > 0 || newDiscoveries.companies.length > 0) && (
                 <div className="new-discoveries-card">
                   <div className="new-discoveries-header">
                     <span className="new-discoveries-icon">✨</span>
@@ -561,7 +571,7 @@ function App() {
                     {newDiscoveries.destinations.length > 0 && <div className="discovery-item"><span className="discovery-icon">📍</span> {newDiscoveries.destinations.length} new destination{newDiscoveries.destinations.length > 1 ? 's' : ''}: {newDiscoveries.destinations.join(', ')}</div>}
                     {newDiscoveries.countries.length > 0 && <div className="discovery-item"><span className="discovery-icon">🌍</span> {newDiscoveries.countries.length} new country{newDiscoveries.countries.length > 1 ? 's' : ''}: {newDiscoveries.countries.join(', ')}</div>}
                     {newDiscoveries.cities.length > 0 && <div className="discovery-item"><span className="discovery-icon">🌆</span> {newDiscoveries.cities.length} new cit{newDiscoveries.cities.length > 1 ? 'ies' : 'y'}: {newDiscoveries.cities.join(', ')}</div>}
-                    {newDiscoveries.isps.length > 0 && <div className="discovery-item"><span className="discovery-icon">🏢</span> {newDiscoveries.isps.length} new ISP{newDiscoveries.isps.length > 1 ? 's' : ''}: {newDiscoveries.isps.join(', ')}</div>}
+                    {newDiscoveries.companies.length > 0 && <div className="discovery-item"><span className="discovery-icon">🏢</span> {newDiscoveries.companies.length} new compan{newDiscoveries.companies.length > 1 ? 'ies' : 'y'}: {newDiscoveries.companies.join(', ')}</div>}
                   </div>
                 </div>
               )}
@@ -669,9 +679,9 @@ function App() {
       )}
 
       {showInventory && token && userCollection && (
-        <div className="modal-overlay" onClick={() => setShowInventory(false)}>
+        <div className="modal-overlay" onClick={() => { setShowInventory(false); setInventoryCategory(null) }}>
           <div className="modal inventory-modal-container" onClick={e => e.stopPropagation()}>
-            <Inventory token={token} collection={userCollection} onClose={() => setShowInventory(false)} />
+            <Inventory token={token} collection={userCollection} onClose={() => { setShowInventory(false); setInventoryCategory(null) }} initialCategory={inventoryCategory} />
           </div>
         </div>
       )}

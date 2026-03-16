@@ -65,7 +65,7 @@ export function getRarity(category: string, value: string): Rarity {
   switch (category) {
     case 'countries':
       return getCountryRarity(value)
-    case 'isps':
+    case 'companies':
       return getIspRarity(value)
     case 'ips':
       return getIpRarity(value)
