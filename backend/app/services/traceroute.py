@@ -73,7 +73,8 @@ def run_traceroute(destination: str, max_hops: int = 30, ip_version: str = "ipv4
     
     try:
         if system == "Windows":
-            cmd = ["tracert", ip_flag, "-h", "20", "-w", "200", "-d", destination]
+            # Use WSL traceroute for faster results (TCP + no DNS)
+            cmd = ["wsl", "traceroute", ip_flag, "-m", "20", "-n", "-T", destination]
         else:
             cmd = ["traceroute", ip_flag, "-m", "20", "-n", "-T", destination]
         

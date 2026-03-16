@@ -410,4 +410,46 @@ VITE_API_URL=http://localhost:8000/api/v1
 
 ---
 
+## 11. Local Development on Windows
+
+For faster traceroute on Windows, use WSL (Windows Subsystem for Linux):
+
+### Prerequisites
+- Install WSL: `wsl --install`
+- Ensure WSL has traceroute: `sudo apt install traceroute`
+
+### How it works
+- On Windows: Uses `wsl traceroute -n -T` for TCP-based traceroute (faster + better firewall traversal)
+- On Linux: Uses native `traceroute -n -T`
+
+### Benefits
+- Same command works on both platforms
+- TCP traceroute goes through firewalls better than UDP
+- No DNS lookups (-n flag) = much faster
+
+---
+
+## 12. Deployment (Future)
+
+### Render.com (Recommended)
+
+**Why Render:**
+- Free tier: 750 hours/month (enough for personal projects)
+- Automatic Linux environment
+- GitHub integration for automatic deploys
+
+**Setup Steps:**
+1. Push code to GitHub
+2. Create account on render.com
+3. Connect GitHub repository
+4. Create new "Web Service"
+5. Configure:
+   - Build Command: `pip install -r requirements.txt`
+   - Start Command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+6. Deploy!
+
+**Note:** For local Windows development, ensure WSL is running. For deployed apps, it runs natively on Linux.
+
+---
+
 *Last updated: 2026-03-16*
