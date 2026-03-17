@@ -548,7 +548,7 @@ function App() {
 
           {traceData && traceData.hops.length > 0 && (
             <div className="hop-list" key={traceData.id}>
-              {traceData.fingerprint_id && isAuthenticated && userCollection && (
+              {traceData.fingerprint_id && isAuthenticated && (
                 <div className="fingerprint-card">
                   <div className="fingerprint-header">
                     <span className="fingerprint-icon">🏷️</span>
@@ -556,18 +556,20 @@ function App() {
                     <span className="fingerprint-id">{traceData.fingerprint_id}</span>
                     {traceData.destination && <span className="fingerprint-dest">({traceData.destination})</span>}
                   </div>
-                  <div className="fingerprint-section">
-                    <div className="fingerprint-section-title">Your Collection</div>
-                    <div className="fp-stats">
-                      <div className="fp-stat clickable" onClick={() => { setInventoryCategory('cities'); setShowInventory(true) }}><span className="fp-stat-icon">🌆</span><span className="fp-stat-value">{userCollection.cities}</span><span className="fp-stat-label">Cities</span></div>
-                      <div className="fp-stat clickable" onClick={() => { setInventoryCategory('countries'); setShowInventory(true) }}><span className="fp-stat-icon">🌍</span><span className="fp-stat-value">{userCollection.countries}</span><span className="fp-stat-label">Countries</span></div>
-                      <div className="fp-stat clickable" onClick={() => { setInventoryCategory('destinations'); setShowInventory(true) }}><span className="fp-stat-icon">📍</span><span className="fp-stat-value">{userCollection.destinations}</span><span className="fp-stat-label">Destinations</span></div>
-                      <div className="fp-stat clickable" onClick={() => { setInventoryCategory('companies'); setShowInventory(true) }}><span className="fp-stat-icon">🏢</span><span className="fp-stat-value">{userCollection.companies}</span><span className="fp-stat-label">Companies</span></div>
-                      <div className="fp-stat clickable" onClick={() => { setInventoryCategory('ips'); setShowInventory(true) }}><span className="fp-stat-icon">🔢</span><span className="fp-stat-value">{userCollection.ips}</span><span className="fp-stat-label">IPs</span></div>
-                      <div className="fp-stat clickable" onClick={() => { setInventoryCategory('asns'); setShowInventory(true) }}><span className="fp-stat-icon">🔢</span><span className="fp-stat-value">{userCollection.asns}</span><span className="fp-stat-label">ASNs</span></div>
-                      <div className="fp-stat clickable" onClick={() => { setInventoryCategory('fingerprints'); setShowInventory(true) }}><span className="fp-stat-icon">🏷️</span><span className="fp-stat-value">{userCollection.fingerprints}</span><span className="fp-stat-label">Fingerprints</span></div>
+                  {userCollection && (
+                    <div className="fingerprint-section">
+                      <div className="fingerprint-section-title">Your Collection</div>
+                      <div className="fp-stats">
+                        <div className="fp-stat clickable" onClick={() => { setInventoryCategory('cities'); setShowInventory(true) }}><span className="fp-stat-icon">🌆</span><span className="fp-stat-value">{userCollection.cities}</span><span className="fp-stat-label">Cities</span></div>
+                        <div className="fp-stat clickable" onClick={() => { setInventoryCategory('countries'); setShowInventory(true) }}><span className="fp-stat-icon">🌍</span><span className="fp-stat-value">{userCollection.countries}</span><span className="fp-stat-label">Countries</span></div>
+                        <div className="fp-stat clickable" onClick={() => { setInventoryCategory('destinations'); setShowInventory(true) }}><span className="fp-stat-icon">📍</span><span className="fp-stat-value">{userCollection.destinations}</span><span className="fp-stat-label">Destinations</span></div>
+                        <div className="fp-stat clickable" onClick={() => { setInventoryCategory('companies'); setShowInventory(true) }}><span className="fp-stat-icon">🏢</span><span className="fp-stat-value">{userCollection.companies}</span><span className="fp-stat-label">Companies</span></div>
+                        <div className="fp-stat clickable" onClick={() => { setInventoryCategory('ips'); setShowInventory(true) }}><span className="fp-stat-icon">🔢</span><span className="fp-stat-value">{userCollection.ips}</span><span className="fp-stat-label">IPs</span></div>
+                        <div className="fp-stat clickable" onClick={() => { setInventoryCategory('asns'); setShowInventory(true) }}><span className="fp-stat-icon">🔢</span><span className="fp-stat-value">{userCollection.asns}</span><span className="fp-stat-label">ASNs</span></div>
+                        <div className="fp-stat clickable" onClick={() => { setInventoryCategory('fingerprints'); setShowInventory(true) }}><span className="fp-stat-icon">🏷️</span><span className="fp-stat-value">{userCollection.fingerprints}</span><span className="fp-stat-label">Fingerprints</span></div>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               )}
               {newDiscoveries && (newDiscoveries.destinations.length > 0 || newDiscoveries.countries.length > 0 || newDiscoveries.cities.length > 0 || newDiscoveries.companies.length > 0) && (

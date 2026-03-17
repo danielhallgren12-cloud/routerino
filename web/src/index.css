@@ -1734,6 +1734,10 @@ body {
   margin-bottom: 1rem;
 }
 
+.badgecase-modal * {
+  text-align: center;
+}
+
 .badgecase-stats {
   display: flex;
   justify-content: center;
