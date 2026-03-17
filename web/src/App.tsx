@@ -95,6 +95,7 @@ function App() {
   const [userCollection, setUserCollection] = useState<{
     destinations: number; countries: number; cities: number; companies: number;
     ips: number; asns: number; total_traces: number; total_hops: number; fingerprints: number;
+    new_items?: { destinations: string[]; countries: string[]; cities: string[]; companies: string[]; ips: string[]; asns: string[]; fingerprints: string[] };
     items?: { destinations: string[]; countries: string[]; cities: string[]; companies: string[]; ips: string[]; asns: string[]; fingerprints: string[] };
   } | null>(null)
   const [newDiscoveries, setNewDiscoveries] = useState<{
@@ -370,7 +371,29 @@ function App() {
                 {showProfileMenu && (
                   <div className="profile-dropdown">
                     <button onClick={() => { loadSavedRoutes(); setShowProfileMenu(false) }} className="dropdown-item">📁 My Routes</button>
-                    <button onClick={() => { setInventoryCategory(null); setShowInventory(true); setShowProfileMenu(false) }} className="dropdown-item">📦 Inventory</button>
+                    <button onClick={() => { 
+                      const newCount = userCollection?.new_items 
+                        ? userCollection.new_items.destinations?.length + userCollection.new_items.countries?.length + userCollection.new_items.cities?.length + userCollection.new_items.companies?.length
+                        : 0;
+                      if (newCount > 0) {
+                        routesApi.clearNewItems(token).then(() => routesApi.getCollection(token).then(setUserCollection))
+                      }
+                      setInventoryCategory(null); setShowInventory(true); setShowProfileMenu(false) 
+                    }} className="dropdown-item">
+                      📦 Inventory
+                      {userCollection?.new_items && (
+                        (userCollection.new_items.destinations?.length || 0) + 
+                        (userCollection.new_items.countries?.length || 0) + 
+                        (userCollection.new_items.cities?.length || 0) + 
+                        (userCollection.new_items.companies?.length || 0) > 0 && 
+                        <span className="new-indicator">+{
+                          (userCollection.new_items.destinations?.length || 0) + 
+                          (userCollection.new_items.countries?.length || 0) + 
+                          (userCollection.new_items.cities?.length || 0) + 
+                          (userCollection.new_items.companies?.length || 0)
+                        }</span>
+                      )}
+                    </button>
                     <button onClick={() => { setShowBadgeCase(true); setShowProfileMenu(false) }} className="dropdown-item">🏆 My Badges</button>
                     <hr className="dropdown-divider" />
                     <button onClick={() => { logout(); setShowProfileMenu(false) }} className="dropdown-item">Logout</button>
@@ -574,9 +597,13 @@ function App() {
               )}
               {newDiscoveries && (newDiscoveries.destinations.length > 0 || newDiscoveries.countries.length > 0 || newDiscoveries.cities.length > 0 || newDiscoveries.companies.length > 0) && (
                 <div className="new-discoveries-card">
+                  <button className="discoveries-dismiss" onClick={() => setNewDiscoveries(null)} title="Dismiss">×</button>
                   <div className="new-discoveries-header">
                     <span className="new-discoveries-icon">✨</span>
                     <span className="new-discoveries-title">New Discoveries!</span>
+                    <span className="new-discoveries-count">
+                      +{newDiscoveries.destinations.length + newDiscoveries.countries.length + newDiscoveries.cities.length + newDiscoveries.companies.length}
+                    </span>
                   </div>
                   <div className="new-discoveries-list">
                     {newDiscoveries.destinations.length > 0 && <div className="discovery-item"><span className="discovery-icon">📍</span> {newDiscoveries.destinations.length} new destination{newDiscoveries.destinations.length > 1 ? 's' : ''}: {newDiscoveries.destinations.join(', ')}</div>}

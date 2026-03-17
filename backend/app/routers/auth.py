@@ -49,6 +49,7 @@ def get_user_collection(current_user: User = Depends(get_current_user)):
     ips = json.loads(current_user.unique_ips or '[]')
     asns = json.loads(current_user.unique_asns or '[]')
     fingerprints = json.loads(current_user.unique_fingerprints or '[]')
+    new_items = json.loads(current_user.new_items or '{}')
     
     return {
         "destinations": len(destinations),
@@ -60,6 +61,7 @@ def get_user_collection(current_user: User = Depends(get_current_user)):
         "total_traces": current_user.total_traces,
         "total_hops": current_user.total_hops,
         "fingerprints": len(fingerprints),
+        "new_items": new_items,
         "items": {
             "destinations": destinations,
             "countries": countries,
@@ -171,6 +173,15 @@ def collect_route(collect: CollectRequest, current_user: User = Depends(get_curr
     current_user.unique_asns = json.dumps(append_unique(current_asns, asns))
     current_user.unique_fingerprints = json.dumps(append_unique(current_fingerprints, {collect.fingerprint_id}))
     
+    # Accumulate new items
+    current_new_items = json.loads(current_user.new_items or '{}')
+    for key in new_items:
+        if new_items[key]:
+            if key not in current_new_items:
+                current_new_items[key] = []
+            current_new_items[key] = list(set(current_new_items[key] + new_items[key]))
+    current_user.new_items = json.dumps(current_new_items)
+    
     db.commit()
     
     # Return updated collection
@@ -184,7 +195,7 @@ def collect_route(collect: CollectRequest, current_user: User = Depends(get_curr
         "total_traces": current_user.total_traces,
         "total_hops": current_user.total_hops,
         "fingerprints": len(json.loads(current_user.unique_fingerprints or '[]')),
-        "new_items": new_items,
+        "new_items": json.loads(current_user.new_items or '{}'),
     }
 
 @router.get("/me/collection/{category}")
@@ -206,6 +217,13 @@ def get_collection_category(category: str, current_user: User = Depends(get_curr
     
     items = json.loads(field_map.get(category, '[]'))
     return {"category": category, "items": items, "count": len(items)}
+
+@router.post("/me/collection/clear-new")
+def clear_new_items(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Clear the new_items list after user has seen them"""
+    current_user.new_items = '[]'
+    db.commit()
+    return {"success": True}
 
 @router.post("/register", response_model=UserResponse)
 def register(user: UserCreate, db: Session = Depends(get_db)):
@@ -247,6 +265,11 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
             detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    
+    # Update last_visit timestamp
+    from datetime import datetime
+    user.last_visit = datetime.utcnow().isoformat() + "Z"
+    db.commit()
     
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(

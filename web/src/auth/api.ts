@@ -158,6 +158,19 @@ export const routesApi = {
     return response.json()
   },
 
+  async clearNewItems(token: string) {
+    const response = await fetch(`${API_URL}/me/collection/clear-new`, {
+      method: 'POST',
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+      },
+    })
+    if (!response.ok) {
+      throw new Error('Failed to clear new items')
+    }
+    return response.json()
+  },
+
   async collectRoute(token: string, destination: string, hopsData: string, fingerprintId: string) {
     const response = await fetch(`${API_URL}/trace/collect`, {
       method: 'POST',

@@ -25,7 +25,9 @@ columns = [
     ('unique_companies', 'TEXT DEFAULT "[]"'),
     ('earned_badges', 'TEXT DEFAULT "[]"'),
     ('last_trace_date', 'TEXT'),
-    ('current_streak', 'INTEGER DEFAULT 0')
+    ('current_streak', 'INTEGER DEFAULT 0'),
+    ('last_visit', 'TEXT'),
+    ('new_items', 'TEXT DEFAULT "[]"')
 ]
 
 for col_name, col_type in columns:

@@ -25,6 +25,8 @@ class User(Base):
     earned_badges = Column(Text, default='[]')
     last_trace_date = Column(String, nullable=True)  # For streak tracking (YYYY-MM-DD)
     current_streak = Column(Integer, default=0)
+    last_visit = Column(String, nullable=True)  # Last visit timestamp (ISO format)
+    new_items = Column(Text, default='[]')  # Items discovered since last visit
     
     routes = relationship("SavedRoute", back_populates="user", cascade="all, delete-orphan")
 
