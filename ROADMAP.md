@@ -155,10 +155,10 @@ Why it works:
 
 ### Week 12+: Gamification and Advanced Features
 
-- [ ] Badge system
-- [ ] Country counter
+- [x] Badge system (22 badges: Milestone, Discovery, Streak, Art)
+- [x] Country counter (via Inventory)
 - [ ] Route uniqueness scoring
-- [ ] Achievements
+- [x] Achievements (badge system)
 - [ ] Compare routes feature
 - [ ] Video export
 
@@ -176,6 +176,13 @@ Why it works:
   - Cities, Countries, Destinations, Companies, IPs, ASNs, Fingerprints
   - Collection updates after every search (logged-in users)
   - Fingerprint ID shows unique route signature
+- **Badge system** (22 badges across 4 categories)
+  - Milestone: trace milestones (1, 5, 10, 25, 50, 100 traces)
+  - Discovery: unique countries/cities/destinations
+  - Streak: daily tracing streaks
+  - Art: export milestones
+- **Inventory modal** (view all collected items with rarity, sorting)
+- **Profile dropdown** (My Routes, Inventory, My Badges)
 
 ---
 

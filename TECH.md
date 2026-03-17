@@ -79,7 +79,7 @@
 
 ### API Design
 
-**Base URL:** `http://localhost:8000/api/v1`
+**Base URL:** `/api/v1` (via Vite proxy - no CORS issues)
 
 #### Endpoints
 
@@ -96,6 +96,9 @@
 | GET | `/share/{share_id}` | Get public shared route | ✅ |
 | GET | `/auth/me/collection` | Get user's collection stats | ✅ |
 | POST | `/trace/collect` | Update collection after trace (auto) | ✅ |
+| GET | `/auth/me/badges` | Get all badges with earned status | ✅ |
+| GET | `/auth/me/badges/check` | Check and award new badges | ✅ |
+| POST | `/auth/me/badges/increment-export` | Increment export count for badges | ✅ |
 
 #### Request/Response Examples
 
@@ -245,6 +248,9 @@ RouteCanvas/
 | unique_fingerprints | TEXT | JSON array of unique fingerprints |
 | unique_cities | TEXT | JSON array of unique cities |
 | unique_companies | TEXT | JSON array of unique companies |
+| earned_badges | TEXT | JSON array of earned badge IDs |
+| last_trace_date | TEXT | Last trace date (YYYY-MM-DD) for streak tracking |
+| current_streak | INTEGER | Current daily tracing streak |
 
 **likes**
 | Column | Type | Description |
@@ -405,12 +411,48 @@ VITE_API_URL=http://localhost:8000/api/v1
 - Rate limiting on trace endpoints (prevent abuse)
 - Input validation on all endpoints
 - Password hashing (bcrypt)
-- CORS configuration
+- CORS configuration (via Vite proxy in development)
 - Sanitize user inputs to prevent injection
 
 ---
 
-## 11. Local Development on Windows
+## 11. Badge System
+
+### Badge Categories
+
+| Category | Description | Badge Count |
+|----------|-------------|--------------|
+| Milestone | Trace count achievements | 6 |
+| Discovery | Unique countries/cities/destinations | 9 |
+| Streak | Daily tracing streaks | 4 |
+| Art | Export milestones | 3 |
+
+### Badge Definitions (22 total)
+
+**Milestone:**
+- First Trace (1 trace)
+- Getting Started (5 traces)
+- Explorer (10 traces)
+- Adventurer (25 traces)
+- Globetrotter (50 traces)
+- Legend (100 traces)
+
+**Discovery:**
+- First Country, First City, First Destination
+- World Traveler (5 countries)
+- Metro Master (5 cities)
+- Destination Addict (5 destinations)
+- Continental (10 countries)
+
+**Streak:**
+- Day 1, Day 3, Day 7, Day 30
+
+**Art:**
+- First Export, Collection (10 exports), Masterpiece (50 exports)
+
+---
+
+## 12. Local Development on Windows
 
 For faster traceroute on Windows, use WSL (Windows Subsystem for Linux):
 

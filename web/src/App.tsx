@@ -111,7 +111,7 @@ function App() {
   }
 
   const runTrace = async (destOverride?: string) => {
-    const target = destOverride?.trim() || destination.trim()
+    const target = (destOverride ? String(destOverride).trim() : destination.trim())
     if (!target) return
     
     setLoading(true)
@@ -390,7 +390,7 @@ function App() {
       <main className="main">
         <div className="input-section">
           <input type="text" placeholder="Enter destination (e.g., google.com)" value={destination} onChange={(e) => setDestination(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && runTrace()} />
-          <button onClick={runTrace} disabled={loading || !destination.trim()}>{loading ? `Tracing${'.'.repeat(loadingDots + 1)}` : 'Trace Route'}</button>
+          <button onClick={() => runTrace()} disabled={loading || !destination.trim()}>{loading ? `Tracing${'.'.repeat(loadingDots + 1)}` : 'Trace Route'}</button>
           {traceData && validHops.length > 0 && (
             <>
               <button onClick={() => setShowArtGenerator(true)} style={{ padding: '0.65rem 1rem', background: 'linear-gradient(135deg, #00F0FF, #FF2D92)', border: 'none', color: '#fff', fontWeight: 600 }}>🎨 Art Generator</button>
@@ -699,7 +699,7 @@ function App() {
 
       {showBadgeCase && token && (
         <div className="modal-overlay" onClick={() => setShowBadgeCase(false)}>
-          <div className="modal" onClick={e => e.stopPropagation()}>
+          <div className="modal badgecase-wrapper" onClick={e => e.stopPropagation()}>
             <BadgeCase token={token} onClose={() => setShowBadgeCase(false)} />
           </div>
         </div>

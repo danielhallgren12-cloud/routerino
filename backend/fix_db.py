@@ -22,7 +22,10 @@ columns = [
     ('unique_asns', 'TEXT DEFAULT "[]"'),
     ('unique_fingerprints', 'TEXT DEFAULT "[]"'),
     ('unique_cities', 'TEXT DEFAULT "[]"'),
-    ('unique_companies', 'TEXT DEFAULT "[]"')
+    ('unique_companies', 'TEXT DEFAULT "[]"'),
+    ('earned_badges', 'TEXT DEFAULT "[]"'),
+    ('last_trace_date', 'TEXT'),
+    ('current_streak', 'INTEGER DEFAULT 0')
 ]
 
 for col_name, col_type in columns:

@@ -58,6 +58,10 @@
 | Dark/Light Mode | ✅ Complete (toggle in header) |
 | Latency Graph | ✅ Complete (toggle view in route details) |
 | Network Fingerprint | ✅ Complete (collection tracking: Cities, Countries, Destinations, Companies, IPs, ASNs, Fingerprints + fingerprint_id for sharing) |
+| Inventory Modal | ✅ Complete (view collected items by category, sorting, rarity system) |
+| Profile Dropdown | ✅ Complete (My Routes, Inventory, My Badges) |
+| Badge System | ✅ Complete (22 badges across 4 categories: Milestone, Discovery, Streak, Art) |
+| Badge Notifications | ✅ Complete (toast notification when earning new badges) |
 
 ### Phase 3 - Social (Planned)
 

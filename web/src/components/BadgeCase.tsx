@@ -91,6 +91,7 @@ export default function BadgeCase({ token, onClose }: BadgeCaseProps) {
             >
               <div className="badge-icon">{badge.icon}</div>
               <div className="badge-name">{badge.name}</div>
+              <div className="badge-desc">{badge.desc}</div>
               {badge.earned && <div className="badge-check">✓</div>}
             </div>
           ))
