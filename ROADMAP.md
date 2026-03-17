@@ -186,48 +186,13 @@ Why it works:
 
 ---
 
-## Additional Documentation
-
-### Current Status Summary
-
-#### ✅ COMPLETED (Demo-Ready)
-- Basic traceroute execution with GeoIP
-- React frontend with Leaflet map
-- Animated journey visualization
-- Color-coded latency markers
-- ASN tracking
-- Three themes (neon, retro, minimal)
-- Two-column layout (map + route details)
-- User authentication (register/login)
-- Save/view/delete routes
-- Preset destinations
-- Error handling with specific messages
-- Artistic hero section
-- Basic image export
-- Dark/Light mode toggle
-- Latency graph with toggle view
-- Route statistics panel
-- Mobile responsive design
-- Art Generator with 6 styles (Geometric, Constellation, Flow, Neon, Minimal, Retro)
-- 300 DPI export for print quality
-
-#### ❌ REMAINING
-
-**High Priority (Quick Wins):**
-- [x] Dark/Light theme toggle
-- [x] Latency graph (visual chart of RTT per hop)
-- [x] Route statistics panel (hop count, avg/max/min latency)
-- [x] Mobile responsive design
-- [x] Share routes via URL
-- [x] Network fingerprint with collection tracking
-
 ### Future Enhancements (Network Fingerprint)
 
 **Planned:**
 - [x] "New" indicators showing items discovered in current trace (vs already collected)
 - [x] Inventory screen to view all collected items in detail
 - [x] Badge system for collection milestones
-- [x] Simple per-user rarity display (first time vs again)
+- [x] Personal discovery tracking (how many times each item seen)
 
 ---
 
@@ -243,8 +208,24 @@ Why it works:
 - Public page: `/fp/{fingerprint_id}` showing the route
 - QR code for fingerprint
 
-### 3. Rarity System (Advanced)
-- Global rarity: show how many users have the same item (rare = few have it)
-- Personal rarity: "You found 3 of 10 possible"
-- Show rarity percentages in Inventory
-- Add "Rarity" as sorting option
+### 3. Advanced Rarity System (Future)
+**Status:** On Hold - requires significant infrastructure
+
+**Vision:** Global rarity tracking across all users
+- Show percentage: "Only 0.8% of users have this"
+- Personal collection progress: "You found 3 of 78 possible cities"
+- Community leaderboards: rarest items
+
+**Why not now:**
+- Requires new database tables (items, user_items)
+- Needs Redis for performance at scale
+- Personal rarity provides 80% of user value
+- Not required for print-on-demand
+- Effort: 2-3 weeks vs 1 day for personal tracking
+
+**Keep for future if:**
+- App grows to 1000+ users
+- Community features prioritized
+- Users request social comparison
+
+---

@@ -451,6 +451,71 @@ VITE_API_URL=http://localhost:8000/api/v1
 **Art:**
 - First Export, Collection (10 exports), Masterpiece (50 exports)
 
+## 12. Item Discovery Tracking (Personal Rarity)
+
+### Implementation
+The system tracks how many times each user encounters specific items across all their traces, providing personal rarity statistics.
+
+**Backend Storage:**
+```json
+// Stored in users.item_discovery_counts JSON field
+{
+  "country:US": 12,
+  "city:Stockholm": 5,
+  "company:Cloudflare": 8,
+  "destination:google.com": 3,
+  "ip:1.1.1.1": 2
+}
+```
+
+**API Response Format:**
+```json
+{
+  "destinations": 5,
+  "countries": 8,
+  "cities": 12,
+  "companies": 10,
+  "ips": 45,
+  "asns": 8,
+  "discovery_counts": {
+    "country:US": 12,
+    "city:Stockholm": 5,
+    ...
+  }
+}
+```
+
+**Frontend Display:**
+- Each inventory item shows: `🏆 Epic (Seen 5×)`
+- Sorting option: "Most Collected" (sorts by discovery count)
+- Inventory header shows: "Items" stat alongside Traces/Hops
+
+**Database Schema:**
+```sql
+ALTER TABLE users ADD COLUMN item_discovery_counts TEXT DEFAULT '{}';
+```
+
+### Future Enhancement: Global Rarity System (On Hold)
+**Status:** Not implemented - requires significant infrastructure changes
+
+**What it would require:**
+- New `items` table (global item registry)
+- New `user_items` table (M:N relationship)
+- Redis caching for performance (1000+ users)
+- Background job to recalculate rarity tiers
+- API endpoints for global stats
+
+**Why it's on hold:**
+- Not needed for MVP
+- Personal rarity provides 80% of user value
+- No impact on print-on-demand feature
+- Estimated effort: 2-3 weeks vs 1 day for personal rarity
+
+**If implementing later, would add:**
+- "0.8% of users have this" (global rarity)
+- "You have 3 of 78 total cities" (personal collection progress)
+- Leaderboard: rarest items in community
+
 ---
 
 ## 12. Local Development on Windows
