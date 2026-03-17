@@ -62,6 +62,7 @@
 | Profile Dropdown | ✅ Complete (My Routes, Inventory, My Badges) |
 | Badge System | ✅ Complete (22 badges across 4 categories: Milestone, Discovery, Streak, Art) |
 | Badge Notifications | ✅ Complete (toast notification when earning new badges) |
+| New Discoveries Indicator | ✅ Complete (animated card, +N badges, NEW labels on items) |
 
 ### Phase 3 - Social (Planned)
 
@@ -70,13 +71,15 @@
 | Public Gallery | Browse latest and popular community routes |
 | Like & Save | Save favorite routes to collection |
 | User Profiles | Display user's route collection and stats |
-| Share Routes | Easy share to social media |
+| Share Routes | Easy share to social media (buttons + OG image) |
+| Fingerprint Share | Share fingerprint with public page + QR code |
 
 ### Phase 4 - Expansion (Planned)
 
 | Feature | Description |
 |---------|-------------|
 | Print-on-Demand | Order posters, T-shirts, canvases with route art |
+| Advanced Rarity | Global rarity (how many users have it), personal rarity stats |
 | Gamification | Badges, country counters, route uniqueness scores |
 | Compare Routes | Overlay routes from different times/locations |
 | Video Export | Export animated journey as MP4/GIF |

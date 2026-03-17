@@ -99,6 +99,7 @@
 | GET | `/auth/me/badges` | Get all badges with earned status | ✅ |
 | GET | `/auth/me/badges/check` | Check and award new badges | ✅ |
 | POST | `/auth/me/badges/increment-export` | Increment export count for badges | ✅ |
+| POST | `/auth/me/collection/clear-new` | Clear new items after user sees them | ✅ |
 
 #### Request/Response Examples
 

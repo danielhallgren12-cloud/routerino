@@ -224,7 +224,27 @@ Why it works:
 ### Future Enhancements (Network Fingerprint)
 
 **Planned:**
-- [ ] "New" indicators showing items discovered in current trace (vs already collected)
-- [ ] Inventory screen to view all collected items in detail
-- [ ] Badge system for collection milestones
-- [ ] Simple per-user rarity display (first time vs again)
+- [x] "New" indicators showing items discovered in current trace (vs already collected)
+- [x] Inventory screen to view all collected items in detail
+- [x] Badge system for collection milestones
+- [x] Simple per-user rarity display (first time vs again)
+
+---
+
+## Next Features (Planned)
+
+### 1. Share to Social Media
+- Share buttons (Twitter/X, Facebook, Reddit, LinkedIn)
+- Auto-generate OG-image (preview image) for social sharing
+- Pre-filled post: "Check out my route from [City] to [Destination]!"
+
+### 2. Fingerprint Share
+- "Copy Fingerprint Link" button
+- Public page: `/fp/{fingerprint_id}` showing the route
+- QR code for fingerprint
+
+### 3. Rarity System (Advanced)
+- Global rarity: show how many users have the same item (rare = few have it)
+- Personal rarity: "You found 3 of 10 possible"
+- Show rarity percentages in Inventory
+- Add "Rarity" as sorting option
