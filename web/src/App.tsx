@@ -8,6 +8,7 @@ import { LoginForm, RegisterForm } from './auth/forms'
 import { routesApi } from './auth/api'
 import { ArtGenerator } from './art/ArtGenerator'
 import Inventory from './components/Inventory'
+import BadgeCase from './components/BadgeCase'
 
 interface Hop {
   hop: number
@@ -88,6 +89,8 @@ function App() {
   const [showProfileMenu, setShowProfileMenu] = useState(false)
   const [showArtGenerator, setShowArtGenerator] = useState(false)
   const [showInventory, setShowInventory] = useState(false)
+  const [showBadgeCase, setShowBadgeCase] = useState(false)
+  const [newBadges, setNewBadges] = useState<{id: string, name: string, icon: string}[]>([])
   const [inventoryCategory, setInventoryCategory] = useState<string | null>(null)
   const [userCollection, setUserCollection] = useState<{
     destinations: number; countries: number; cities: number; companies: number;
@@ -140,6 +143,11 @@ function App() {
           setUserCollection(collection)
           if (collection.new_items) {
             setNewDiscoveries(collection.new_items)
+          }
+          // Check for new badges
+          const badgeResult = await routesApi.checkBadges(token)
+          if (badgeResult.new_badges && badgeResult.new_badges.length > 0) {
+            setNewBadges(badgeResult.new_badges)
           }
         } catch (err) { console.error('Failed to collect route:', err) }
       }
@@ -363,6 +371,7 @@ function App() {
                   <div className="profile-dropdown">
                     <button onClick={() => { loadSavedRoutes(); setShowProfileMenu(false) }} className="dropdown-item">📁 My Routes</button>
                     <button onClick={() => { setInventoryCategory(null); setShowInventory(true); setShowProfileMenu(false) }} className="dropdown-item">📦 Inventory</button>
+                    <button onClick={() => { setShowBadgeCase(true); setShowProfileMenu(false) }} className="dropdown-item">🏆 My Badges</button>
                     <hr className="dropdown-divider" />
                     <button onClick={() => { logout(); setShowProfileMenu(false) }} className="dropdown-item">Logout</button>
                   </div>
@@ -683,6 +692,27 @@ function App() {
           <div className="modal inventory-modal-container" onClick={e => e.stopPropagation()}>
             <Inventory token={token} collection={userCollection} onClose={() => { setShowInventory(false); setInventoryCategory(null) }} initialCategory={inventoryCategory} />
           </div>
+        </div>
+      )}
+
+      {showBadgeCase && token && (
+        <div className="modal-overlay" onClick={() => setShowBadgeCase(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <BadgeCase token={token} onClose={() => setShowBadgeCase(false)} />
+          </div>
+        </div>
+      )}
+
+      {newBadges.length > 0 && (
+        <div className="new-badges-toast">
+          <div className="new-badges-title">🎉 New Badge{newBadges.length > 1 ? 's' : ''} Earned!</div>
+          {newBadges.map(badge => (
+            <div key={badge.id} className="new-badge-item">
+              <span className="new-badge-icon">{badge.icon}</span>
+              <span className="new-badge-name">{badge.name}</span>
+            </div>
+          ))}
+          <button onClick={() => setNewBadges([])} className="dismiss-btn">✓</button>
         </div>
       )}
     </div>

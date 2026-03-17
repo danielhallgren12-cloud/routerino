@@ -1717,3 +1717,175 @@ body {
 .delete-route:hover {
   opacity: 1;
 }
+
+/* Badge Case */
+.badgecase-modal {
+  background: var(--bg-card);
+  border-radius: 12px;
+  padding: 1.5rem;
+  max-width: 600px;
+  width: 95vw;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.badgecase-modal h3 {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.badgecase-stats {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  margin-bottom: 1.5rem;
+}
+
+.badge-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.badge-stat-value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--primary);
+}
+
+.badge-stat-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.badgecase-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  justify-content: center;
+}
+
+.badge-tab {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.badge-tab:hover {
+  border-color: var(--primary);
+}
+
+.badge-tab.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--bg-dark);
+}
+
+.badgecase-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 1rem;
+}
+
+.badge-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem 0.5rem;
+  border-radius: 8px;
+  background: var(--bg-dark);
+  text-align: center;
+  position: relative;
+}
+
+.badge-item.locked {
+  opacity: 0.4;
+}
+
+.badge-item.earned {
+  border: 2px solid var(--primary);
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+}
+
+.badge-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.badge-name {
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.badge-check {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  color: var(--primary);
+  font-size: 0.8rem;
+}
+
+.badgecase-loading {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 2rem;
+}
+
+/* New Badges Toast */
+.new-badges-toast {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background: linear-gradient(135deg, var(--bg-card), #1a1a2e);
+  border: 2px solid var(--primary);
+  border-radius: 12px;
+  padding: 1.5rem;
+  z-index: 2000;
+  box-shadow: 0 0 30px rgba(0, 212, 255, 0.4);
+  animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.new-badges-title {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: var(--primary);
+  margin-bottom: 1rem;
+}
+
+.new-badge-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.new-badge-icon {
+  font-size: 1.5rem;
+}
+
+.new-badge-name {
+  font-weight: 600;
+}
+
+.dismiss-btn {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background: var(--primary);
+  border: none;
+  border-radius: 6px;
+  color: var(--bg-dark);
+  cursor: pointer;
+  font-weight: 600;
+}

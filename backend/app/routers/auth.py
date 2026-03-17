@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from datetime import timedelta
+from datetime import timedelta, date
 from typing import List
 import secrets
 import string
@@ -141,6 +141,19 @@ def collect_route(collect: CollectRequest, current_user: User = Depends(get_curr
     # Update counts
     current_user.total_traces += 1
     current_user.total_hops += len([h for h in hops if h.get('ip') and h.get('ip') != '*'])
+    
+    # Update streak
+    today = date.today().isoformat()
+    if current_user.last_trace_date:
+        last_date = date.fromisoformat(current_user.last_trace_date)
+        days_diff = (date.today() - last_date).days
+        if days_diff == 1:
+            current_user.current_streak += 1
+        elif days_diff > 1:
+            current_user.current_streak = 1
+    else:
+        current_user.current_streak = 1
+    current_user.last_trace_date = today
     
     # Add new items to collections (append to end to preserve discovery order)
     def append_unique(existing_list, new_items):
@@ -310,3 +323,73 @@ def get_shared_route(share_id: str, db: Session = Depends(get_db)):
     if not route:
         raise HTTPException(status_code=404, detail="Shared route not found")
     return route
+
+@router.get("/me/badges")
+def get_user_badges(current_user: User = Depends(get_current_user)):
+    """Get user's badges and all available badges"""
+    from app.badges import get_all_badges, BADGES
+    
+    earned = json.loads(current_user.earned_badges or '[]')
+    all_badges = get_all_badges()
+    
+    # Build response with earned status
+    result = []
+    for badge in all_badges:
+        result.append({
+            **badge,
+            "earned": badge["id"] in earned
+        })
+    
+    return {
+        "earned": earned,
+        "badges": result,
+        "total_earned": len(earned),
+        "total_available": len(all_badges)
+    }
+
+@router.get("/me/badges/check")
+def check_badges(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Check and award any new badges based on user stats"""
+    from app.badges import get_all_badges
+    
+    earned = set(json.loads(current_user.earned_badges or '[]'))
+    all_badges = get_all_badges()
+    new_badges = []
+    
+    # Get current stats
+    stats = {
+        "traces": current_user.total_traces,
+        "countries": len(json.loads(current_user.unique_countries or '[]')),
+        "cities": len(json.loads(current_user.unique_cities or '[]')),
+        "destinations": len(json.loads(current_user.unique_destinations or '[]')),
+        "companies": len(json.loads(current_user.unique_companies or '[]')),
+        "streak": current_user.current_streak,
+        "exports": 0,  # Would need to track this separately
+    }
+    
+    # Check each badge
+    for badge in all_badges:
+        if badge["id"] in earned:
+            continue
+            
+        req_type, req_value = badge["req"]
+        
+        if req_type in stats and stats[req_type] >= req_value:
+            earned.add(badge["id"])
+            new_badges.append(badge)
+    
+    # Update database if new badges earned
+    if new_badges:
+        current_user.earned_badges = json.dumps(list(earned))
+        db.commit()
+    
+    return {
+        "new_badges": new_badges,
+        "total_earned": len(earned)
+    }
+
+@router.post("/me/badges/increment-export")
+def increment_export(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Increment export counter for badges"""
+    # For now just return success - would need export tracking
+    return {"success": True}

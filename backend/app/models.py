@@ -21,7 +21,10 @@ class User(Base):
     unique_asns = Column(Text, default='[]')
     unique_fingerprints = Column(Text, default='[]')
     unique_cities = Column(Text, default='[]')
-    unique_isps = Column(Text, default='[]')
+    unique_companies = Column(Text, default='[]')
+    earned_badges = Column(Text, default='[]')
+    last_trace_date = Column(String, nullable=True)  # For streak tracking (YYYY-MM-DD)
+    current_streak = Column(Integer, default=0)
     
     routes = relationship("SavedRoute", back_populates="user", cascade="all, delete-orphan")
 

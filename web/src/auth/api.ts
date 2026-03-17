@@ -172,4 +172,28 @@ export const routesApi = {
     }
     return response.json()
   },
+
+  async getBadges(token: string) {
+    const response = await fetch(`${API_URL}/me/badges`, {
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+      },
+    })
+    if (!response.ok) {
+      throw new Error('Failed to get badges')
+    }
+    return response.json()
+  },
+
+  async checkBadges(token: string) {
+    const response = await fetch(`${API_URL}/me/badges/check`, {
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+      },
+    })
+    if (!response.ok) {
+      throw new Error('Failed to check badges')
+    }
+    return response.json()
+  },
 }
