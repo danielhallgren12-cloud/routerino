@@ -34,6 +34,7 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: 'rarity-asc', label: 'Rarity (Common→Rare)' },
   { value: 'rarity-desc', label: 'Rarity (Rare→Common)' },
   { value: 'recent', label: 'Recently Added' },
+  { value: 'most-collected', label: 'Most Collected' },
 ]
 
 const RARITY_ORDER: Record<Rarity, number> = {
@@ -62,6 +63,43 @@ export default function Inventory({ token, collection, onClose, initialCategory 
     }
   }, [activeCategory, token, collection.items])
 
+  // Get discovery counts from the collection
+  const discoveryCounts = (collection as any).discovery_counts || {}
+
+  // Calculate inventory summary stats
+  const totalItems = useMemo(() => {
+    return items.length
+  }, [items])
+
+  const mostSeenItem = useMemo(() => {
+    if (items.length === 0) return null
+    
+    // Find item with highest discovery count
+    const counts = items.map(item => ({
+      item,
+      count: discoveryCounts[`${activeCategory.slice(0, -1)}:${item}`] || 1
+    }))
+    
+    return counts.reduce((max, curr) => curr.count > max.count ? curr : max)
+  }, [items, discoveryCounts, activeCategory])
+
+  const rarestItem = useMemo(() => {
+    if (items.length === 0) return null
+    
+    // Find item with highest rarity tier
+    const rarities = items.map(item => ({
+      item,
+      rarity: getRarity(activeCategory, item),
+      count: discoveryCounts[`${activeCategory.slice(0, -1)}:${item}`] || 1
+    }))
+    
+    // Get item with highest rarity (legendary > epic > rare > uncommon > common)
+    const rarityOrder = { legendary: 5, epic: 4, rare: 3, uncommon: 2, common: 1 } as const
+    return rarities.reduce((max, curr) => 
+      rarityOrder[curr.rarity as keyof typeof rarityOrder] > rarityOrder[max.rarity as keyof typeof rarityOrder] ? curr : max
+    )
+  }, [items, discoveryCounts, activeCategory])
+
   const sortedItems = useMemo(() => {
     const sorted = [...items]
     sorted.sort((a, b) => {
@@ -77,6 +115,11 @@ export default function Inventory({ token, collection, onClose, initialCategory 
         case 'recent':
           // Items are stored with newest at the end, so reverse to show newest first
           return 0
+        case 'most-collected':
+          // Sort by discovery count (highest first)
+          const countA = discoveryCounts[`${activeCategory.slice(0, -1)}:${a}`] || 1
+          const countB = discoveryCounts[`${activeCategory.slice(0, -1)}:${b}`] || 1
+          return countB - countA
         default:
           return 0
       }
@@ -86,7 +129,7 @@ export default function Inventory({ token, collection, onClose, initialCategory 
       sorted.reverse()
     }
     return sorted
-  }, [items, sortBy, activeCategory])
+  }, [items, sortBy, activeCategory, discoveryCounts])
 
   const counts = {
     destinations: collection.destinations,
@@ -108,6 +151,7 @@ export default function Inventory({ token, collection, onClose, initialCategory 
       <div className="inventory-stats">
         <div className="inv-stat"><span className="inv-stat-value">{collection.total_traces}</span><span className="inv-stat-label">Traces</span></div>
         <div className="inv-stat"><span className="inv-stat-value">{collection.total_hops}</span><span className="inv-stat-label">Hops</span></div>
+        <div className="inv-stat"><span className="inv-stat-value">{totalItems}</span><span className="inv-stat-label">Items</span></div>
       </div>
       <div className="inventory-tabs">
         {CATEGORIES.map(cat => {
@@ -144,13 +188,20 @@ export default function Inventory({ token, collection, onClose, initialCategory 
               const displayValue = activeCategory === 'countries' ? `${item} - ${getCountryName(item)}` : item
               const isNew = newCounts[activeCategory]?.includes(item) || false
               return (
-                <div key={idx} className="inventory-item" style={{ borderLeftColor: RARITY_COLORS[rarity] }}>
-                  <span className="item-value">
-                    {displayValue}
-                    {isNew && <span className="item-new-badge">NEW</span>}
-                  </span>
-                  <span className="item-rarity" style={{ color: RARITY_COLORS[rarity] }}>{RARITY_LABELS[rarity]}</span>
-                </div>
+                 <div key={idx} className="inventory-item" style={{ borderLeftColor: RARITY_COLORS[rarity] }}>
+                   <span className="item-value">
+                     {displayValue}
+                     {isNew && <span className="item-new-badge">NEW</span>}
+                   </span>
+                   <span className="item-meta">
+                     <span className="item-rarity" style={{ color: RARITY_COLORS[rarity] }}>
+                       {RARITY_LABELS[rarity]}
+                     </span>
+                     <span className="item-count">
+                       Seen {(discoveryCounts[`${activeCategory.slice(0, -1)}:${item}`] || 1)}×
+                     </span>
+                   </span>
+                 </div>
               )
             })}
           </div>

@@ -595,21 +595,21 @@ function App() {
                   )}
                 </div>
               )}
-              {newDiscoveries && (newDiscoveries.destinations.length > 0 || newDiscoveries.countries.length > 0 || newDiscoveries.cities.length > 0 || newDiscoveries.companies.length > 0) && (
+               {newDiscoveries && ((newDiscoveries.destinations?.length || 0) > 0 || (newDiscoveries.countries?.length || 0) > 0 || (newDiscoveries.cities?.length || 0) > 0 || (newDiscoveries.companies?.length || 0) > 0) && (
                 <div className="new-discoveries-card">
                   <button className="discoveries-dismiss" onClick={() => setNewDiscoveries(null)} title="Dismiss">×</button>
                   <div className="new-discoveries-header">
                     <span className="new-discoveries-icon">✨</span>
                     <span className="new-discoveries-title">New Discoveries!</span>
-                    <span className="new-discoveries-count">
-                      +{newDiscoveries.destinations.length + newDiscoveries.countries.length + newDiscoveries.cities.length + newDiscoveries.companies.length}
-                    </span>
-                  </div>
-                  <div className="new-discoveries-list">
-                    {newDiscoveries.destinations.length > 0 && <div className="discovery-item"><span className="discovery-icon">📍</span> {newDiscoveries.destinations.length} new destination{newDiscoveries.destinations.length > 1 ? 's' : ''}: {newDiscoveries.destinations.join(', ')}</div>}
-                    {newDiscoveries.countries.length > 0 && <div className="discovery-item"><span className="discovery-icon">🌍</span> {newDiscoveries.countries.length} new country{newDiscoveries.countries.length > 1 ? 's' : ''}: {newDiscoveries.countries.join(', ')}</div>}
-                    {newDiscoveries.cities.length > 0 && <div className="discovery-item"><span className="discovery-icon">🌆</span> {newDiscoveries.cities.length} new cit{newDiscoveries.cities.length > 1 ? 'ies' : 'y'}: {newDiscoveries.cities.join(', ')}</div>}
-                    {newDiscoveries.companies.length > 0 && <div className="discovery-item"><span className="discovery-icon">🏢</span> {newDiscoveries.companies.length} new compan{newDiscoveries.companies.length > 1 ? 'ies' : 'y'}: {newDiscoveries.companies.join(', ')}</div>}
+                     <span className="new-discoveries-count">
+                       +{(newDiscoveries.destinations?.length || 0) + (newDiscoveries.countries?.length || 0) + (newDiscoveries.cities?.length || 0) + (newDiscoveries.companies?.length || 0)}
+                     </span>
+                   </div>
+                   <div className="new-discoveries-list">
+                     {(newDiscoveries.destinations?.length || 0) > 0 && <div className="discovery-item"><span className="discovery-icon">📍</span> {newDiscoveries.destinations.length} new destination{newDiscoveries.destinations.length > 1 ? 's' : ''}: {newDiscoveries.destinations.join(', ')}</div>}
+                     {(newDiscoveries.countries?.length || 0) > 0 && <div className="discovery-item"><span className="discovery-icon">🌍</span> {newDiscoveries.countries.length} new country{newDiscoveries.countries.length > 1 ? 's' : ''}: {newDiscoveries.countries.join(', ')}</div>}
+                     {(newDiscoveries.cities?.length || 0) > 0 && <div className="discovery-item"><span className="discovery-icon">🌆</span> {newDiscoveries.cities.length} new cit{newDiscoveries.cities.length > 1 ? 'ies' : 'y'}: {newDiscoveries.cities.join(', ')}</div>}
+                     {(newDiscoveries.companies?.length || 0) > 0 && <div className="discovery-item"><span className="discovery-icon">🏢</span> {newDiscoveries.companies.length} new compan{newDiscoveries.companies.length > 1 ? 'ies' : 'y'}: {newDiscoveries.companies.join(', ')}</div>}
                   </div>
                 </div>
               )}

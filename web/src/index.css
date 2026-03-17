@@ -1544,6 +1544,18 @@ body {
   border-left: 3px solid var(--primary);
 }
 
+.item-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.item-count {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
 .item-value {
   font-family: monospace;
   font-size: 0.875rem;

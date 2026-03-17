@@ -50,6 +50,7 @@ def get_user_collection(current_user: User = Depends(get_current_user)):
     asns = json.loads(current_user.unique_asns or '[]')
     fingerprints = json.loads(current_user.unique_fingerprints or '[]')
     new_items = json.loads(current_user.new_items or '{}')
+    discovery_counts = json.loads(current_user.item_discovery_counts or '{}')
     
     return {
         "destinations": len(destinations),
@@ -62,6 +63,7 @@ def get_user_collection(current_user: User = Depends(get_current_user)):
         "total_hops": current_user.total_hops,
         "fingerprints": len(fingerprints),
         "new_items": new_items,
+        "discovery_counts": discovery_counts,
         "items": {
             "destinations": destinations,
             "countries": countries,
@@ -182,9 +184,28 @@ def collect_route(collect: CollectRequest, current_user: User = Depends(get_curr
             current_new_items[key] = list(set(current_new_items[key] + new_items[key]))
     current_user.new_items = json.dumps(current_new_items)
     
+    # Update item discovery counts
+    discovery_counts = json.loads(current_user.item_discovery_counts or '{}')
+    
+    # Increment counts for all items in this trace
+    for item in countries:
+        discovery_counts[f"country:{item}"] = discovery_counts.get(f"country:{item}", 0) + 1
+    for item in cities:
+        discovery_counts[f"city:{item}"] = discovery_counts.get(f"city:{item}", 0) + 1
+    for item in isps:
+        discovery_counts[f"company:{item}"] = discovery_counts.get(f"company:{item}", 0) + 1
+    for item in ips:
+        discovery_counts[f"ip:{item}"] = discovery_counts.get(f"ip:{item}", 0) + 1
+    for item in asns:
+        discovery_counts[f"asn:{item}"] = discovery_counts.get(f"asn:{item}", 0) + 1
+    discovery_counts[f"destination:{collect.destination}"] = discovery_counts.get(f"destination:{collect.destination}", 0) + 1
+    discovery_counts[f"fingerprint:{collect.fingerprint_id}"] = discovery_counts.get(f"fingerprint:{collect.fingerprint_id}", 0) + 1
+    
+    current_user.item_discovery_counts = json.dumps(discovery_counts)
+    
     db.commit()
     
-    # Return updated collection
+    # Return updated collection with discovery counts
     return {
         "destinations": len(json.loads(current_user.unique_destinations or '[]')),
         "countries": len(json.loads(current_user.unique_countries or '[]')),
@@ -196,6 +217,7 @@ def collect_route(collect: CollectRequest, current_user: User = Depends(get_curr
         "total_hops": current_user.total_hops,
         "fingerprints": len(json.loads(current_user.unique_fingerprints or '[]')),
         "new_items": json.loads(current_user.new_items or '{}'),
+        "discovery_counts": discovery_counts,
     }
 
 @router.get("/me/collection/{category}")
