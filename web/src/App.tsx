@@ -9,6 +9,7 @@ import { routesApi } from './auth/api'
 import { ArtGenerator } from './art/ArtGenerator'
 import Inventory from './components/Inventory'
 import BadgeCase from './components/BadgeCase'
+import FingerprintModal from './components/FingerprintModal'
 
 interface Hop {
   hop: number
@@ -90,6 +91,7 @@ function App() {
   const [showArtGenerator, setShowArtGenerator] = useState(false)
   const [showInventory, setShowInventory] = useState(false)
   const [showBadgeCase, setShowBadgeCase] = useState(false)
+  const [showFingerprintModal, setShowFingerprintModal] = useState(false)
   const [newBadges, setNewBadges] = useState<{id: string, name: string, icon: string}[]>([])
   const [inventoryCategory, setInventoryCategory] = useState<string | null>(null)
   const [userCollection, setUserCollection] = useState<{
@@ -114,6 +116,17 @@ function App() {
   const runTrace = async (destOverride?: string) => {
     const target = (destOverride ? String(destOverride).trim() : destination.trim())
     if (!target) return
+    
+    // Rensa gamla nya items INNAN vi börjar ny sökning
+    const token = localStorage.getItem('token')
+    if (token) {
+      try {
+        await routesApi.clearNewItems(token)
+        setNewDiscoveries(null)
+      } catch (err) {
+        console.error('Failed to clear new items:', err)
+      }
+    }
     
     setLoading(true)
     setError('')
@@ -372,12 +385,6 @@ function App() {
                   <div className="profile-dropdown">
                     <button onClick={() => { loadSavedRoutes(); setShowProfileMenu(false) }} className="dropdown-item">📁 My Routes</button>
                     <button onClick={() => { 
-                      const newCount = userCollection?.new_items 
-                        ? userCollection.new_items.destinations?.length + userCollection.new_items.countries?.length + userCollection.new_items.cities?.length + userCollection.new_items.companies?.length
-                        : 0;
-                      if (newCount > 0) {
-                        routesApi.clearNewItems(token).then(() => routesApi.getCollection(token).then(setUserCollection))
-                      }
                       setInventoryCategory(null); setShowInventory(true); setShowProfileMenu(false) 
                     }} className="dropdown-item">
                       📦 Inventory
@@ -576,7 +583,14 @@ function App() {
                   <div className="fingerprint-header">
                     <span className="fingerprint-icon">🏷️</span>
                     <span className="fingerprint-title">Network Fingerprint</span>
-                    <span className="fingerprint-id">{traceData.fingerprint_id}</span>
+                    <span className="fingerprint-id clickable" onClick={() => setShowFingerprintModal(true)}>
+                      {traceData.fingerprint_id}
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="share-icon" style={{ marginLeft: 4 }}>
+                        <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                        <polyline points="16 6 12 2 8 6"/>
+                        <line x1="12" y1="2" x2="12" y2="15"/>
+                      </svg>
+                    </span>
                     {traceData.destination && <span className="fingerprint-dest">({traceData.destination})</span>}
                   </div>
                   {userCollection && (
@@ -730,6 +744,16 @@ function App() {
             <BadgeCase token={token} onClose={() => setShowBadgeCase(false)} />
           </div>
         </div>
+      )}
+
+      {showFingerprintModal && traceData && (
+        <FingerprintModal
+          fingerprintId={traceData.fingerprint_id!}
+          destination={traceData.destination}
+          hops={traceData.hops}
+          userLocation={userLocation}
+          onClose={() => setShowFingerprintModal(false)}
+        />
       )}
 
       {newBadges.length > 0 && (

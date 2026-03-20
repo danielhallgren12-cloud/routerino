@@ -72,7 +72,7 @@
 | Like & Save | Save favorite routes to collection |
 | User Profiles | Display user's route collection and stats |
 | Share Routes | ✅ Social buttons (Twitter, Facebook, LinkedIn, Reddit, Instagram) - full functionality with real share pages |
-| Fingerprint Share | Share fingerprint with public page + QR code |
+| Fingerprint Share | ✅ Click fingerprint ID → modal with fingerprint card + download + social share |
 
 ### Phase 4 - Expansion (Planned)
 

@@ -333,6 +333,15 @@ import MapView from 'react-native-maps';
 | Reddit | ✅ | Pre-filled title and link |
 | Instagram | ✅ | Opens Instagram web (best effort for web) |
 
+### Fingerprint Share
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Click to open modal | ✅ | Click fingerprint ID in fingerprint card |
+| Fingerprint card display | ✅ | Shows hops, countries, cities, companies, ASNs |
+| Download as image | ✅ | html2canvas + download |
+| Social share | ✅ | Twitter, Facebook, LinkedIn, Reddit, Instagram |
+
 ---
 
 ## 7. Deployment
