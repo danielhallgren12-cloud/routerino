@@ -106,7 +106,7 @@ This roadmap outlines the development phases for RouteCanvas, from initial demo 
 
 - [ ] Like routes
 - [ ] Save favorites
-- [ ] Share to social media
+- [x] Share to social media (Twitter, Facebook, LinkedIn, Reddit, Instagram)
 - [ ] User profiles with stats
 
 **Deliverables:**
@@ -160,7 +160,6 @@ Why it works:
 - [ ] Route uniqueness scoring
 - [x] Achievements (badge system)
 - [ ] Compare routes feature
-- [ ] Video export
 
 **🔄 On Hold:**
 - **Historical route comparison** - Compare saved routes with current trace
@@ -198,10 +197,10 @@ Why it works:
 
 ## Next Features (Planned)
 
-### 1. Share to Social Media
-- Share buttons (Twitter/X, Facebook, Reddit, LinkedIn)
-- Auto-generate OG-image (preview image) for social sharing
-- Pre-filled post: "Check out my route from [City] to [Destination]!"
+### 1. Share to Social Media ✅ DONE
+- [x] Share buttons (Twitter/X, Facebook, Reddit, LinkedIn, Instagram)
+- [x] Auto-generate preview image for social sharing
+- [x] Pre-filled post: "Check out my route from [City] to [Destination]!"
 
 ### 2. Fingerprint Share
 - "Copy Fingerprint Link" button

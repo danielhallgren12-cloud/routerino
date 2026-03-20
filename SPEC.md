@@ -64,14 +64,14 @@
 | Badge Notifications | ✅ Complete (toast notification when earning new badges) |
 | New Discoveries Indicator | ✅ Complete (animated card, +N badges, NEW labels on items) |
 
-### Phase 3 - Social (Planned)
+### Phase 3 - Social (In Progress)
 
 | Feature | Description |
 |---------|-------------|
 | Public Gallery | Browse latest and popular community routes |
 | Like & Save | Save favorite routes to collection |
 | User Profiles | Display user's route collection and stats |
-| Share Routes | Easy share to social media (buttons + OG image) |
+| Share Routes | ✅ Social buttons (Twitter, Facebook, LinkedIn, Reddit, Instagram) - full functionality with real share pages |
 | Fingerprint Share | Share fingerprint with public page + QR code |
 
 ### Phase 4 - Expansion (Planned)
@@ -82,7 +82,6 @@
 | Advanced Rarity | Global rarity (how many users have it), personal rarity stats |
 | Gamification | Badges, country counters, route uniqueness scores |
 | Compare Routes | Overlay routes from different times/locations |
-| Video Export | Export animated journey as MP4/GIF |
 
 ---
 

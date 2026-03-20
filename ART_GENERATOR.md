@@ -120,6 +120,7 @@ Each art piece displays:
 | **Layout** | Portrait, Square, Large | Portrait |
 | **Custom Title** | Text input | "THE JOURNEY" |
 | **Show Stats** | Toggle | ON |
+| **Social Share** | Twitter, Facebook, LinkedIn, Reddit, Instagram | Buttons below Download |
 
 ### Future Enhancements (v2)
 
@@ -256,8 +257,7 @@ Colors cycle for routes with many hops.
 
 ### Phase 3
 - [ ] Print-on-demand integration
-- [ ] Social sharing (direct to Instagram/Twitter)
-- [ ] Video export (animated art)
+- [x] Social sharing (Twitter, Facebook, LinkedIn, Reddit, Instagram)
 - [ ] Custom branding options
 
 ---

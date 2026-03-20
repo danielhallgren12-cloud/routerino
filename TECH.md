@@ -323,6 +323,16 @@ import MapView from 'react-native-maps';
 | Minimal | Black/white, simple lines, maximum whitespace | ✅ |
 | Retro | 80s/90s synthwave, grid lines, gradient mesh | ✅ |
 
+### Social Sharing
+
+| Platform | Status | Notes |
+|----------|--------|-------|
+| Twitter/X | ✅ | Pre-filled text, link preview with OG image |
+| Facebook | ✅ | Pre-filled text, shared image |
+| LinkedIn | ✅ | Share offsite with link |
+| Reddit | ✅ | Pre-filled title and link |
+| Instagram | ✅ | Opens Instagram web (best effort for web) |
+
 ---
 
 ## 7. Deployment
