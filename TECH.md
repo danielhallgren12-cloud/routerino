@@ -333,6 +333,16 @@ import MapView from 'react-native-maps';
 | Reddit | ✅ | Pre-filled title and link |
 | Instagram | ✅ | Opens Instagram web (best effort for web) |
 
+### Color Themes
+
+| Theme | Colors | Status |
+|-------|--------|--------|
+| Cyan/Magenta | cyan, magenta, green, orange, purple | ✅ Default |
+| Sunset | orange, red, pink, gold | ✅ |
+| Ocean | teal, blue, aqua | ✅ |
+| Forest | green, brown, earth tones | ✅ |
+| Mono | black, grays, white | ✅ |
+
 ### Fingerprint Share
 
 | Feature | Status | Notes |

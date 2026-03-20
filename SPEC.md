@@ -42,7 +42,9 @@
 | Color-coded latency | ✅ Complete |
 | ASN tracking | ✅ Complete |
 | Art themes: Geometric, Constellation, Flow, Neon, Minimal, Retro | ✅ Complete |
-| Image Export | ✅ Complete |
+| Image Export | ✅ Complete (300 DPI) |
+| Color Themes | ✅ Complete (5 palettes: Cyan/Magenta, Sunset, Ocean, Forest, Mono) |
+| Custom Name on Art | ✅ Complete (optional "Created by" attribution) |
 
 ### Phase 2 - Engagement ✅ COMPLETED
 

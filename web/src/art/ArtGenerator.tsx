@@ -1,8 +1,25 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import html2canvas from 'html2canvas'
 
 type ArtStyle = 'geometric' | 'neon' | 'constellation' | 'flow' | 'minimal' | 'retro'
 type Layout = 'portrait' | 'square' | 'large'
+type ColorTheme = 'default' | 'sunset' | 'ocean' | 'forest' | 'mono'
+
+const colorPalettes: Record<ColorTheme, string[]> = {
+  default: ['#00F0FF', '#FF2D92', '#00FFA3', '#FFD000', '#B04AFF', '#FF6B35'],
+  sunset: ['#FF6B35', '#F7931E', '#FFD700', '#FF4500', '#FF1493', '#DC143C'],
+  ocean: ['#00CED1', '#1E90FF', '#00BFFF', '#87CEEB', '#20B2AA', '#48D1CC'],
+  forest: ['#228B22', '#6B8E23', '#8B4513', '#2E8B57', '#556B2F', '#808000'],
+  mono: ['#000000', '#333333', '#666666', '#999999', '#CCCCCC', '#FFFFFF']
+}
+
+const colorSwatches: { id: ColorTheme; color: string; name: string }[] = [
+  { id: 'default', color: '#00F0FF', name: 'Cyan/Magenta' },
+  { id: 'sunset', color: '#FF6B35', name: 'Sunset' },
+  { id: 'ocean', color: '#00CED1', name: 'Ocean' },
+  { id: 'forest', color: '#228B22', name: 'Forest' },
+  { id: 'mono', color: '#333333', name: 'Mono' }
+]
 
 interface Hop {
   hop: number
@@ -62,8 +79,35 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
   const [layout, setLayout] = useState<Layout>('portrait')
   const [customTitle, setCustomTitle] = useState('')
   const [includeStats, setIncludeStats] = useState(true)
+  const [colorTheme, setColorTheme] = useState<ColorTheme>('default')
+  const [customName, setCustomName] = useState('')
+  const [includeName, setIncludeName] = useState(false)
   const [exporting, setExporting] = useState(false)
   const [sharing, setSharing] = useState(false)
+
+  useEffect(() => {
+    const savedColorTheme = localStorage.getItem('routecanvas_colorTheme') as ColorTheme
+    const savedCustomName = localStorage.getItem('routecanvas_customName')
+    if (savedColorTheme) setColorTheme(savedColorTheme)
+    if (savedCustomName) {
+      setCustomName(savedCustomName)
+      setIncludeName(true)
+    }
+  }, [])
+
+  const handleColorThemeChange = (theme: ColorTheme) => {
+    setColorTheme(theme)
+    localStorage.setItem('routecanvas_colorTheme', theme)
+  }
+
+  const handleCustomNameChange = (name: string) => {
+    setCustomName(name)
+    localStorage.setItem('routecanvas_customName', name)
+  }
+
+  const handleIncludeNameChange = (include: boolean) => {
+    setIncludeName(include)
+  }
 
   const validHops = traceData ? traceData.hops.filter(h => h.ip && h.ip !== '*') : []
 
@@ -167,9 +211,13 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
     avgRtt: validHops.length ? Math.round(validHops.filter(h => h.rtt).reduce((a, b) => a + (b.rtt || 0), 0) / validHops.filter(h => h.rtt).length) || 0 : 0
   }
 
-  const colors = ['#00F0FF', '#FF2D92', '#00FFA3', '#FFD000', '#B04AFF', '#FF6B35']
-  const neonColors = ['#00F0FF', '#FF2D92', '#FFD000', '#00FFA3', '#FF6BFF', '#FFFFFF']
-  const retroColors = ['#D4A500', '#CC5500', '#6B8E23', '#8B4513', '#B22222', '#CD853F']
+  const colors = colorPalettes[colorTheme]
+  const neonColors = colorPalettes[colorTheme].length >= 4 
+    ? [colorPalettes[colorTheme][0], colorPalettes[colorTheme][1], colorPalettes[colorTheme][3], colorPalettes[colorTheme][2], colorPalettes[colorTheme][4], '#FFFFFF']
+    : ['#00F0FF', '#FF2D92', '#FFD000', '#00FFA3', '#FF6BFF', '#FFFFFF']
+  const retroColors = colorPalettes[colorTheme].length >= 5
+    ? [colorPalettes[colorTheme][0], colorPalettes[colorTheme][1], colorPalettes[colorTheme][2], colorPalettes[colorTheme][3], colorPalettes[colorTheme][4], colorPalettes[colorTheme][5] || colorPalettes[colorTheme][0]]
+    : ['#D4A500', '#CC5500', '#6B8E23', '#8B4513', '#B22222', '#CD853F']
   const getColor = (i: number) => colors[i % colors.length]
   const getNeonColor = (i: number) => neonColors[i % neonColors.length]
   const getRetroColor = (i: number) => retroColors[i % retroColors.length]
@@ -226,6 +274,11 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
           <div style={{ position: 'absolute', bottom: 14, right: 18, fontFamily: 'Space Mono, monospace', fontSize: 9, color: '#999' }}>
             routecanvas.app
           </div>
+          {includeName && customName && (
+            <div style={{ position: 'absolute', bottom: 14, left: 18, fontFamily: 'Space Mono, monospace', fontSize: 9, color: '#999' }}>
+              Created by {customName}
+            </div>
+          )}
         </div>
       )
     }
@@ -283,6 +336,11 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
           <div style={{ position: 'absolute', bottom: 14, right: 18, fontFamily: 'Space Mono, monospace', fontSize: 9, color: '#555' }}>
             routecanvas.app
           </div>
+          {includeName && customName && (
+            <div style={{ position: 'absolute', bottom: 14, left: 18, fontFamily: 'Space Mono, monospace', fontSize: 9, color: '#555' }}>
+              Created by {customName}
+            </div>
+          )}
         </div>
       )
     }
@@ -351,6 +409,11 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
           <div style={{ position: 'absolute', bottom: 14, right: 18, fontFamily: 'Space Mono, monospace', fontSize: 9, color: '#555' }}>
             routecanvas.app
           </div>
+          {includeName && customName && (
+            <div style={{ position: 'absolute', bottom: 14, left: 18, fontFamily: 'Space Mono, monospace', fontSize: 9, color: '#555' }}>
+              Created by {customName}
+            </div>
+          )}
         </div>
       )
     }
@@ -407,6 +470,11 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
           <div style={{ position: 'absolute', bottom: 14, right: 18, fontFamily: 'Space Mono, monospace', fontSize: 9, color: '#aaa' }}>
             routecanvas.app
           </div>
+          {includeName && customName && (
+            <div style={{ position: 'absolute', bottom: 14, left: 18, fontFamily: 'Space Mono, monospace', fontSize: 9, color: '#aaa' }}>
+              Created by {customName}
+            </div>
+          )}
         </div>
       )
     }
@@ -457,6 +525,11 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
           <div style={{ position: 'absolute', bottom: 14, right: 18, fontFamily: 'system-ui, sans-serif', fontSize: 9, color: '#bbb', letterSpacing: 1 }}>
             routecanvas.app
           </div>
+          {includeName && customName && (
+            <div style={{ position: 'absolute', bottom: 14, left: 18, fontFamily: 'system-ui, sans-serif', fontSize: 9, color: '#bbb', letterSpacing: 1 }}>
+              Created by {customName}
+            </div>
+          )}
         </div>
       )
     }
@@ -526,6 +599,11 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
           <div style={{ position: 'absolute', bottom: 12, right: 18, fontFamily: 'Georgia, serif', fontSize: 9, color: '#8B4513', letterSpacing: 0.5, opacity: 0.7 }}>
             routecanvas.app
           </div>
+          {includeName && customName && (
+            <div style={{ position: 'absolute', bottom: 12, left: 18, fontFamily: 'Georgia, serif', fontSize: 9, color: '#8B4513', letterSpacing: 0.5, opacity: 0.7 }}>
+              Created by {customName}
+            </div>
+          )}
         </div>
       )
     }
@@ -543,6 +621,28 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
         <button onClick={() => setStyle('minimal')} style={{ padding: '12px 20px', border: style === 'minimal' ? '2px solid #333' : '1px solid #444', background: style === 'minimal' ? 'rgba(51,51,51,0.2)' : 'transparent', color: style === 'minimal' ? '#fff' : '#888', borderRadius: 10, cursor: 'pointer', fontFamily: 'Syne, sans-serif', fontSize: 13, fontWeight: 600, letterSpacing: 1 }}>MINIMAL</button>
         <button onClick={() => setStyle('retro')} style={{ padding: '12px 20px', border: style === 'retro' ? '2px solid #D4A500' : '1px solid #444', background: style === 'retro' ? 'rgba(212,165,0,0.15)' : 'transparent', color: style === 'retro' ? '#D4A500' : '#888', borderRadius: 10, cursor: 'pointer', fontFamily: 'Syne, sans-serif', fontSize: 13, fontWeight: 600, letterSpacing: 1 }}>RETRO</button>
       </div>
+
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
+        {colorSwatches.map((swatch) => (
+          <button
+            key={swatch.id}
+            onClick={() => handleColorThemeChange(swatch.id)}
+            title={swatch.name}
+            style={{
+              width: 24,
+              height: 24,
+              borderRadius: '50%',
+              background: swatch.color,
+              border: colorTheme === swatch.id ? '3px solid #fff' : '2px solid #444',
+              cursor: 'pointer',
+              padding: 0,
+              boxShadow: colorTheme === swatch.id ? `0 0 10px ${swatch.color}` : 'none',
+              transform: colorTheme === swatch.id ? 'scale(1.15)' : 'scale(1)',
+              transition: 'all 0.2s'
+            }}
+          />
+        ))}
+      </div>
       
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}>
         <select value={layout} onChange={(e) => setLayout(e.target.value as Layout)} style={{ padding: '12px 16px', borderRadius: 10, border: '1px solid #444', background: '#1a1a1a', color: '#fff', fontFamily: 'Space Mono, monospace', fontSize: 12 }}>
@@ -553,6 +653,12 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
         <input type="text" value={customTitle} onChange={(e) => setCustomTitle(e.target.value)} placeholder="Custom title" style={{ padding: '12px 16px', borderRadius: 10, border: '1px solid #444', background: '#0a0a0a', color: '#fff', fontFamily: 'Space Mono, monospace', fontSize: 12, width: 160 }} />
         <label style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#888', fontSize: 11, fontFamily: 'Space Mono, monospace', cursor: 'pointer' }}>
           <input type="checkbox" checked={includeStats} onChange={(e) => setIncludeStats(e.target.checked)} />STATS
+        </label>
+        {includeName && (
+          <input type="text" value={customName} onChange={(e) => handleCustomNameChange(e.target.value)} placeholder="Your name" style={{ padding: '10px 14px', borderRadius: 8, border: '1px solid #444', background: '#0a0a0a', color: '#fff', fontFamily: 'Space Mono, monospace', fontSize: 11, width: 120 }} />
+        )}
+        <label style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#888', fontSize: 11, fontFamily: 'Space Mono, monospace', cursor: 'pointer' }}>
+          <input type="checkbox" checked={includeName} onChange={(e) => handleIncludeNameChange(e.target.checked)} />NAME
         </label>
       </div>
       
