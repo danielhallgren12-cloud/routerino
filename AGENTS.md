@@ -88,7 +88,8 @@ npm test src/components/Inventory.test.tsx
 When adding features, verify manually:
 - [ ] Social sharing (Twitter, Facebook, LinkedIn, Reddit, Instagram)
 - [ ] Art generation and download
-- [ ] Color themes (5 palettes)
+- [ ] Color themes (5 palettes with style-aware filtering)
+- [ ] Background colors (style-specific backgrounds)
 - [ ] Custom name on art ("Created by")
 - [ ] Fingerprint share (click fingerprint ID → modal with download + share)
 - [ ] User authentication (register, login, logout)

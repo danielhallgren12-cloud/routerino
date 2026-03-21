@@ -4,6 +4,7 @@ import html2canvas from 'html2canvas'
 type ArtStyle = 'geometric' | 'neon' | 'constellation' | 'flow' | 'minimal' | 'retro'
 type Layout = 'portrait' | 'square' | 'large'
 type ColorTheme = 'default' | 'sunset' | 'ocean' | 'forest' | 'mono'
+type BackgroundColor = 'white' | 'cream' | 'black' | 'lightgray' | 'deepblue' | 'sepia'
 
 const colorPalettes: Record<ColorTheme, string[]> = {
   default: ['#00F0FF', '#FF2D92', '#00FFA3', '#FFD000', '#B04AFF', '#FF6B35'],
@@ -13,6 +14,24 @@ const colorPalettes: Record<ColorTheme, string[]> = {
   mono: ['#000000', '#333333', '#666666', '#999999', '#CCCCCC', '#FFFFFF']
 }
 
+const backgroundPalettes: Record<BackgroundColor, string> = {
+  white: '#ffffff',
+  cream: '#faf8f5',
+  black: '#000000',
+  lightgray: '#f0f0f0',
+  deepblue: '#050510',
+  sepia: '#f5e6d3'
+}
+
+const backgroundSwatches: { id: BackgroundColor; color: string; name: string }[] = [
+  { id: 'white', color: '#ffffff', name: 'White' },
+  { id: 'cream', color: '#faf8f5', name: 'Cream' },
+  { id: 'lightgray', color: '#f0f0f0', name: 'Light Gray' },
+  { id: 'black', color: '#000000', name: 'Black' },
+  { id: 'deepblue', color: '#050510', name: 'Deep Blue' },
+  { id: 'sepia', color: '#f5e6d3', name: 'Sepia' }
+]
+
 const colorSwatches: { id: ColorTheme; color: string; name: string }[] = [
   { id: 'default', color: '#00F0FF', name: 'Cyan/Magenta' },
   { id: 'sunset', color: '#FF6B35', name: 'Sunset' },
@@ -20,6 +39,33 @@ const colorSwatches: { id: ColorTheme; color: string; name: string }[] = [
   { id: 'forest', color: '#228B22', name: 'Forest' },
   { id: 'mono', color: '#333333', name: 'Mono' }
 ]
+
+const styleAllowedColorThemes: Record<ArtStyle, ColorTheme[]> = {
+  geometric: ['default', 'sunset', 'ocean', 'forest', 'mono'],
+  neon: ['default', 'mono'],
+  constellation: ['default', 'ocean'],
+  flow: ['default', 'sunset', 'ocean', 'forest', 'mono'],
+  minimal: ['mono'],
+  retro: ['default', 'sunset', 'ocean', 'forest', 'mono']
+}
+
+const styleAllowedBackgrounds: Record<ArtStyle, BackgroundColor[]> = {
+  geometric: ['white', 'cream', 'lightgray', 'black', 'sepia'],
+  neon: ['black', 'deepblue'],
+  constellation: ['black', 'deepblue'],
+  flow: ['white', 'cream', 'lightgray'],
+  minimal: ['white', 'lightgray'],
+  retro: ['cream', 'sepia']
+}
+
+const styleDefaultBackground: Record<ArtStyle, BackgroundColor> = {
+  geometric: 'white',
+  neon: 'black',
+  constellation: 'deepblue',
+  flow: 'cream',
+  minimal: 'white',
+  retro: 'sepia'
+}
 
 interface Hop {
   hop: number
@@ -80,6 +126,7 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
   const [customTitle, setCustomTitle] = useState('')
   const [includeStats, setIncludeStats] = useState(true)
   const [colorTheme, setColorTheme] = useState<ColorTheme>('default')
+  const [backgroundColor, setBackgroundColor] = useState<BackgroundColor>('white')
   const [customName, setCustomName] = useState('')
   const [includeName, setIncludeName] = useState(false)
   const [exporting, setExporting] = useState(false)
@@ -100,6 +147,18 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
     localStorage.setItem('routecanvas_colorTheme', theme)
   }
 
+  const handleBackgroundColorChange = (bg: BackgroundColor) => {
+    setBackgroundColor(bg)
+  }
+
+  const handleStyleChange = (newStyle: ArtStyle) => {
+    setStyle(newStyle)
+    setBackgroundColor(styleDefaultBackground[newStyle])
+    if (!styleAllowedColorThemes[newStyle].includes(colorTheme)) {
+      setColorTheme('default')
+    }
+  }
+
   const handleCustomNameChange = (name: string) => {
     setCustomName(name)
     localStorage.setItem('routecanvas_customName', name)
@@ -116,7 +175,7 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
     const canvas = await html2canvas(artRef.current, {
       scale: 10,
       useCORS: true,
-      backgroundColor: style === 'neon' ? '#000000' : style === 'constellation' ? '#050510' : style === 'minimal' ? '#fafafa' : style === 'retro' ? '#f5e6d3' : '#ffffff',
+      backgroundColor: backgroundPalettes[backgroundColor],
       logging: false
     })
     return new Promise((resolve) => {
@@ -228,7 +287,7 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
     // ==================== GEOMETRIC ====================
     if (style === 'geometric') {
       return (
-        <div style={{ background: '#ffffff', width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', position: 'relative', boxSizing: 'border-box' }}>
+        <div style={{ background: backgroundPalettes[backgroundColor], width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', position: 'relative', boxSizing: 'border-box' }}>
           {/* Frame */}
           <div style={{ position: 'absolute', top: 10, left: 10, right: 10, bottom: 10, border: '3px solid #0a0a0a', borderRadius: 2, pointerEvents: 'none' }} />
           
@@ -286,7 +345,7 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
     // ==================== NEON ====================
     if (style === 'neon') {
       return (
-        <div style={{ background: '#000000', width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', position: 'relative', boxSizing: 'border-box' }}>
+        <div style={{ background: backgroundPalettes[backgroundColor], width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', position: 'relative', boxSizing: 'border-box' }}>
           {/* Glowing border */}
           <div style={{ position: 'absolute', top: 6, left: 6, right: 6, bottom: 6, border: '4px solid', borderImage: 'linear-gradient(135deg, #00F0FF, #FF2D92) 1', boxShadow: '0 0 30px rgba(0,240,255,0.3)', pointerEvents: 'none' }} />
           
@@ -348,7 +407,7 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
     // ==================== CONSTELLATION ====================
     if (style === 'constellation') {
       return (
-        <div style={{ background: 'linear-gradient(135deg, #050510, #0a0a1a, #0f0f25)', width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', position: 'relative', boxSizing: 'border-box' }}>
+        <div style={{ background: backgroundPalettes[backgroundColor], width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', position: 'relative', boxSizing: 'border-box' }}>
           {/* Glowing frame */}
           <div style={{ position: 'absolute', top: 10, left: 10, right: 10, bottom: 10, border: '1px solid rgba(100,100,255,0.4)', borderRadius: 2, boxShadow: '0 0 30px rgba(100,100,255,0.15)', pointerEvents: 'none' }} />
           
@@ -421,7 +480,7 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
     // ==================== FLOW ====================
     if (style === 'flow') {
       return (
-        <div style={{ background: '#faf8f5', width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', position: 'relative', boxSizing: 'border-box' }}>
+        <div style={{ background: backgroundPalettes[backgroundColor], width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', position: 'relative', boxSizing: 'border-box' }}>
           {/* Elegant frame */}
           <div style={{ position: 'absolute', top: 10, left: 10, right: 10, bottom: 10, border: '2px solid #e0d8d0', borderRadius: 2, pointerEvents: 'none' }} />
           
@@ -482,7 +541,7 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
     // ==================== MINIMAL ====================
     if (style === 'minimal') {
       return (
-        <div style={{ background: '#fafafa', width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', position: 'relative', boxSizing: 'border-box' }}>
+        <div style={{ background: backgroundPalettes[backgroundColor], width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', position: 'relative', boxSizing: 'border-box' }}>
           <svg width={420} height={280} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', opacity: 0.1 }}>
             <line x1={40} y1={260} x2={380} y2={260} stroke="#000" strokeWidth={1} />
             <circle cx={210} cy={140} r={3} fill="#000" />
@@ -537,7 +596,7 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
     // ==================== RETRO ====================
     if (style === 'retro') {
       return (
-        <div style={{ background: '#f5e6d3', width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', position: 'relative', boxSizing: 'border-box' }}>
+        <div style={{ background: backgroundPalettes[backgroundColor], width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', position: 'relative', boxSizing: 'border-box' }}>
           {/* Vintage frame */}
           <div style={{ position: 'absolute', top: 8, left: 8, right: 8, bottom: 8, border: '6px solid #8B4513', borderRadius: 4, pointerEvents: 'none' }} />
           <div style={{ position: 'absolute', top: 14, left: 14, right: 14, bottom: 14, border: '2px solid #D4A500', pointerEvents: 'none' }} />
@@ -614,16 +673,16 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20 }}>
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
-        <button onClick={() => setStyle('geometric')} style={{ padding: '12px 20px', border: style === 'geometric' ? '2px solid #00F0FF' : '1px solid #444', background: style === 'geometric' ? 'rgba(0,240,255,0.15)' : 'transparent', color: style === 'geometric' ? '#00F0FF' : '#888', borderRadius: 10, cursor: 'pointer', fontFamily: 'Syne, sans-serif', fontSize: 13, fontWeight: 600, letterSpacing: 1 }}>GEOMETRIC</button>
-        <button onClick={() => setStyle('neon')} style={{ padding: '12px 20px', border: style === 'neon' ? '2px solid #FF2D92' : '1px solid #444', background: style === 'neon' ? 'rgba(255,45,146,0.15)' : 'transparent', color: style === 'neon' ? '#FF2D92' : '#888', borderRadius: 10, cursor: 'pointer', fontFamily: 'Syne, sans-serif', fontSize: 13, fontWeight: 600, letterSpacing: 1 }}>NEON</button>
-        <button onClick={() => setStyle('constellation')} style={{ padding: '12px 20px', border: style === 'constellation' ? '2px solid #a855f7' : '1px solid #444', background: style === 'constellation' ? 'rgba(168,85,247,0.15)' : 'transparent', color: style === 'constellation' ? '#a855f7' : '#888', borderRadius: 10, cursor: 'pointer', fontFamily: 'Syne, sans-serif', fontSize: 13, fontWeight: 600, letterSpacing: 1 }}>CONSTELLATION</button>
-        <button onClick={() => setStyle('flow')} style={{ padding: '12px 20px', border: style === 'flow' ? '2px solid #FF6B9d' : '1px solid #444', background: style === 'flow' ? 'rgba(255,107,157,0.15)' : 'transparent', color: style === 'flow' ? '#FF6B9d' : '#888', borderRadius: 10, cursor: 'pointer', fontFamily: 'Syne, sans-serif', fontSize: 13, fontWeight: 600, letterSpacing: 1 }}>FLOW</button>
-        <button onClick={() => setStyle('minimal')} style={{ padding: '12px 20px', border: style === 'minimal' ? '2px solid #333' : '1px solid #444', background: style === 'minimal' ? 'rgba(51,51,51,0.2)' : 'transparent', color: style === 'minimal' ? '#fff' : '#888', borderRadius: 10, cursor: 'pointer', fontFamily: 'Syne, sans-serif', fontSize: 13, fontWeight: 600, letterSpacing: 1 }}>MINIMAL</button>
-        <button onClick={() => setStyle('retro')} style={{ padding: '12px 20px', border: style === 'retro' ? '2px solid #D4A500' : '1px solid #444', background: style === 'retro' ? 'rgba(212,165,0,0.15)' : 'transparent', color: style === 'retro' ? '#D4A500' : '#888', borderRadius: 10, cursor: 'pointer', fontFamily: 'Syne, sans-serif', fontSize: 13, fontWeight: 600, letterSpacing: 1 }}>RETRO</button>
+        <button onClick={() => handleStyleChange('geometric')} style={{ padding: '12px 20px', border: style === 'geometric' ? '2px solid #00F0FF' : '1px solid #444', background: style === 'geometric' ? 'rgba(0,240,255,0.15)' : 'transparent', color: style === 'geometric' ? '#00F0FF' : '#888', borderRadius: 10, cursor: 'pointer', fontFamily: 'Syne, sans-serif', fontSize: 13, fontWeight: 600, letterSpacing: 1 }}>GEOMETRIC</button>
+        <button onClick={() => handleStyleChange('neon')} style={{ padding: '12px 20px', border: style === 'neon' ? '2px solid #FF2D92' : '1px solid #444', background: style === 'neon' ? 'rgba(255,45,146,0.15)' : 'transparent', color: style === 'neon' ? '#FF2D92' : '#888', borderRadius: 10, cursor: 'pointer', fontFamily: 'Syne, sans-serif', fontSize: 13, fontWeight: 600, letterSpacing: 1 }}>NEON</button>
+        <button onClick={() => handleStyleChange('constellation')} style={{ padding: '12px 20px', border: style === 'constellation' ? '2px solid #a855f7' : '1px solid #444', background: style === 'constellation' ? 'rgba(168,85,247,0.15)' : 'transparent', color: style === 'constellation' ? '#a855f7' : '#888', borderRadius: 10, cursor: 'pointer', fontFamily: 'Syne, sans-serif', fontSize: 13, fontWeight: 600, letterSpacing: 1 }}>CONSTELLATION</button>
+        <button onClick={() => handleStyleChange('flow')} style={{ padding: '12px 20px', border: style === 'flow' ? '2px solid #FF6B9d' : '1px solid #444', background: style === 'flow' ? 'rgba(255,107,157,0.15)' : 'transparent', color: style === 'flow' ? '#FF6B9d' : '#888', borderRadius: 10, cursor: 'pointer', fontFamily: 'Syne, sans-serif', fontSize: 13, fontWeight: 600, letterSpacing: 1 }}>FLOW</button>
+        <button onClick={() => handleStyleChange('minimal')} style={{ padding: '12px 20px', border: style === 'minimal' ? '2px solid #333' : '1px solid #444', background: style === 'minimal' ? 'rgba(51,51,51,0.2)' : 'transparent', color: style === 'minimal' ? '#fff' : '#888', borderRadius: 10, cursor: 'pointer', fontFamily: 'Syne, sans-serif', fontSize: 13, fontWeight: 600, letterSpacing: 1 }}>MINIMAL</button>
+        <button onClick={() => handleStyleChange('retro')} style={{ padding: '12px 20px', border: style === 'retro' ? '2px solid #D4A500' : '1px solid #444', background: style === 'retro' ? 'rgba(212,165,0,0.15)' : 'transparent', color: style === 'retro' ? '#D4A500' : '#888', borderRadius: 10, cursor: 'pointer', fontFamily: 'Syne, sans-serif', fontSize: 13, fontWeight: 600, letterSpacing: 1 }}>RETRO</button>
       </div>
 
       <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
-        {colorSwatches.map((swatch) => (
+        {colorSwatches.filter(s => styleAllowedColorThemes[style].includes(s.id)).map((swatch) => (
           <button
             key={swatch.id}
             onClick={() => handleColorThemeChange(swatch.id)}
@@ -638,6 +697,29 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
               padding: 0,
               boxShadow: colorTheme === swatch.id ? `0 0 10px ${swatch.color}` : 'none',
               transform: colorTheme === swatch.id ? 'scale(1.15)' : 'scale(1)',
+              transition: 'all 0.2s'
+            }}
+          />
+        ))}
+      </div>
+
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
+        <span style={{ color: '#666', fontSize: 10, fontFamily: 'Space Mono, monospace', marginRight: 4 }}>BG:</span>
+        {backgroundSwatches.filter(s => styleAllowedBackgrounds[style].includes(s.id)).map((swatch) => (
+          <button
+            key={swatch.id}
+            onClick={() => handleBackgroundColorChange(swatch.id)}
+            title={swatch.name}
+            style={{
+              width: 20,
+              height: 20,
+              borderRadius: '50%',
+              background: swatch.color,
+              border: backgroundColor === swatch.id ? '3px solid #fff' : '2px solid #444',
+              cursor: 'pointer',
+              padding: 0,
+              boxShadow: backgroundColor === swatch.id ? `0 0 8px ${swatch.color}` : 'none',
+              transform: backgroundColor === swatch.id ? 'scale(1.15)' : 'scale(1)',
               transition: 'all 0.2s'
             }}
           />

@@ -121,16 +121,17 @@ Each art piece displays:
 | **Custom Title** | Text input | "THE JOURNEY" |
 | **Show Stats** | Toggle | ON |
 | **Social Share** | Twitter, Facebook, LinkedIn, Reddit, Instagram | Buttons below Download |
-| **Color Themes** | Cyan/Magenta, Sunset, Ocean, Forest, Mono | Cyan/Magenta |
+| **Color Themes** | Cyan/Magenta, Sunset, Ocean, Forest, Mono | Cyan/Magenta | Style-aware filtering |
 | **Custom Name** | Text input with toggle ("Created by [Name]") | Off |
+| **Background Colors** | Style-specific palettes (6 colors) | Style default |
 
 ### Future Enhancements (v2)
 
 - [x] Color theme selection (5 palettes)
 - [x] Custom name ("Created by [Name]")
+- [x] Background color picker (style-specific)
 - [ ] Personal message/caption
 - [ ] Date watermark
-- [ ] Background color picker
 
 ---
 

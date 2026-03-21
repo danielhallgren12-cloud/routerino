@@ -343,6 +343,17 @@ import MapView from 'react-native-maps';
 | Forest | green, brown, earth tones | ✅ |
 | Mono | black, grays, white | ✅ |
 
+### Background Colors (Style-Specific)
+
+| Style | Allowed Backgrounds | Default |
+|-------|-------------------|---------|
+| Geometric | White, Cream, Light Gray, Black, Sepia | White |
+| Neon | Black, Deep Blue | Black |
+| Constellation | Black, Deep Blue | Deep Blue |
+| Flow | White, Cream, Light Gray | Cream |
+| Minimal | White, Light Gray | White |
+| Retro | Cream, Sepia | Sepia |
+
 ### Fingerprint Share
 
 | Feature | Status | Notes |
