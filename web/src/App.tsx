@@ -482,7 +482,23 @@ function App() {
 
         <div className="content-columns">
           <div className="map-container">
-            {loading && <div className="loading">Running traceroute...</div>}
+            {loading && (
+              <div className="tracing-loading">
+                <svg viewBox="0 0 400 200" style={{ width: '100%', maxWidth: '500px' }}>
+                  <defs>
+                    <linearGradient id="traceLineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="#00d4ff" stopOpacity="0.2"/>
+                      <stop offset="50%" stopColor="#ff00aa" stopOpacity="1"/>
+                      <stop offset="100%" stopColor="#00d4ff" stopOpacity="0.2"/>
+                    </linearGradient>
+                    <filter id="traceGlow"><feGaussianBlur stdDeviation="3" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                  </defs>
+                  <path d="M 40 150 Q 100 50, 160 100 T 260 80 T 330 60" fill="none" stroke="url(#traceLineGrad)" strokeWidth="3" filter="url(#traceGlow)" className="tracing-path" />
+                </svg>
+                <div className="tracing-brand">routecanvas</div>
+                <div className="tracing-status">Tracing your route...</div>
+              </div>
+            )}
             
             {!loading && traceData && validHops.length > 0 && (
               <MapContainer ref={mapRef} center={[20, 0]} zoom={2} style={{ height: '100%', width: '100%' }} zoomControl={true} doubleClickZoom={false} scrollWheelZoom={true} touchZoom={true} dragging={true} preferCanvas={true}>
@@ -557,6 +573,7 @@ function App() {
             {!loading && !traceData && (
               <div className="hero-bg">
                 <div className="hero-content">
+                  <div className="hero-brand">routecanvas</div>
                   <div className="route-art-preview">
                     <svg viewBox="0 0 400 200" className="art-svg">
                       <defs>

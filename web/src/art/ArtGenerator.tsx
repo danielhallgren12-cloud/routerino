@@ -46,7 +46,7 @@ const styleAllowedColorThemes: Record<ArtStyle, ColorTheme[]> = {
   constellation: ['default', 'ocean'],
   flow: ['default', 'sunset', 'ocean', 'forest', 'mono'],
   minimal: ['mono'],
-  retro: ['default', 'sunset', 'ocean', 'forest', 'mono']
+  retro: ['sunset', 'ocean', 'forest', 'mono']
 }
 
 const styleAllowedBackgrounds: Record<ArtStyle, BackgroundColor[]> = {
@@ -121,12 +121,12 @@ const InstagramIcon = () => (
 
 export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
   const artRef = useRef<HTMLDivElement>(null)
-  const [style, setStyle] = useState<ArtStyle>('geometric')
+  const [style, setStyle] = useState<ArtStyle>('neon')
   const [layout, setLayout] = useState<Layout>('portrait')
   const [customTitle, setCustomTitle] = useState('')
   const [includeStats, setIncludeStats] = useState(true)
   const [colorTheme, setColorTheme] = useState<ColorTheme>('default')
-  const [backgroundColor, setBackgroundColor] = useState<BackgroundColor>('white')
+  const [backgroundColor, setBackgroundColor] = useState<BackgroundColor>('black')
   const [customName, setCustomName] = useState('')
   const [includeName, setIncludeName] = useState(false)
   const [exporting, setExporting] = useState(false)
@@ -155,7 +155,7 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
     setStyle(newStyle)
     setBackgroundColor(styleDefaultBackground[newStyle])
     if (!styleAllowedColorThemes[newStyle].includes(colorTheme)) {
-      setColorTheme('default')
+      setColorTheme(styleAllowedColorThemes[newStyle][0])
     }
   }
 
@@ -344,38 +344,66 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
     
     // ==================== NEON ====================
     if (style === 'neon') {
+      const neonHopPositions = hops.map((h, i) => {
+        const x = 40 + (i * (340 / Math.max(hops.length - 1, 1)))
+        const y = 140 + Math.cos(i * 0.7) * 30
+        return { x, y }
+      })
+
+      const pathD = neonHopPositions.length > 0 
+        ? `M ${neonHopPositions.map((p, i) => {
+            if (i === 0) return `${p.x} ${p.y}`
+            if (i === 1) {
+              const prev = neonHopPositions[0]
+              const cpX = (prev.x + p.x) / 2
+              const cpY = prev.y < p.y ? prev.y - 40 : prev.y + 40
+              return `Q ${cpX} ${cpY}, ${p.x} ${p.y}`
+            }
+            return `T ${p.x} ${p.y}`
+          }).join(' ')}`
+        : ''
+
       return (
         <div style={{ background: backgroundPalettes[backgroundColor], width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', position: 'relative', boxSizing: 'border-box' }}>
-          {/* Glowing border */}
-          <div style={{ position: 'absolute', top: 6, left: 6, right: 6, bottom: 6, border: '4px solid', borderImage: 'linear-gradient(135deg, #00F0FF, #FF2D92) 1', boxShadow: '0 0 30px rgba(0,240,255,0.3)', pointerEvents: 'none' }} />
-          
-          <h1 style={{ fontFamily: 'Syne, sans-serif', fontSize: 48, fontWeight: 700, letterSpacing: 4, textTransform: 'uppercase', color: '#ffffff', marginBottom: 20, textShadow: '0 0 20px #00F0FF, 0 0 40px #00F0FF' }}>
+          {/* Softer glowing border */}
+          <div style={{ position: 'absolute', top: 6, left: 6, right: 6, bottom: 6, border: '4px solid', borderImage: 'linear-gradient(135deg, #00F0FF, #FF2D92) 1', boxShadow: '0 0 40px rgba(0,240,255,0.4), 0 0 60px rgba(255,45,146,0.2)', pointerEvents: 'none', borderRadius: 4 }} />
+
+          <h1 style={{ fontFamily: 'Syne, sans-serif', fontSize: 48, fontWeight: 700, letterSpacing: 4, textTransform: 'uppercase', color: '#ffffff', marginBottom: 20, textShadow: '0 0 30px #00F0FF, 0 0 60px #00F0FF, 0 0 90px #FF2D92' }}>
             {customTitle || 'THE JOURNEY'}
           </h1>
-          
+
           <svg width={420} height={280} viewBox="0 0 420 280">
             <defs>
-              <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
-                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+              <filter id="neonGlow" x="-100%" y="-100%" width="300%" height="300%">
+                <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
                 <feMerge>
                   <feMergeNode in="coloredBlur"/>
                   <feMergeNode in="SourceGraphic"/>
                 </feMerge>
               </filter>
+              <linearGradient id="neonTrailGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor={getNeonColor(0)} stopOpacity={0.9}/>
+                <stop offset="50%" stopColor={getNeonColor(Math.floor(hops.length / 2))} stopOpacity={0.7}/>
+                <stop offset="100%" stopColor={getNeonColor(hops.length - 1)} stopOpacity={0.9}/>
+              </linearGradient>
             </defs>
-            {hops.map((h, i) => {
-              const x = 40 + (i * (340 / Math.max(hops.length - 1, 1)))
-              const y = 140 + Math.cos(i * 0.7) * 50
-              const nx = i < hops.length - 1 ? 40 + ((i + 1) * (340 / Math.max(hops.length - 1, 1))) : x
-              const ny = i < hops.length - 1 ? 140 + Math.cos((i + 1) * 0.7) * 50 : y
-              const color = getNeonColor(i)
-              return (
-                <g key={i} filter="url(#neonGlow)">
-                  {i < hops.length - 1 && <line x1={x} y1={y} x2={nx} y2={ny} stroke={color} strokeWidth={4} strokeLinecap="round" style={{ filter: `drop-shadow(0 0 8px ${color})` }} />}
-                  <circle cx={x} cy={y} r={i === 0 || i === hops.length - 1 ? 14 : 10} fill={color} style={{ filter: `drop-shadow(0 0 10px ${color})` }} />
-                </g>
-              )
-            })}
+
+            {/* Soft glow trail behind the path */}
+            {hops.length > 1 && (
+              <path d={pathD} fill="none" stroke="url(#neonTrailGrad)" strokeWidth={20} strokeLinecap="round" filter="url(#neonGlow)" opacity={0.25} />
+            )}
+
+            {/* Main glowing path - smooth flowing bezier curves */}
+            {hops.length > 1 && (
+              <path d={pathD} fill="none" stroke="url(#neonTrailGrad)" strokeWidth={4} strokeLinecap="round" filter="url(#neonGlow)" />
+            )}
+
+            {neonHopPositions.map((p, i) => (
+              <g key={i}>
+                <circle cx={p.x} cy={p.y} r={i === 0 || i === hops.length - 1 ? 16 : 12} fill={getNeonColor(i)} filter="url(#neonGlow)" />
+                <circle cx={p.x} cy={p.y} r={i === 0 || i === hops.length - 1 ? 8 : 6} fill="#ffffff" opacity={0.8} />
+              </g>
+            ))}
           </svg>
           
           <div style={{ display: 'flex', gap: 30, marginTop: 20, fontFamily: 'Space Mono, monospace', fontSize: 13, letterSpacing: 1 }}>
@@ -408,47 +436,69 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
     if (style === 'constellation') {
       return (
         <div style={{ background: backgroundPalettes[backgroundColor], width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', position: 'relative', boxSizing: 'border-box' }}>
-          {/* Glowing frame */}
-          <div style={{ position: 'absolute', top: 10, left: 10, right: 10, bottom: 10, border: '1px solid rgba(100,100,255,0.4)', borderRadius: 2, boxShadow: '0 0 30px rgba(100,100,255,0.15)', pointerEvents: 'none' }} />
+          {/* Softer glowing frame */}
+          <div style={{ position: 'absolute', top: 10, left: 10, right: 10, bottom: 10, border: '1px solid rgba(100,100,255,0.4)', borderRadius: 4, boxShadow: '0 0 40px rgba(100,100,255,0.2)', pointerEvents: 'none' }} />
           
-          {/* Stars */}
+          {/* Stars with varying opacity */}
           <svg width={420} height={280} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
-            {Array.from({ length: 60 }, (_, i) => (
-              <circle key={i} cx={Math.random() * 400 + 10} cy={Math.random() * 260 + 10} r={Math.random() * 1.5 + 0.5} fill="#fff" opacity={Math.random() * 0.5 + 0.2} />
+            {Array.from({ length: 80 }, (_, i) => (
+              <circle key={i} cx={Math.random() * 400 + 10} cy={Math.random() * 260 + 10} r={Math.random() * 1.5 + 0.5} fill="#fff" opacity={Math.random() * 0.6 + 0.2} />
             ))}
           </svg>
           
-          {/* Planets */}
-          <div style={{ position: 'absolute', top: 25, right: 40, width: 22, height: 22, borderRadius: '50%', background: 'linear-gradient(135deg, #FF6B9d, #B04AFF)', boxShadow: '0 0 20px rgba(176,74,255,0.5)' }} />
-          <div style={{ position: 'absolute', bottom: 50, left: 35, width: 14, height: 14, borderRadius: '50%', background: 'linear-gradient(135deg, #00F0FF, #00FFA3)', boxShadow: '0 0 15px rgba(0,255,163,0.5)' }} />
+          {/* Planets with soft glow */}
+          <div style={{ position: 'absolute', top: 25, right: 40, width: 24, height: 24, borderRadius: '50%', background: 'linear-gradient(135deg, #FF6B9d, #B04AFF)', boxShadow: '0 0 30px rgba(176,74,255,0.6)', filter: 'blur(1px)' }} />
+          <div style={{ position: 'absolute', bottom: 50, left: 35, width: 16, height: 16, borderRadius: '50%', background: 'linear-gradient(135deg, #00F0FF, #00FFA3)', boxShadow: '0 0 20px rgba(0,255,163,0.6)', filter: 'blur(1px)' }} />
           
-          <h1 style={{ fontFamily: 'Syne, sans-serif', fontSize: 40, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase', color: '#e8e8ff', marginBottom: 20, textShadow: '0 0 20px rgba(100,100,255,0.5)' }}>
+          <h1 style={{ fontFamily: 'Syne, sans-serif', fontSize: 40, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase', color: '#e8e8ff', marginBottom: 20, textShadow: '0 0 30px rgba(100,100,255,0.6)' }}>
             {customTitle || 'THE JOURNEY'}
           </h1>
           
           <svg width={420} height={280} viewBox="0 0 420 280">
             <defs>
               <filter id="constGlow" x="-50%" y="-50%" width="200%" height="200%">
-                <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
                 <feMerge>
                   <feMergeNode in="coloredBlur"/>
                   <feMergeNode in="SourceGraphic"/>
                 </feMerge>
               </filter>
+              <linearGradient id="constTrailGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor={getColor(0)} stopOpacity={0.8}/>
+                <stop offset="50%" stopColor={getColor(Math.floor(hops.length / 2))} stopOpacity={0.6}/>
+                <stop offset="100%" stopColor={getColor(hops.length - 1)} stopOpacity={0.8}/>
+              </linearGradient>
             </defs>
-            {hops.map((h, i) => {
-              const x = 40 + (i * (340 / Math.max(hops.length - 1, 1)))
-              const y = 140 + Math.cos(i * 0.6) * 50
-              const nx = i < hops.length - 1 ? 40 + ((i + 1) * (340 / Math.max(hops.length - 1, 1))) : x
-              const ny = i < hops.length - 1 ? 140 + Math.cos((i + 1) * 0.6) * 50 : y
+            {(() => {
+              const constHopPositions = hops.map((h, i) => ({
+                x: 40 + (i * (340 / Math.max(hops.length - 1, 1))),
+                y: 140 + Math.cos(i * 0.7) * 30
+              }))
+              const pathD = constHopPositions.length > 0
+                ? `M ${constHopPositions.map((p, i) => {
+                    if (i === 0) return `${p.x} ${p.y}`
+                    if (i === 1) {
+                      const prev = constHopPositions[0]
+                      const cpX = (prev.x + p.x) / 2
+                      const cpY = prev.y < p.y ? prev.y - 40 : prev.y + 40
+                      return `Q ${cpX} ${cpY}, ${p.x} ${p.y}`
+                    }
+                    return `T ${p.x} ${p.y}`
+                  }).join(' ')}`
+                : ''
               return (
-                <g key={i} filter="url(#constGlow)">
-                  {i < hops.length - 1 && <line x1={x} y1={y} x2={nx} y2={ny} stroke={getColor(i)} strokeWidth={2} opacity={0.7} />}
-                  <circle cx={x} cy={y} r={i === 0 || i === hops.length - 1 ? 10 : 6} fill={getColor(i)} />
-                  <circle cx={x} cy={y} r={i === 0 || i === hops.length - 1 ? 5 : 3} fill="#fff" opacity={0.9} />
-                </g>
+                <>
+                  <path d={pathD} fill="none" stroke="url(#constTrailGrad)" strokeWidth={12} strokeLinecap="round" filter="url(#constGlow)" opacity={0.2} />
+                  <path d={pathD} fill="none" stroke="url(#constTrailGrad)" strokeWidth={2} strokeLinecap="round" filter="url(#constGlow)" />
+                  {constHopPositions.map((p, i) => (
+                    <g key={i} filter="url(#constGlow)">
+                      <circle cx={p.x} cy={p.y} r={i === 0 || i === hops.length - 1 ? 12 : 7} fill={getColor(i)} />
+                      <circle cx={p.x} cy={p.y} r={i === 0 || i === hops.length - 1 ? 6 : 4} fill="#ffffff" opacity={0.9} />
+                    </g>
+                  ))}
+                </>
               )
-            })}
+            })()}
           </svg>
           
           <div style={{ display: 'flex', gap: 30, marginTop: 20, fontFamily: 'Space Mono, monospace', fontSize: 13, color: '#b0b0d0', letterSpacing: 1 }}>
@@ -477,23 +527,29 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
       )
     }
     
-    // ==================== FLOW ====================
+// ==================== FLOW ====================
     if (style === 'flow') {
       return (
         <div style={{ background: backgroundPalettes[backgroundColor], width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', position: 'relative', boxSizing: 'border-box' }}>
-          {/* Elegant frame */}
-          <div style={{ position: 'absolute', top: 10, left: 10, right: 10, bottom: 10, border: '2px solid #e0d8d0', borderRadius: 2, pointerEvents: 'none' }} />
-          
-          {/* Corner flourishes */}
-          <div style={{ position: 'absolute', top: 18, left: 25, width: 45, height: 45, borderBottom: '1.5px solid #c0b8b0', borderLeft: '1.5px solid #c0b8b0' }} />
-          <div style={{ position: 'absolute', top: 18, right: 25, width: 45, height: 45, borderBottom: '1.5px solid #c0b8b0', borderRight: '1.5px solid #c0b8b0' }} />
-          <div style={{ position: 'absolute', bottom: 18, left: 25, width: 45, height: 45, borderTop: '1.5px solid #c0b8b0', borderLeft: '1.5px solid #c0b8b0' }} />
-          <div style={{ position: 'absolute', bottom: 18, right: 25, width: 45, height: 45, borderTop: '1.5px solid #c0b8b0', borderRight: '1.5px solid #c0b8b0' }} />
-          
+          {/* Softer elegant frame */}
+          <div style={{ position: 'absolute', top: 10, left: 10, right: 10, bottom: 10, border: '2px solid #d0c8c0', borderRadius: 4, pointerEvents: 'none' }} />
+
+          {/* Curved corner flourishes - at actual SVG corners */}
+          <svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}>
+            {/* Top-left corner - curves inward from top edge to left edge */}
+            <path d="M 10,50 Q 10,10 50,10" fill="none" stroke="#c0b8b0" strokeWidth={2} />
+            {/* Top-right corner - curves inward from top edge to right edge */}
+            <path d="M 490,10 Q 530,10 530,50" fill="none" stroke="#c0b8b0" strokeWidth={2} />
+            {/* Bottom-left corner - curves inward from bottom edge to left edge */}
+            <path d="M 10,617 Q 10,657 50,657" fill="none" stroke="#c0b8b0" strokeWidth={2} />
+            {/* Bottom-right corner - curves inward from bottom edge to right edge */}
+            <path d="M 490,657 Q 530,657 530,617" fill="none" stroke="#c0b8b0" strokeWidth={2} />
+          </svg>
+
           <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: 38, fontWeight: 400, fontStyle: 'italic', letterSpacing: 1, color: '#2a2a2a', marginBottom: 20 }}>
             {customTitle || 'Journey'}
           </h1>
-          
+
           <svg width={440} height={280} viewBox="0 0 440 280">
             <defs>
               <linearGradient id="flowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -502,18 +558,39 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
                 <stop offset="100%" stopColor={getColor(hops.length - 1)} stopOpacity={0.9}/>
               </linearGradient>
               <filter id="flowBlur">
-                <feGaussianBlur stdDeviation="3" />
+                <feGaussianBlur stdDeviation="4" />
               </filter>
             </defs>
-            <path d={`M ${hops.map((h, i) => `${30 + (i * (380 / Math.max(hops.length - 1, 1)))} ${140 + Math.sin(i * 0.7) * 70}`).join(' L ')}`} 
-                  fill="none" stroke="url(#flowGrad)" strokeWidth={12} strokeLinecap="round" filter="url(#flowBlur)" opacity={0.35} />
-            <path d={`M ${hops.map((h, i) => `${30 + (i * (380 / Math.max(hops.length - 1, 1)))} ${140 + Math.sin(i * 0.7) * 70}`).join(' L ')}`} 
-                  fill="none" stroke="url(#flowGrad)" strokeWidth={5} strokeLinecap="round" />
-            {hops.map((h, i) => (
-              <circle key={i} cx={30 + (i * (380 / Math.max(hops.length - 1, 1)))} cy={140 + Math.sin(i * 0.7) * 70} r={i === 0 || i === hops.length - 1 ? 14 : 10} fill={getColor(i)} />
-            ))}
+            {(() => {
+              const flowHopPositions = hops.map((h, i) => ({
+                x: 30 + (i * (380 / Math.max(hops.length - 1, 1))),
+                y: 140 + Math.cos(i * 0.7) * 30
+              }))
+              const pathD = flowHopPositions.length > 0
+                ? `M ${flowHopPositions.map((p, i) => {
+                    if (i === 0) return `${p.x} ${p.y}`
+                    if (i === 1) {
+                      const prev = flowHopPositions[0]
+                      const cpX = (prev.x + p.x) / 2
+                      const cpY = prev.y < p.y ? prev.y - 40 : prev.y + 40
+                      return `Q ${cpX} ${cpY}, ${p.x} ${p.y}`
+                    }
+                    return `T ${p.x} ${p.y}`
+                  }).join(' ')}`
+                : ''
+              return (
+                <>
+                  <path d={pathD} fill="none" stroke="url(#flowGrad)" strokeWidth={24} strokeLinecap="round" filter="url(#flowBlur)" opacity={0.2} />
+                  <path d={pathD} fill="none" stroke="url(#flowGrad)" strokeWidth={8} strokeLinecap="round" />
+                  <path d={pathD} fill="none" stroke="url(#flowGrad)" strokeWidth={2} strokeLinecap="round" opacity={0.6} />
+                  {flowHopPositions.map((p, i) => (
+                    <circle key={i} cx={p.x} cy={p.y} r={i === 0 || i === hops.length - 1 ? 16 : 11} fill={getColor(i)} />
+                  ))}
+                </>
+              )
+            })()}
           </svg>
-          
+
           <div style={{ marginTop: 24, fontFamily: 'Playfair Display, serif', fontSize: 14, color: '#666', fontStyle: 'italic' }}>
             {userLocation?.city || 'From here'} — {traceData?.destination || 'To there'}
           </div>
@@ -542,16 +619,16 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
     if (style === 'minimal') {
       return (
         <div style={{ background: backgroundPalettes[backgroundColor], width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', position: 'relative', boxSizing: 'border-box' }}>
-          <svg width={420} height={280} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', opacity: 0.1 }}>
+          <svg width={420} height={280} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', opacity: 0.08 }}>
             <line x1={40} y1={260} x2={380} y2={260} stroke="#000" strokeWidth={1} />
-            <circle cx={210} cy={140} r={3} fill="#000" />
+            <circle cx={210} cy={140} r={4} fill="#000" />
             <circle cx={210} cy={140} r={160} fill="none" stroke="#000" strokeWidth={0.5} />
           </svg>
-          
+
           <h1 style={{ fontFamily: 'Syne, sans-serif', fontSize: 52, fontWeight: 700, letterSpacing: 6, textTransform: 'uppercase', color: '#000000', marginBottom: 28 }}>
             {customTitle || 'ROUTE'}
           </h1>
-          
+
           <svg width={420} height={260} viewBox="0 0 420 260">
             {hops.map((h, i) => {
               const x = 40 + (i * (340 / Math.max(hops.length - 1, 1)))
@@ -597,48 +674,75 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
     if (style === 'retro') {
       return (
         <div style={{ background: backgroundPalettes[backgroundColor], width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', position: 'relative', boxSizing: 'border-box' }}>
-          {/* Vintage frame */}
-          <div style={{ position: 'absolute', top: 8, left: 8, right: 8, bottom: 8, border: '6px solid #8B4513', borderRadius: 4, pointerEvents: 'none' }} />
-          <div style={{ position: 'absolute', top: 14, left: 14, right: 14, bottom: 14, border: '2px solid #D4A500', pointerEvents: 'none' }} />
+          {/* Softer vintage frame */}
+          <div style={{ position: 'absolute', top: 8, left: 8, right: 8, bottom: 8, border: '6px solid #8B4513', borderRadius: 8, pointerEvents: 'none' }} />
+          <div style={{ position: 'absolute', top: 14, left: 14, right: 14, bottom: 14, border: '2px solid #D4A500', borderRadius: 4, pointerEvents: 'none' }} />
           
-          {/* Sun rays */}
+          {/* Curved sun rays */}
           <svg width={420} height={280} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
-            {Array.from({ length: 12 }, (_, i) => {
-              const angle = (i * 30) * Math.PI / 180
-              const x1 = 210 + Math.cos(angle) * 70
-              const y1 = 140 + Math.sin(angle) * 70
-              const x2 = 210 + Math.cos(angle) * 100
-              const y2 = 140 + Math.sin(angle) * 100
-              return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#D4A500" strokeWidth={2} opacity={0.3} />
+            {Array.from({ length: 16 }, (_, i) => {
+              const angle = (i * 22.5) * Math.PI / 180
+              const x1 = 210 + Math.cos(angle) * 80
+              const y1 = 140 + Math.sin(angle) * 80
+              const x2 = 210 + Math.cos(angle) * 110
+              const y2 = 140 + Math.sin(angle) * 110
+              return <path key={i} d={`M ${x1},${y1} Q ${210 + Math.cos(angle) * 95},${140 + Math.sin(angle) * 95} ${x2},${y2}`} fill="none" stroke="#D4A500" strokeWidth={2} opacity={0.25} />
             })}
           </svg>
           
           {/* Paper texture */}
-          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.02) 2px, rgba(0,0,0,0.02) 4px)', pointerEvents: 'none' }} />
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.015) 2px, rgba(0,0,0,0.015) 4px)', pointerEvents: 'none' }} />
           
           <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: 44, fontWeight: 700, letterSpacing: 4, color: '#8B4513', marginBottom: 18, textShadow: '2px 2px 0 #D4A500' }}>
             {customTitle || 'THE JOURNEY'}
           </h1>
           
           <svg width={420} height={260} viewBox="0 0 420 260">
-            {hops.map((h, i) => {
-              const x = 40 + (i * (340 / Math.max(hops.length - 1, 1)))
-              const y = 130 + Math.sin(i * 0.5 + 1) * 45
-              const nx = i < hops.length - 1 ? 40 + ((i + 1) * (340 / Math.max(hops.length - 1, 1))) : x
-              const ny = i < hops.length - 1 ? 130 + Math.sin((i + 1) * 0.5 + 1) * 45 : y
-              const color = getRetroColor(i)
+            <defs>
+              <filter id="retroGlow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+                <feMerge>
+                  <feMergeNode in="coloredBlur"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+              </filter>
+              <linearGradient id="retroTrailGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor={getRetroColor(0)} stopOpacity={0.8}/>
+                <stop offset="50%" stopColor={getRetroColor(Math.floor(hops.length / 2))} stopOpacity={0.6}/>
+                <stop offset="100%" stopColor={getRetroColor(hops.length - 1)} stopOpacity={0.8}/>
+              </linearGradient>
+            </defs>
+            {(() => {
+              const retroHopPositions = hops.map((h, i) => ({
+                x: 40 + (i * (340 / Math.max(hops.length - 1, 1))),
+                y: 130 + Math.cos(i * 0.7) * 30
+              }))
+              const pathD = retroHopPositions.length > 0
+                ? `M ${retroHopPositions.map((p, i) => {
+                    if (i === 0) return `${p.x} ${p.y}`
+                    if (i === 1) {
+                      const prev = retroHopPositions[0]
+                      const cpX = (prev.x + p.x) / 2
+                      const cpY = prev.y < p.y ? prev.y - 40 : prev.y + 40
+                      return `Q ${cpX} ${cpY}, ${p.x} ${p.y}`
+                    }
+                    return `T ${p.x} ${p.y}`
+                  }).join(' ')}`
+                : ''
               return (
-                <g key={i}>
-                  {i < hops.length - 1 && (
-                    <>
-                      <line x1={x} y1={y} x2={nx} y2={ny} stroke={color} strokeWidth={6} strokeLinecap="round" opacity={0.4} />
-                      <line x1={x} y1={y} x2={nx} y2={ny} stroke={color} strokeWidth={3} strokeLinecap="round" strokeDasharray={i % 2 === 0 ? '0' : '8,4'} />
-                    </>
-                  )}
-                  <circle cx={x} cy={y} r={i === 0 || i === hops.length - 1 ? 14 : 9} fill={color} stroke="#8B4513" strokeWidth={2} />
-                </g>
+                <>
+                  <path d={pathD} fill="none" stroke="url(#retroTrailGrad)" strokeWidth={16} strokeLinecap="round" filter="url(#retroGlow)" opacity={0.25} />
+                  <path d={pathD} fill="none" stroke="url(#retroTrailGrad)" strokeWidth={6} strokeLinecap="round" opacity={0.5} />
+                  <path d={pathD} fill="none" stroke="url(#retroTrailGrad)" strokeWidth={2} strokeLinecap="round" />
+                  {retroHopPositions.map((p, i) => (
+                    <g key={i}>
+                      <circle cx={p.x} cy={p.y} r={i === 0 || i === hops.length - 1 ? 15 : 10} fill={getRetroColor(i)} stroke="#8B4513" strokeWidth={2} />
+                      <circle cx={p.x} cy={p.y} r={i === 0 || i === hops.length - 1 ? 7 : 5} fill="#f5e6d3" opacity={0.6} />
+                    </g>
+                  ))}
+                </>
               )
-            })}
+            })()}
           </svg>
           
           <div style={{ display: 'flex', gap: 30, marginTop: 18, fontFamily: 'Georgia, serif', fontSize: 14, fontStyle: 'italic', color: '#6B8E23', letterSpacing: 1 }}>
@@ -673,8 +777,8 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20 }}>
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
-        <button onClick={() => handleStyleChange('geometric')} style={{ padding: '12px 20px', border: style === 'geometric' ? '2px solid #00F0FF' : '1px solid #444', background: style === 'geometric' ? 'rgba(0,240,255,0.15)' : 'transparent', color: style === 'geometric' ? '#00F0FF' : '#888', borderRadius: 10, cursor: 'pointer', fontFamily: 'Syne, sans-serif', fontSize: 13, fontWeight: 600, letterSpacing: 1 }}>GEOMETRIC</button>
         <button onClick={() => handleStyleChange('neon')} style={{ padding: '12px 20px', border: style === 'neon' ? '2px solid #FF2D92' : '1px solid #444', background: style === 'neon' ? 'rgba(255,45,146,0.15)' : 'transparent', color: style === 'neon' ? '#FF2D92' : '#888', borderRadius: 10, cursor: 'pointer', fontFamily: 'Syne, sans-serif', fontSize: 13, fontWeight: 600, letterSpacing: 1 }}>NEON</button>
+        <button onClick={() => handleStyleChange('geometric')} style={{ padding: '12px 20px', border: style === 'geometric' ? '2px solid #00F0FF' : '1px solid #444', background: style === 'geometric' ? 'rgba(0,240,255,0.15)' : 'transparent', color: style === 'geometric' ? '#00F0FF' : '#888', borderRadius: 10, cursor: 'pointer', fontFamily: 'Syne, sans-serif', fontSize: 13, fontWeight: 600, letterSpacing: 1 }}>GEOMETRIC</button>
         <button onClick={() => handleStyleChange('constellation')} style={{ padding: '12px 20px', border: style === 'constellation' ? '2px solid #a855f7' : '1px solid #444', background: style === 'constellation' ? 'rgba(168,85,247,0.15)' : 'transparent', color: style === 'constellation' ? '#a855f7' : '#888', borderRadius: 10, cursor: 'pointer', fontFamily: 'Syne, sans-serif', fontSize: 13, fontWeight: 600, letterSpacing: 1 }}>CONSTELLATION</button>
         <button onClick={() => handleStyleChange('flow')} style={{ padding: '12px 20px', border: style === 'flow' ? '2px solid #FF6B9d' : '1px solid #444', background: style === 'flow' ? 'rgba(255,107,157,0.15)' : 'transparent', color: style === 'flow' ? '#FF6B9d' : '#888', borderRadius: 10, cursor: 'pointer', fontFamily: 'Syne, sans-serif', fontSize: 13, fontWeight: 600, letterSpacing: 1 }}>FLOW</button>
         <button onClick={() => handleStyleChange('minimal')} style={{ padding: '12px 20px', border: style === 'minimal' ? '2px solid #333' : '1px solid #444', background: style === 'minimal' ? 'rgba(51,51,51,0.2)' : 'transparent', color: style === 'minimal' ? '#fff' : '#888', borderRadius: 10, cursor: 'pointer', fontFamily: 'Syne, sans-serif', fontSize: 13, fontWeight: 600, letterSpacing: 1 }}>MINIMAL</button>

@@ -984,6 +984,74 @@ body {
   color: #666;
 }
 
+/* Tracing loading screen */
+.tracing-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 400px;
+  background: 
+    radial-gradient(ellipse at 20% 80%, rgba(0, 212, 255, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 20%, rgba(255, 0, 170, 0.08) 0%, transparent 50%),
+    linear-gradient(180deg, transparent 0%, rgba(0, 212, 255, 0.03) 100%);
+}
+
+.tracing-path {
+  stroke-dasharray: 500;
+  stroke-dashoffset: 500;
+  animation: tracePath 2s ease-out infinite;
+}
+
+@keyframes tracePath {
+  0% {
+    stroke-dashoffset: 500;
+  }
+  50% {
+    stroke-dashoffset: 0;
+  }
+  50.1% {
+    stroke-dashoffset: -500;
+  }
+  100% {
+    stroke-dashoffset: -500;
+  }
+}
+
+.tracing-brand {
+  font-family: 'Syne', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #fff;
+  margin-top: 2rem;
+  letter-spacing: 0.05em;
+}
+
+.hero-brand {
+  font-family: 'Syne', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 2rem;
+  letter-spacing: 0.05em;
+}
+
+.route-art-preview {
+  width: 100%;
+  max-width: 500px;
+  margin-bottom: 2rem;
+}
+
+.tracing-status {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.85rem;
+  color: #666;
+  margin-top: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
 .error {
   padding: 1rem;
   background: #ff444420;
