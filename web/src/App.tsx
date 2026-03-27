@@ -95,6 +95,7 @@ function App() {
   const [showFingerprintModal, setShowFingerprintModal] = useState(false)
   const [showGallery, setShowGallery] = useState(false)
   const [newBadges, setNewBadges] = useState<{id: string, name: string, icon: string}[]>([])
+  const [firstDiscoveries, setFirstDiscoveries] = useState<string[]>([])
   const [inventoryCategory, setInventoryCategory] = useState<string | null>(null)
   const [userCollection, setUserCollection] = useState<{
     destinations: number; countries: number; cities: number; companies: number;
@@ -152,21 +153,24 @@ function App() {
       const data = await response.json()
       setTraceData(data)
       
-      if (token && data.fingerprint_id) {
-        try {
-          const hopsData = JSON.stringify(data.hops)
-          const collection = await routesApi.collectRoute(token, data.destination, hopsData, data.fingerprint_id)
-          setUserCollection(collection)
-          if (collection.new_items) {
-            setNewDiscoveries(collection.new_items)
-          }
-          // Check for new badges
-          const badgeResult = await routesApi.checkBadges(token)
-          if (badgeResult.new_badges && badgeResult.new_badges.length > 0) {
-            setNewBadges(badgeResult.new_badges)
-          }
-        } catch (err) { console.error('Failed to collect route:', err) }
-      }
+if (token && data.fingerprint_id) {
+          try {
+            const hopsData = JSON.stringify(data.hops)
+            const collection = await routesApi.collectRoute(token, data.destination, hopsData, data.fingerprint_id)
+            setUserCollection(collection)
+            if (collection.new_items) {
+              setNewDiscoveries(collection.new_items)
+            }
+            if (collection.first_discoveries_this_trace?.length > 0) {
+              setFirstDiscoveries(collection.first_discoveries_this_trace)
+            }
+            // Check for new badges
+            const badgeResult = await routesApi.checkBadges(token)
+            if (badgeResult.new_badges && badgeResult.new_badges.length > 0) {
+              setNewBadges(badgeResult.new_badges)
+            }
+          } catch (err) { console.error('Failed to collect route:', err) }
+        }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Trace failed - please try again')
     } finally {
@@ -797,6 +801,19 @@ function App() {
             </div>
           ))}
           <button onClick={() => setNewBadges([])} className="dismiss-btn">✓</button>
+        </div>
+      )}
+
+      {firstDiscoveries.length > 0 && (
+        <div className="first-discovery-toast">
+          <div className="first-discovery-title">🌍 WORLD FIRST DISCOVERIES!</div>
+          {firstDiscoveries.map((item, idx) => (
+            <div key={idx} className="first-discovery-item">
+              <span className="first-discovery-icon">🌍</span>
+              <span className="first-discovery-name">First to discover: {item.split(':')[1]}</span>
+            </div>
+          ))}
+          <button onClick={() => setFirstDiscoveries([])} className="dismiss-btn">✓</button>
         </div>
       )}
     </div>

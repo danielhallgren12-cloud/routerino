@@ -1704,6 +1704,22 @@ body {
   animation: fadeIn 0.5s ease-out;
 }
 
+.item-first-badge {
+  font-size: 0.55rem;
+  font-weight: bold;
+  background: linear-gradient(135deg, #00F0FF, #FF00AA);
+  color: white;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  text-transform: uppercase;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.item-uniqueness {
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+}
+
 .item-rarity {
   font-size: 0.7rem;
   font-weight: bold;
@@ -2150,6 +2166,46 @@ body {
   color: var(--bg-dark);
   cursor: pointer;
   font-weight: 600;
+}
+
+/* First Discovery Toast */
+.first-discovery-toast {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background: linear-gradient(135deg, #0a0a1a, #1a0a2e);
+  border: 2px solid #00F0FF;
+  border-radius: 12px;
+  padding: 1.5rem;
+  z-index: 2000;
+  box-shadow: 0 0 30px rgba(0, 240, 255, 0.4), 0 0 60px rgba(255, 0, 170, 0.2);
+  animation: slideIn 0.5s ease-out;
+}
+
+.first-discovery-title {
+  font-size: 1.1rem;
+  font-weight: bold;
+  background: linear-gradient(90deg, #00F0FF, #FF00AA);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 1rem;
+}
+
+.first-discovery-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.first-discovery-icon {
+  font-size: 1.5rem;
+}
+
+.first-discovery-name {
+  font-weight: 600;
+  color: var(--text);
 }
 
 /* Fingerprint Modal */

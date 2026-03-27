@@ -258,9 +258,25 @@ RouteCanvas/
 |--------|------|-------------|
 | id | INTEGER | Primary key (auto-increment) |
 | route_id | INTEGER | FK to saved_routes |
-| reporter_id | INTEGER | FK to users (reporter) |
+| reporter_id | INTEGER | FK to users |
 | reason | TEXT | Report reason |
 | created_at | TIMESTAMP | Report time |
+
+**global_discovery_counts**
+| Column | Type | Description |
+|--------|------|-------------|
+| id | INTEGER | Primary key (auto-increment) |
+| item_type | VARCHAR | Type: country, city, asn, company, destination, fingerprint |
+| item_value | VARCHAR | The actual value (e.g., "Cloudflare", "Stockholm") |
+| user_count | INTEGER | How many users discovered this item |
+| created_at | TIMESTAMP | First discovery time |
+
+**users** (additional fields)
+| Column | Type | Description |
+|--------|------|-------------|
+| first_discoveries | INTEGER | Count of world-first discoveries (default: 0) |
+| new_items | TEXT | JSON dict of items discovered since last visit |
+| item_discovery_counts | TEXT | JSON dict tracking how many times each item was seen |
 
 ---
 
@@ -468,8 +484,9 @@ VITE_API_URL=http://localhost:8000/api/v1
 | Discovery | Unique countries/cities/destinations | 9 |
 | Streak | Daily tracing streaks | 4 |
 | Art | Export milestones | 3 |
+| First Discovery | World first discoveries | 5 |
 
-### Badge Definitions (22 total)
+### Badge Definitions (27 total)
 
 **Milestone:**
 - First Trace (1 trace)
@@ -491,6 +508,13 @@ VITE_API_URL=http://localhost:8000/api/v1
 
 **Art:**
 - First Export, Collection (10 exports), Masterpiece (50 exports)
+
+**First Discovery:**
+- First Footsteps (1 world first)
+- Pathfinder (10 world firsts)
+- Trailblazer (25 world firsts)
+- Pioneer (50 world firsts)
+- Legend (100 world firsts)
 
 ## 12. Item Discovery Tracking (Personal Rarity)
 
@@ -601,4 +625,4 @@ For faster traceroute on Windows, use WSL (Windows Subsystem for Linux):
 
 ---
 
-*Last updated: 2026-03-16*
+*Last updated: 2026-03-27*

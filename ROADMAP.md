@@ -71,7 +71,7 @@ This roadmap outlines the development phases for RouteCanvas, from initial demo 
 
 ### Week 12+: Gamification and Advanced Features
 
-- [ ] Route uniqueness scoring
+- [x] Route uniqueness scoring ("1 in X users have this route")
 - [ ] Compare routes feature
 - [ ] Advanced Rarity System (global rarity across users)
 
@@ -91,6 +91,7 @@ This roadmap outlines the development phases for RouteCanvas, from initial demo 
 - **Public user profiles** (stats and routes with thumbnails)
 - **Social sharing** (Twitter, Facebook, LinkedIn, Reddit, Instagram)
 - **Fingerprint share** (modal with download + social share)
+- **First Discoveries / Route Uniqueness** (world first tracking, "1 in X users", FIRST badges, 5 first discovery badges)
 
 ---
 

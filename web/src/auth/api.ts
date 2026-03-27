@@ -158,6 +158,18 @@ export const routesApi = {
     return response.json()
   },
 
+  async getUniqueness(token: string) {
+    const response = await fetch(`${API_URL}/me/uniqueness`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    })
+    if (!response.ok) {
+      throw new Error('Failed to get uniqueness stats')
+    }
+    return response.json()
+  },
+
   async clearNewItems(token: string) {
     const response = await fetch(`${API_URL}/me/collection/clear-new`, {
       method: 'POST',

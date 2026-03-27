@@ -20,6 +20,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   discovery: 'Discovery',
   streak: 'Streaks',
   art: 'Art',
+  first_discovery: 'First Discoveries',
 }
 
 export default function BadgeCase({ token, onClose }: BadgeCaseProps) {

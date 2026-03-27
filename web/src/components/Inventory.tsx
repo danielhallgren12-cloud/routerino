@@ -50,6 +50,14 @@ export default function Inventory({ token, collection, onClose, initialCategory 
   const [items, setItems] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const [sortBy, setSortBy] = useState<SortOption>('name-asc')
+  const [uniqueness, setUniqueness] = useState<Record<string, number>>({})
+
+  useEffect(() => {
+    // Fetch uniqueness stats
+    routesApi.getUniqueness(token)
+      .then(data => setUniqueness(data))
+      .catch(err => console.error('Failed to load uniqueness:', err))
+  }, [token])
 
   useEffect(() => {
     if (collection.items && collection.items[activeCategory]) {
@@ -187,19 +195,34 @@ export default function Inventory({ token, collection, onClose, initialCategory 
               const rarity = getRarity(activeCategory, item)
               const displayValue = activeCategory === 'countries' ? `${item} - ${getCountryName(item)}` : item
               const isNew = newCounts[activeCategory]?.includes(item) || false
+              const itemKey = `${activeCategory.slice(0, -1)}:${item}`
+              const globalCount = uniqueness[itemKey] || 0
+              const isFirst = globalCount === 1
+              
               return (
                  <div key={idx} className="inventory-item" style={{ borderLeftColor: RARITY_COLORS[rarity] }}>
                    <span className="item-value">
                      {displayValue}
                      {isNew && <span className="item-new-badge">NEW</span>}
+                     {isFirst && <span className="item-first-badge">FIRST</span>}
                    </span>
                    <span className="item-meta">
-                     <span className="item-rarity" style={{ color: RARITY_COLORS[rarity] }}>
-                       {RARITY_LABELS[rarity]}
-                     </span>
-                     <span className="item-count">
-                       Seen {(discoveryCounts[`${activeCategory.slice(0, -1)}:${item}`] || 1)}×
-                     </span>
+                     {activeCategory === 'fingerprints' ? (
+                       globalCount > 0 ? (
+                         <span className="item-uniqueness">1 in {globalCount} users</span>
+                       ) : (
+                         <span className="item-uniqueness" style={{ color: '#00F0FF' }}>Only you</span>
+                       )
+                     ) : (
+                       <>
+                         <span className="item-rarity" style={{ color: RARITY_COLORS[rarity] }}>
+                           {RARITY_LABELS[rarity]}
+                         </span>
+                         <span className="item-count">
+                           Seen {(discoveryCounts[`${activeCategory.slice(0, -1)}:${item}`] || 1)}×
+                         </span>
+                       </>
+                     )}
                    </span>
                  </div>
               )

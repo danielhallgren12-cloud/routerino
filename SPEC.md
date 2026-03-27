@@ -76,6 +76,8 @@
 | User Profiles | ✅ Complete (public profile modal with stats and routes) |
 | Share Routes | ✅ Social buttons (Twitter, Facebook, LinkedIn, Reddit, Instagram) - full functionality with real share pages |
 | Fingerprint Share | ✅ Click fingerprint ID → modal with fingerprint card + download + social share |
+| First Discoveries | ✅ Complete (world first tracking, "1 in X users" stats, FIRST badges on unique items, 5 first discovery badges) |
+| Route Uniqueness | ✅ Complete ("1 in X users have this route" displayed in fingerprints inventory) |
 
 ### Phase 4 - Expansion (Planned)
 
@@ -110,4 +112,4 @@ Users will want to buy prints because:
 
 ---
 
-*Last updated: 2026-03-16*
+*Last updated: 2026-03-27*

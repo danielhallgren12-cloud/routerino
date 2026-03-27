@@ -28,9 +28,21 @@ class User(Base):
     last_visit = Column(String, nullable=True)  # Last visit timestamp (ISO format)
     new_items = Column(Text, default='{}')  # Items discovered since last visit (dict of lists)
     item_discovery_counts = Column(Text, default='{}')  # Track how many times each item was seen
+    first_discoveries = Column(Integer, default=0)  # Count of world-first discoveries
 
     routes = relationship("SavedRoute", back_populates="user", cascade="all, delete-orphan")
     likes = relationship("Like", back_populates="user", cascade="all, delete-orphan")
+
+class GlobalDiscovery(Base):
+    __tablename__ = "global_discovery_counts"
+
+    id = Column(Integer, primary_key=True, index=True)
+    item_type = Column(String, nullable=False)  # country, city, asn, company, destination, fingerprint
+    item_value = Column(String, nullable=False)  # "Cloudflare", "Stockholm", etc.
+    user_count = Column(Integer, default=0)  # How many users discovered this
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    __table_args__ = (UniqueConstraint('item_type', 'item_value', name='unique_discovery'),)
 
 class SavedRoute(Base):
     __tablename__ = "saved_routes"

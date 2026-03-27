@@ -30,6 +30,13 @@ BADGES = {
         {"id": "first_art", "name": "Artist", "desc": "Export your first art", "icon": "🎨", "req": ("exports", 1)},
         {"id": "art_10", "name": "Creative", "desc": "Export 10 artworks", "icon": "🖼️", "req": ("exports", 10)},
     ],
+    "first_discovery": [
+        {"id": "first_discovery_1", "name": "First Footsteps", "desc": "Make your first world first discovery", "icon": "🌍", "req": ("first_discoveries", 1)},
+        {"id": "first_discovery_10", "name": "Pathfinder", "desc": "Make 10 world first discoveries", "icon": "🗺️", "req": ("first_discoveries", 10)},
+        {"id": "first_discovery_25", "name": "Trailblazer", "desc": "Make 25 world first discoveries", "icon": "🌐", "req": ("first_discoveries", 25)},
+        {"id": "first_discovery_50", "name": "Pioneer", "desc": "Make 50 world first discoveries", "icon": "🏔️", "req": ("first_discoveries", 50)},
+        {"id": "first_discovery_100", "name": "Legend", "desc": "Make 100 world first discoveries", "icon": "🚀", "req": ("first_discoveries", 100)},
+    ],
 }
 
 def get_all_badges():

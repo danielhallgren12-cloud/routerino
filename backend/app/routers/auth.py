@@ -10,7 +10,7 @@ import secrets
 from fastapi.responses import JSONResponse
 from app.config import settings
 from app.database import get_db
-from app.models import User, SavedRoute, Like, Report
+from app.models import User, SavedRoute, Like, Report, GlobalDiscovery
 from app.auth import verify_password, get_password_hash, create_access_token, decode_access_token
 from app.schemas import (
     UserCreate, UserLogin, Token, UserResponse,
@@ -211,6 +211,59 @@ def collect_route(collect: CollectRequest, current_user: User = Depends(get_curr
 
     current_user.item_discovery_counts = json.dumps(discovery_counts)
 
+    # ========== GLOBAL FIRST DISCOVERY TRACKING ==========
+    first_discoveries_this_trace = []
+    
+    def track_global_discovery(item_type, item_value):
+        """Track global discovery and return True if this is a world first"""
+        existing = db.query(GlobalDiscovery).filter(
+            GlobalDiscovery.item_type == item_type,
+            GlobalDiscovery.item_value == item_value
+        ).first()
+        
+        if existing:
+            existing.user_count += 1
+            return False
+        else:
+            # World First! Nobody else has discovered this
+            new_discovery = GlobalDiscovery(
+                item_type=item_type,
+                item_value=item_value,
+                user_count=1
+            )
+            db.add(new_discovery)
+            return True
+    
+    # Check all new items for world first discoveries
+    for dest in new_items.get("destinations", []):
+        if track_global_discovery("destination", dest):
+            first_discoveries_this_trace.append(f"destination:{dest}")
+    
+    for country in new_items.get("countries", []):
+        if track_global_discovery("country", country):
+            first_discoveries_this_trace.append(f"country:{country}")
+    
+    for city in new_items.get("cities", []):
+        if track_global_discovery("city", city):
+            first_discoveries_this_trace.append(f"city:{city}")
+    
+    for company in new_items.get("companies", []):
+        if track_global_discovery("company", company):
+            first_discoveries_this_trace.append(f"company:{company}")
+    
+    for asn in new_items.get("asns", []):
+        if track_global_discovery("asn", asn):
+            first_discoveries_this_trace.append(f"asn:{asn}")
+    
+    for fingerprint in new_items.get("fingerprints", []):
+        if track_global_discovery("fingerprint", fingerprint):
+            first_discoveries_this_trace.append(f"fingerprint:{fingerprint}")
+    
+    # Update user's first discovery count
+    if first_discoveries_this_trace:
+        current_user.first_discoveries += len(first_discoveries_this_trace)
+    # ========== END GLOBAL FIRST DISCOVERY ==========
+
     db.commit()
 
     # Return updated collection with discovery counts
@@ -226,7 +279,43 @@ def collect_route(collect: CollectRequest, current_user: User = Depends(get_curr
         "fingerprints": len(json.loads(current_user.unique_fingerprints or '[]')),
         "new_items": json.loads(current_user.new_items or '{}'),
         "discovery_counts": discovery_counts,
+        "first_discoveries": current_user.first_discoveries,
+        "first_discoveries_this_trace": first_discoveries_this_trace,
     }
+
+@router.get("/me/collection/uniqueness")
+def get_collection_uniqueness(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Get global uniqueness stats for user's collection items"""
+    uniqueness = {}
+    
+    # Check fingerprints
+    fingerprints = json.loads(current_user.unique_fingerprints or '[]')
+    for fp in fingerprints:
+        discovery = db.query(GlobalDiscovery).filter(
+            GlobalDiscovery.item_type == "fingerprint",
+            GlobalDiscovery.item_value == fp
+        ).first()
+        uniqueness[f"fingerprint:{fp}"] = discovery.user_count if discovery else 0
+    
+    # Check other items for "first discovery" status
+    for category, field in [
+        ("country", current_user.unique_countries),
+        ("city", current_user.unique_cities),
+        ("company", current_user.unique_companies),
+        ("asn", current_user.unique_asns),
+        ("destination", current_user.unique_destinations),
+    ]:
+        items = json.loads(field or '[]')
+        for item in items:
+            key = f"{category}:{item}"
+            if key not in uniqueness:
+                discovery = db.query(GlobalDiscovery).filter(
+                    GlobalDiscovery.item_type == category,
+                    GlobalDiscovery.item_value == item
+                ).first()
+                uniqueness[key] = discovery.user_count if discovery else 0
+    
+    return uniqueness
 
 @router.get("/me/collection/{category}")
 def get_collection_category(category: str, current_user: User = Depends(get_current_user)):
@@ -247,6 +336,40 @@ def get_collection_category(category: str, current_user: User = Depends(get_curr
 
     items = json.loads(field_map.get(category, '[]'))
     return {"category": category, "items": items, "count": len(items)}
+
+@router.get("/me/uniqueness")
+def get_collection_uniqueness(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Get global uniqueness stats for user's collection items"""
+    uniqueness = {}
+    
+    # Check fingerprints
+    fingerprints = json.loads(current_user.unique_fingerprints or '[]')
+    for fp in fingerprints:
+        discovery = db.query(GlobalDiscovery).filter(
+            GlobalDiscovery.item_type == "fingerprint",
+            GlobalDiscovery.item_value == fp
+        ).first()
+        uniqueness[f"fingerprint:{fp}"] = discovery.user_count if discovery else 0
+    
+    # Check other items for "first discovery" status
+    for category, field in [
+        ("country", current_user.unique_countries),
+        ("city", current_user.unique_cities),
+        ("company", current_user.unique_companies),
+        ("asn", current_user.unique_asns),
+        ("destination", current_user.unique_destinations),
+    ]:
+        items = json.loads(field or '[]')
+        for item in items:
+            key = f"{category}:{item}"
+            if key not in uniqueness:
+                discovery = db.query(GlobalDiscovery).filter(
+                    GlobalDiscovery.item_type == category,
+                    GlobalDiscovery.item_value == item
+                ).first()
+                uniqueness[key] = discovery.user_count if discovery else 0
+    
+    return uniqueness
 
 @router.post("/me/collection/clear-new")
 def clear_new_items(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
@@ -662,6 +785,7 @@ def check_badges(current_user: User = Depends(get_current_user), db: Session = D
         "companies": len(json.loads(current_user.unique_companies or '[]')),
         "streak": current_user.current_streak,
         "exports": 0,
+        "first_discoveries": current_user.first_discoveries,
     }
 
     # Check each badge
