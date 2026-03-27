@@ -100,6 +100,15 @@
 | GET | `/auth/me/badges/check` | Check and award new badges | ✅ |
 | POST | `/auth/me/badges/increment-export` | Increment export count for badges | ✅ |
 | POST | `/auth/me/collection/clear-new` | Clear new items after user sees them | ✅ |
+| GET | `/gallery` | Get public routes for gallery (paginated, sortable) | ✅ |
+| GET | `/gallery/random` | Get random routes for featured section | ✅ |
+| GET | `/user/{username}` | Get public user profile with stats and routes | ✅ |
+| GET | `/user/{username}/routes` | Get user's public routes (paginated) | ✅ |
+| POST | `/routes/{route_id}/like` | Like or unlike a route | ✅ |
+| GET | `/routes/{route_id}/like/status` | Check if user liked a route | ✅ |
+| PATCH | `/routes/{route_id}/visibility` | Update route visibility (public/private) | ✅ |
+| POST | `/routes/{route_id}/view` | Increment view count | ✅ |
+| POST | `/routes/{route_id}/report` | Report a route | ✅ |
 
 #### Request/Response Examples
 
@@ -230,36 +239,28 @@ RouteCanvas/
 | destination | VARCHAR | Target domain/IP |
 | hops_data | TEXT | JSON string of hops |
 | share_id | VARCHAR | Unique public share ID (nullable) |
+| is_public | BOOLEAN | Whether route is visible in gallery (default: false) |
+| like_count | INTEGER | Number of likes (default: 0) |
+| view_count | INTEGER | Number of views (default: 0) |
+| art_thumbnail | TEXT | Base64-encoded 600x600 PNG thumbnail for gallery |
 | created_at | TIMESTAMP | Creation time |
-
-**users**
-| Column | Type | Description |
-|--------|------|-------------|
-| id | INTEGER | Primary key (auto-increment) |
-| username | VARCHAR | Unique username |
-| email | VARCHAR | Unique email |
-| password_hash | VARCHAR | Bcrypt hash |
-| created_at | TIMESTAMP | Registration time |
-| total_traces | INTEGER | Total traces performed |
-| total_hops | INTEGER | Total hops across all traces |
-| unique_countries | TEXT | JSON array of unique countries |
-| unique_destinations | TEXT | JSON array of unique destinations |
-| unique_ips | TEXT | JSON array of unique IPs |
-| unique_asns | TEXT | JSON array of unique ASNs |
-| unique_fingerprints | TEXT | JSON array of unique fingerprints |
-| unique_cities | TEXT | JSON array of unique cities |
-| unique_companies | TEXT | JSON array of unique companies |
-| earned_badges | TEXT | JSON array of earned badge IDs |
-| last_trace_date | TEXT | Last trace date (YYYY-MM-DD) for streak tracking |
-| current_streak | INTEGER | Current daily tracing streak |
 
 **likes**
 | Column | Type | Description |
 |--------|------|-------------|
-| id | UUID | Primary key |
-| user_id | UUID | FK to users |
-| route_id | UUID | FK to routes |
+| id | INTEGER | Primary key (auto-increment) |
+| user_id | INTEGER | FK to users |
+| route_id | INTEGER | FK to saved_routes |
 | created_at | TIMESTAMP | Like time |
+
+**reports**
+| Column | Type | Description |
+|--------|------|-------------|
+| id | INTEGER | Primary key (auto-increment) |
+| route_id | INTEGER | FK to saved_routes |
+| reporter_id | INTEGER | FK to users (reporter) |
+| reason | TEXT | Report reason |
+| created_at | TIMESTAMP | Report time |
 
 ---
 

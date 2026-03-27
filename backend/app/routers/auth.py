@@ -1,17 +1,22 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from datetime import timedelta, date
 from typing import List
-import secrets
-import string
 import json
-from app.database import get_db
-from app.models import User, SavedRoute
-from app.auth import verify_password, get_password_hash, create_access_token, decode_access_token
-from app.schemas import UserCreate, UserLogin, Token, UserResponse, SavedRouteCreate, SavedRouteResponse
+import string
+import secrets
+from fastapi.responses import JSONResponse
 from app.config import settings
+from app.database import get_db
+from app.models import User, SavedRoute, Like, Report
+from app.auth import verify_password, get_password_hash, create_access_token, decode_access_token
+from app.schemas import (
+    UserCreate, UserLogin, Token, UserResponse,
+    SavedRouteCreate, SavedRouteResponse, SavedRouteWithUser,
+    GalleryRoute, PublicProfile, LikeResponse, ReportCreate, ReportResponse
+)
 
 router = APIRouter()
 
@@ -51,7 +56,7 @@ def get_user_collection(current_user: User = Depends(get_current_user)):
     fingerprints = json.loads(current_user.unique_fingerprints or '[]')
     new_items = json.loads(current_user.new_items or '{}')
     discovery_counts = json.loads(current_user.item_discovery_counts or '{}')
-    
+
     return {
         "destinations": len(destinations),
         "countries": len(countries),
@@ -79,14 +84,14 @@ def get_user_collection(current_user: User = Depends(get_current_user)):
 def collect_route(collect: CollectRequest, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     """Update user's collection with new trace data"""
     hops = json.loads(collect.hops_data)
-    
+
     # Extract unique items from this trace
     countries = set(h.get('country', '') for h in hops if h.get('country'))
     cities = set(h.get('city', '') for h in hops if h.get('city'))
     ips = set(h.get('ip', '') for h in hops if h.get('ip') and h.get('ip') != '*')
     asns = set(h.get('asn', '') for h in hops if h.get('asn'))
     isps = set(h.get('isp', '') for h in hops if h.get('isp'))
-    
+
     # Get current collections
     current_countries = set(json.loads(current_user.unique_countries or '[]'))
     current_destinations = set(json.loads(current_user.unique_destinations or '[]'))
@@ -95,7 +100,7 @@ def collect_route(collect: CollectRequest, current_user: User = Depends(get_curr
     current_ips = set(json.loads(current_user.unique_ips or '[]'))
     current_asns = set(json.loads(current_user.unique_asns or '[]'))
     current_fingerprints = set(json.loads(current_user.unique_fingerprints or '[]'))
-    
+
     # Track new discoveries
     new_items = {
         "destinations": [],
@@ -106,46 +111,46 @@ def collect_route(collect: CollectRequest, current_user: User = Depends(get_curr
         "asns": [],
         "fingerprints": [],
     }
-    
+
     # Find new destinations
     new_destinations = {collect.destination} - current_destinations
     if new_destinations:
         new_items["destinations"] = list(new_destinations)
-    
+
     # Find new countries
     new_countries = countries - current_countries
     if new_countries:
         new_items["countries"] = list(new_countries)
-    
+
     # Find new cities
     new_cities = cities - current_cities
     if new_cities:
         new_items["cities"] = list(new_cities)
-    
+
     # Find new ISPs/companies
     new_companies = isps - current_companies
     if new_companies:
         new_items["companies"] = list(new_companies)
-    
+
     # Find new IPs
     new_ips = ips - current_ips
     if new_ips:
         new_items["ips"] = list(new_ips)
-    
+
     # Find new ASNs
     new_asns = asns - current_asns
     if new_asns:
         new_items["asns"] = list(new_asns)
-    
+
     # Find new fingerprints
     new_fingerprints = {collect.fingerprint_id} - current_fingerprints
     if new_fingerprints:
         new_items["fingerprints"] = list(new_fingerprints)
-    
+
     # Update counts
     current_user.total_traces += 1
     current_user.total_hops += len([h for h in hops if h.get('ip') and h.get('ip') != '*'])
-    
+
     # Update streak
     today = date.today().isoformat()
     if current_user.last_trace_date:
@@ -158,7 +163,7 @@ def collect_route(collect: CollectRequest, current_user: User = Depends(get_curr
     else:
         current_user.current_streak = 1
     current_user.last_trace_date = today
-    
+
     # Add new items to collections (append to end to preserve discovery order)
     def append_unique(existing_list, new_items):
         result = list(existing_list)
@@ -166,7 +171,7 @@ def collect_route(collect: CollectRequest, current_user: User = Depends(get_curr
             if item not in result:
                 result.append(item)
         return result
-    
+
     current_user.unique_countries = json.dumps(append_unique(current_countries, countries))
     current_user.unique_destinations = json.dumps(append_unique(current_destinations, {collect.destination}))
     current_user.unique_cities = json.dumps(append_unique(current_cities, cities))
@@ -174,7 +179,7 @@ def collect_route(collect: CollectRequest, current_user: User = Depends(get_curr
     current_user.unique_ips = json.dumps(append_unique(current_ips, ips))
     current_user.unique_asns = json.dumps(append_unique(current_asns, asns))
     current_user.unique_fingerprints = json.dumps(append_unique(current_fingerprints, {collect.fingerprint_id}))
-    
+
     # Accumulate new items
     current_new_items = json.loads(current_user.new_items or '{}')
     for key in new_items:
@@ -183,10 +188,10 @@ def collect_route(collect: CollectRequest, current_user: User = Depends(get_curr
                 current_new_items[key] = []
             current_new_items[key] = list(set(current_new_items[key] + new_items[key]))
     current_user.new_items = json.dumps(current_new_items)
-    
+
     # Update item discovery counts
     discovery_counts = json.loads(current_user.item_discovery_counts or '{}')
-    
+
     # Increment counts for all items in this trace
     for item in countries:
         discovery_counts[f"country:{item}"] = discovery_counts.get(f"country:{item}", 0) + 1
@@ -200,11 +205,11 @@ def collect_route(collect: CollectRequest, current_user: User = Depends(get_curr
         discovery_counts[f"asn:{item}"] = discovery_counts.get(f"asn:{item}", 0) + 1
     discovery_counts[f"destination:{collect.destination}"] = discovery_counts.get(f"destination:{collect.destination}", 0) + 1
     discovery_counts[f"fingerprint:{collect.fingerprint_id}"] = discovery_counts.get(f"fingerprint:{collect.fingerprint_id}", 0) + 1
-    
+
     current_user.item_discovery_counts = json.dumps(discovery_counts)
-    
+
     db.commit()
-    
+
     # Return updated collection with discovery counts
     return {
         "destinations": len(json.loads(current_user.unique_destinations or '[]')),
@@ -226,7 +231,7 @@ def get_collection_category(category: str, current_user: User = Depends(get_curr
     valid_categories = ["destinations", "countries", "cities", "companies", "ips", "asns", "fingerprints"]
     if category not in valid_categories:
         raise HTTPException(status_code=400, detail=f"Invalid category. Valid: {valid_categories}")
-    
+
     field_map = {
         "destinations": current_user.unique_destinations,
         "countries": current_user.unique_countries,
@@ -236,7 +241,7 @@ def get_collection_category(category: str, current_user: User = Depends(get_curr
         "asns": current_user.unique_asns,
         "fingerprints": current_user.unique_fingerprints,
     }
-    
+
     items = json.loads(field_map.get(category, '[]'))
     return {"category": category, "items": items, "count": len(items)}
 
@@ -258,7 +263,7 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Username or email already registered"
         )
-    
+
     # Create new user
     try:
         hashed_password = get_password_hash(user.password)
@@ -287,12 +292,12 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
             detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
+
     # Update last_visit timestamp
     from datetime import datetime
     user.last_visit = datetime.utcnow().isoformat() + "Z"
     db.commit()
-    
+
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": user.email}, expires_delta=access_token_expires
@@ -314,7 +319,9 @@ def save_route(route: SavedRouteCreate, current_user: User = Depends(get_current
     db_route = SavedRoute(
         user_id=current_user.id,
         destination=route.destination,
-        hops_data=route.hops_data
+        hops_data=route.hops_data,
+        is_public=route.is_public,
+        art_thumbnail=route.art_thumbnail
     )
     db.add(db_route)
     db.commit()
@@ -349,12 +356,14 @@ def share_route(route: SavedRouteCreate, current_user: User = Depends(get_curren
     share_id = generate_share_id()
     while db.query(SavedRoute).filter(SavedRoute.share_id == share_id).first():
         share_id = generate_share_id()
-    
+
     db_route = SavedRoute(
         user_id=current_user.id,
         destination=route.destination,
         hops_data=route.hops_data,
-        share_id=share_id
+        share_id=share_id,
+        is_public=route.is_public,
+        art_thumbnail=route.art_thumbnail
     )
     db.add(db_route)
     db.commit()
@@ -369,14 +378,254 @@ def get_shared_route(share_id: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Shared route not found")
     return route
 
+# ============ GALLERY ENDPOINTS ============
+
+@router.get("/gallery")
+def get_gallery(
+    page: int = 1,
+    limit: int = 12,
+    sort: str = "latest",
+    db: Session = Depends(get_db)
+):
+    """Get public routes for gallery display"""
+    query = db.query(SavedRoute).options(joinedload(SavedRoute.user)).filter(SavedRoute.is_public == True)
+
+    if sort == "popular":
+        query = query.order_by(SavedRoute.like_count.desc())
+    elif sort == "trending":
+        query = query.order_by(SavedRoute.view_count.desc())
+    else:  # latest
+        query = query.order_by(SavedRoute.created_at.desc())
+
+    total = query.count()
+    offset = (page - 1) * limit
+    routes = query.offset(offset).limit(limit).all()
+
+    result = []
+    for r in routes:
+        result.append({
+            "id": r.id,
+            "destination": r.destination,
+            "created_at": r.created_at.isoformat() if r.created_at else None,
+            "like_count": r.like_count,
+            "view_count": r.view_count,
+            "username": r.user.username if r.user else "unknown",
+            "user_id": r.user_id,
+            "art_thumbnail": r.art_thumbnail
+        })
+    return {"routes": result, "total": total, "page": page, "limit": limit}
+
+@router.get("/gallery/random")
+def get_random_gallery(limit: int = 6, db: Session = Depends(get_db)):
+    """Get random public routes for homepage featured section"""
+    import random
+    routes = db.query(SavedRoute).options(joinedload(SavedRoute.user)).filter(SavedRoute.is_public == True).all()
+    random.shuffle(routes)
+    result = []
+    for r in routes[:limit]:
+        result.append({
+            "id": r.id,
+            "destination": r.destination,
+            "created_at": r.created_at.isoformat() if r.created_at else None,
+            "like_count": r.like_count,
+            "view_count": r.view_count,
+            "username": r.user.username if r.user else "unknown",
+            "user_id": r.user_id,
+            "art_thumbnail": r.art_thumbnail
+        })
+    return {"routes": result}
+
+@router.get("/user/{username}")
+def get_public_profile(username: str, db: Session = Depends(get_db)):
+    """Get public profile with stats and routes"""
+    user = db.query(User).filter(User.username == username).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Get public routes for this user
+    public_routes = db.query(SavedRoute).filter(
+        SavedRoute.user_id == user.id,
+        SavedRoute.is_public == True
+    ).order_by(SavedRoute.created_at.desc()).all()
+
+    # Calculate stats
+    collection_items = (
+        len(json.loads(user.unique_countries or '[]')) +
+        len(json.loads(user.unique_destinations or '[]')) +
+        len(json.loads(user.unique_cities or '[]')) +
+        len(json.loads(user.unique_companies or '[]')) +
+        len(json.loads(user.unique_ips or '[]')) +
+        len(json.loads(user.unique_asns or '[]'))
+    )
+
+    badges = json.loads(user.earned_badges or '[]')
+
+    # Serialize public routes
+    serialized_routes = []
+    for r in public_routes:
+        serialized_routes.append({
+            "id": r.id,
+            "destination": r.destination,
+            "created_at": r.created_at.isoformat() if r.created_at else None,
+            "like_count": r.like_count,
+            "view_count": r.view_count,
+            "is_public": r.is_public,
+            "art_thumbnail": r.art_thumbnail
+        })
+
+    return JSONResponse(content={
+        "username": user.username,
+        "created_at": user.created_at.isoformat() if user.created_at else None,
+        "total_routes": len(public_routes),
+        "total_traces": user.total_traces,
+        "total_hops": user.total_hops,
+        "collection_items": collection_items,
+        "badges_count": len(badges),
+        "public_routes": serialized_routes
+    })
+
+@router.get("/user/{username}/routes")
+def get_user_public_routes(
+    username: str,
+    page: int = 1,
+    limit: int = 12,
+    sort: str = "latest",
+    db: Session = Depends(get_db)
+):
+    """Get public routes for a specific user"""
+    user = db.query(User).filter(User.username == username).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    query = db.query(SavedRoute).filter(
+        SavedRoute.user_id == user.id,
+        SavedRoute.is_public == True
+    )
+
+    if sort == "popular":
+        query = query.order_by(SavedRoute.like_count.desc())
+    else:
+        query = query.order_by(SavedRoute.created_at.desc())
+
+    total = query.count()
+    offset = (page - 1) * limit
+    routes = query.offset(offset).limit(limit).all()
+
+    return {"routes": routes, "total": total, "page": page, "limit": limit}
+
+@router.post("/routes/{route_id}/like")
+def like_route(
+    route_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Like or unlike a route"""
+    route = db.query(SavedRoute).filter(SavedRoute.id == route_id).first()
+    if not route:
+        raise HTTPException(status_code=404, detail="Route not found")
+
+    # Check if already liked
+    existing_like = db.query(Like).filter(
+        Like.user_id == current_user.id,
+        Like.route_id == route_id
+    ).first()
+
+    if existing_like:
+        # Unlike
+        db.delete(existing_like)
+        route.like_count = max(0, route.like_count - 1)
+        liked = False
+    else:
+        # Like
+        new_like = Like(user_id=current_user.id, route_id=route_id)
+        db.add(new_like)
+        route.like_count = route.like_count + 1
+        liked = True
+
+    db.commit()
+    return {"success": True, "like_count": route.like_count, "liked": liked}
+
+@router.get("/routes/{route_id}/like/status")
+def get_like_status(
+    route_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Check if current user has liked a route"""
+    existing_like = db.query(Like).filter(
+        Like.user_id == current_user.id,
+        Like.route_id == route_id
+    ).first()
+    return {"liked": existing_like is not None}
+
+@router.patch("/routes/{route_id}/visibility")
+def update_route_visibility(
+    route_id: int,
+    is_public: bool,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Update route visibility (public/private)"""
+    route = db.query(SavedRoute).filter(
+        SavedRoute.id == route_id,
+        SavedRoute.user_id == current_user.id
+    ).first()
+    if not route:
+        raise HTTPException(status_code=404, detail="Route not found")
+
+    route.is_public = is_public
+    db.commit()
+    return {"success": True, "is_public": is_public}
+
+@router.post("/routes/{route_id}/view")
+def increment_view_count(
+    route_id: int,
+    db: Session = Depends(get_db)
+):
+    """Increment view count for a route (public endpoint)"""
+    route = db.query(SavedRoute).filter(SavedRoute.id == route_id).first()
+    if not route:
+        raise HTTPException(status_code=404, detail="Route not found")
+
+    route.view_count = route.view_count + 1
+    db.commit()
+    return {"success": True, "view_count": route.view_count}
+
+@router.post("/routes/{route_id}/report")
+def report_route(
+    route_id: int,
+    report: ReportCreate,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Report a route for inappropriate content"""
+    route = db.query(SavedRoute).filter(SavedRoute.id == route_id).first()
+    if not route:
+        raise HTTPException(status_code=404, detail="Route not found")
+
+    # Don't let users report their own routes
+    if route.user_id == current_user.id:
+        raise HTTPException(status_code=400, detail="Cannot report your own route")
+
+    # Create report
+    db_report = Report(
+        route_id=route_id,
+        reporter_id=current_user.id,
+        reason=report.reason
+    )
+    db.add(db_report)
+    db.commit()
+
+    return {"success": True, "message": "Report submitted"}
+
 @router.get("/me/badges")
 def get_user_badges(current_user: User = Depends(get_current_user)):
     """Get user's badges and all available badges"""
     from app.badges import get_all_badges, BADGES
-    
+
     earned = json.loads(current_user.earned_badges or '[]')
     all_badges = get_all_badges()
-    
+
     # Build response with earned status
     result = []
     for badge in all_badges:
@@ -384,7 +633,7 @@ def get_user_badges(current_user: User = Depends(get_current_user)):
             **badge,
             "earned": badge["id"] in earned
         })
-    
+
     return {
         "earned": earned,
         "badges": result,
@@ -396,11 +645,11 @@ def get_user_badges(current_user: User = Depends(get_current_user)):
 def check_badges(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     """Check and award any new badges based on user stats"""
     from app.badges import get_all_badges
-    
+
     earned = set(json.loads(current_user.earned_badges or '[]'))
     all_badges = get_all_badges()
     new_badges = []
-    
+
     # Get current stats
     stats = {
         "traces": current_user.total_traces,
@@ -409,25 +658,25 @@ def check_badges(current_user: User = Depends(get_current_user), db: Session = D
         "destinations": len(json.loads(current_user.unique_destinations or '[]')),
         "companies": len(json.loads(current_user.unique_companies or '[]')),
         "streak": current_user.current_streak,
-        "exports": 0,  # Would need to track this separately
+        "exports": 0,
     }
-    
+
     # Check each badge
     for badge in all_badges:
         if badge["id"] in earned:
             continue
-            
+
         req_type, req_value = badge["req"]
-        
+
         if req_type in stats and stats[req_type] >= req_value:
             earned.add(badge["id"])
             new_badges.append(badge)
-    
+
     # Update database if new badges earned
     if new_badges:
         current_user.earned_badges = json.dumps(list(earned))
         db.commit()
-    
+
     return {
         "new_badges": new_badges,
         "total_earned": len(earned)
@@ -436,5 +685,4 @@ def check_badges(current_user: User = Depends(get_current_user), db: Session = D
 @router.post("/me/badges/increment-export")
 def increment_export(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     """Increment export counter for badges"""
-    # For now just return success - would need export tracking
     return {"success": True}

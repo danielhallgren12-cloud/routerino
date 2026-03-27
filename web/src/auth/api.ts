@@ -30,7 +30,7 @@ export const authApi = {
     const formData = new URLSearchParams()
     formData.append('username', email)
     formData.append('password', password)
-    
+
     const response = await fetch(`${API_URL}/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -45,7 +45,7 @@ export const authApi = {
 
   async getMe(token: string): Promise<User> {
     const response = await fetch(`${API_URL}/me`, {
-      headers: { 
+      headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
       },
@@ -60,7 +60,7 @@ export const authApi = {
 export const routesApi = {
   async getRoutes(token: string) {
     const response = await fetch(`${API_URL}/routes`, {
-      headers: { 
+      headers: {
         'Authorization': `Bearer ${token}`,
       },
     })
@@ -70,14 +70,14 @@ export const routesApi = {
     return response.json()
   },
 
-  async saveRoute(token: string, destination: string, hopsData: string) {
+  async saveRoute(token: string, destination: string, hopsData: string, isPublic: boolean = false, artThumbnail?: string) {
     const response = await fetch(`${API_URL}/routes`, {
       method: 'POST',
-      headers: { 
+      headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ destination, hops_data: hopsData }),
+      body: JSON.stringify({ destination, hops_data: hopsData, is_public: isPublic, art_thumbnail: artThumbnail }),
     })
     if (!response.ok) {
       throw new Error('Failed to save route')
@@ -88,7 +88,7 @@ export const routesApi = {
   async deleteRoute(token: string, routeId: number) {
     const response = await fetch(`${API_URL}/routes/${routeId}`, {
       method: 'DELETE',
-      headers: { 
+      headers: {
         'Authorization': `Bearer ${token}`,
       },
     })
@@ -101,7 +101,7 @@ export const routesApi = {
   async getRoute(token: string, routeId: number) {
     const response = await fetch(`${API_URL}/routes/${routeId}`, {
       method: 'GET',
-      headers: { 
+      headers: {
         'Authorization': `Bearer ${token}`,
       },
     })
@@ -111,14 +111,14 @@ export const routesApi = {
     return response.json()
   },
 
-  async shareRoute(token: string, destination: string, hopsData: string) {
+  async shareRoute(token: string, destination: string, hopsData: string, isPublic: boolean = false, artThumbnail?: string) {
     const response = await fetch(`${API_URL}/routes/share`, {
       method: 'POST',
-      headers: { 
+      headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ destination, hops_data: hopsData }),
+      body: JSON.stringify({ destination, hops_data: hopsData, is_public: isPublic, art_thumbnail: artThumbnail }),
     })
     if (!response.ok) {
       throw new Error('Failed to share route')
@@ -136,7 +136,7 @@ export const routesApi = {
 
   async getCollection(token: string) {
     const response = await fetch(`${API_URL}/me/collection`, {
-      headers: { 
+      headers: {
         'Authorization': `Bearer ${token}`,
       },
     })
@@ -148,7 +148,7 @@ export const routesApi = {
 
   async getCollectionCategory(token: string, category: string) {
     const response = await fetch(`${API_URL}/me/collection/${category}`, {
-      headers: { 
+      headers: {
         'Authorization': `Bearer ${token}`,
       },
     })
@@ -161,7 +161,7 @@ export const routesApi = {
   async clearNewItems(token: string) {
     const response = await fetch(`${API_URL}/me/collection/clear-new`, {
       method: 'POST',
-      headers: { 
+      headers: {
         'Authorization': `Bearer ${token}`,
       },
     })
@@ -174,7 +174,7 @@ export const routesApi = {
   async collectRoute(token: string, destination: string, hopsData: string, fingerprintId: string) {
     const response = await fetch(`${API_URL}/trace/collect`, {
       method: 'POST',
-      headers: { 
+      headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
       },
@@ -188,7 +188,7 @@ export const routesApi = {
 
   async getBadges(token: string) {
     const response = await fetch(`${API_URL}/me/badges`, {
-      headers: { 
+      headers: {
         'Authorization': `Bearer ${token}`,
       },
     })
@@ -200,12 +200,112 @@ export const routesApi = {
 
   async checkBadges(token: string) {
     const response = await fetch(`${API_URL}/me/badges/check`, {
-      headers: { 
+      headers: {
         'Authorization': `Bearer ${token}`,
       },
     })
     if (!response.ok) {
       throw new Error('Failed to check badges')
+    }
+    return response.json()
+  },
+}
+
+// Gallery API
+export const galleryApi = {
+  async getGallery(page: number = 1, limit: number = 12, sort: string = 'latest') {
+    const response = await fetch(`${API_URL}/gallery?page=${page}&limit=${limit}&sort=${sort}`)
+    if (!response.ok) {
+      throw new Error('Failed to get gallery')
+    }
+    return response.json()
+  },
+
+  async getRandomRoutes(limit: number = 6) {
+    const response = await fetch(`${API_URL}/gallery/random?limit=${limit}`)
+    if (!response.ok) {
+      throw new Error('Failed to get random routes')
+    }
+    return response.json()
+  },
+
+  async getPublicProfile(username: string) {
+    const response = await fetch(`${API_URL}/user/${username}`)
+    if (!response.ok) {
+      throw new Error('Failed to get profile')
+    }
+    return response.json()
+  },
+
+  async getUserRoutes(username: string, page: number = 1, limit: number = 12, sort: string = 'latest') {
+    const response = await fetch(`${API_URL}/user/${username}/routes?page=${page}&limit=${limit}&sort=${sort}`)
+    if (!response.ok) {
+      throw new Error('Failed to get user routes')
+    }
+    return response.json()
+  },
+
+  async likeRoute(token: string, routeId: number) {
+    const response = await fetch(`${API_URL}/routes/${routeId}/like`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    })
+    if (!response.ok) {
+      throw new Error('Failed to like route')
+    }
+    return response.json()
+  },
+
+  async getLikeStatus(token: string, routeId: number) {
+    const response = await fetch(`${API_URL}/routes/${routeId}/like/status`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    })
+    if (!response.ok) {
+      throw new Error('Failed to get like status')
+    }
+    return response.json()
+  },
+
+  async updateVisibility(token: string, routeId: number, isPublic: boolean) {
+    const response = await fetch(`${API_URL}/routes/${routeId}/visibility`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ is_public: isPublic }),
+    })
+    if (!response.ok) {
+      throw new Error('Failed to update visibility')
+    }
+    return response.json()
+  },
+
+  async incrementView(routeId: number) {
+    const response = await fetch(`${API_URL}/routes/${routeId}/view`, {
+      method: 'POST',
+    })
+    if (!response.ok) {
+      throw new Error('Failed to increment view')
+    }
+    return response.json()
+  },
+
+  async reportRoute(token: string, routeId: number, reason: string) {
+    const response = await fetch(`${API_URL}/routes/${routeId}/report`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ reason }),
+    })
+    if (!response.ok) {
+      throw new Error('Failed to report route')
     }
     return response.json()
   },

@@ -95,6 +95,10 @@ When adding features, verify manually:
 - [ ] User authentication (register, login, logout)
 - [ ] Route saving and sharing
 - [ ] Badge awards
+- [ ] Public Gallery (browse, scroll, sort)
+- [ ] Save to Gallery (thumbnail generation for constellation/retro)
+- [ ] Like/Unlike routes
+- [ ] Public user profiles
 
 ## Linting Commands
 

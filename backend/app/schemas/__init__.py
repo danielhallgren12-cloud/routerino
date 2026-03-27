@@ -46,7 +46,7 @@ class UserResponse(BaseModel):
     username: str
     email: str
     created_at: datetime
-    
+
     class Config:
         from_attributes = True
 
@@ -54,12 +54,59 @@ class UserResponse(BaseModel):
 class SavedRouteCreate(BaseModel):
     destination: str
     hops_data: str  # JSON string
+    is_public: bool = False
+    art_thumbnail: Optional[str] = None
 
 class SavedRouteResponse(BaseModel):
     id: int
     destination: str
     share_id: Optional[str] = None
     created_at: datetime
-    
+    is_public: bool = False
+    like_count: int = 0
+    view_count: int = 0
+    art_thumbnail: Optional[str] = None
+    user_id: Optional[int] = None
+    username: Optional[str] = None
+
     class Config:
         from_attributes = True
+
+class SavedRouteWithUser(SavedRouteResponse):
+    username: str
+    user_id: int
+
+class GalleryRoute(BaseModel):
+    id: int
+    destination: str
+    created_at: datetime
+    like_count: int
+    view_count: int
+    username: str
+    user_id: int
+    art_thumbnail: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+class PublicProfile(BaseModel):
+    username: str
+    created_at: datetime
+    total_routes: int
+    total_traces: int
+    total_hops: int
+    collection_items: int
+    badges_count: int
+    public_routes: List[SavedRouteResponse]
+
+class LikeResponse(BaseModel):
+    success: bool
+    like_count: int
+    liked: bool
+
+class ReportCreate(BaseModel):
+    reason: str
+
+class ReportResponse(BaseModel):
+    success: bool
+    message: str

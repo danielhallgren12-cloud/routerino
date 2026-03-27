@@ -230,16 +230,19 @@ Colors cycle for routes with many hops.
 6. Preview updates in real-time
 7. User clicks "Download Art"
 8. High-quality PNG downloads
+9. User clicks "Save to Gallery"
+10. Square 600x600 thumbnail is captured and saved to public gallery
 
 ---
 
 ## Success Metrics
 
-- [ ] Downloads work for all 3 styles
-- [ ] All layouts produce correctly sized images
-- [ ] Custom titles appear in export
-- [ ] Stats toggle works correctly
-- [ ] Export quality is print-worthy (300 DPI equivalent)
+- [x] Downloads work for all 6 styles
+- [x] All layouts produce correctly sized images
+- [x] Custom titles appear in export
+- [x] Stats toggle works correctly
+- [x] Export quality is print-worthy (300 DPI equivalent)
+- [x] Save to Gallery produces square 600x600 thumbnails
 - [ ] Works on mobile (responsive)
 
 ---
@@ -253,9 +256,12 @@ All art customization features have been implemented:
 - [x] Custom name ("Created by")
 - [x] Social sharing (Twitter, Facebook, LinkedIn, Reddit, Instagram)
 
-### Phase 3 - Social
-- [ ] Print-on-demand integration
-- [ ] Custom branding options
+### Phase 3 - Social ✅ COMPLETE
+- [x] Public Gallery with infinite scroll and sorting
+- [x] Like/Unlike routes with heart button
+- [x] Public user profiles with stats and routes
+- [x] Gallery button with shimmer effect in header
+- [x] Square 600x600 thumbnail generation for gallery
 
 ### Phase 4 - Expansion
 - [ ] Print-on-demand integration
@@ -265,9 +271,28 @@ All art customization features have been implemented:
 
 ## Technical Debt / Known Issues
 
+- [x] Constellation stars render incorrectly in gallery thumbnail (html2canvas off-screen positioning)
+  - **Fix:** Stars are hidden when `galleryMode=true` for thumbnail capture
+  - **Affected:** Constellation style (stars), Retro style (sun rays)
+  - **Not affected:** Planets (fixed pixel positions), hop path, frames
 - [ ] html2canvas can be buggy with advanced CSS (gradients, shadows)
 - [ ] Glow effects may not render perfectly in export
 - [ ] Large layout exports may be slow or memory-intensive
+
+---
+
+## Gallery Thumbnail Capture
+
+When saving to gallery, a 600x600 square thumbnail is generated using html2canvas with a hidden off-screen element. Due to html2canvas coordinate calculation issues with percentage-based positioning, decorative elements using `transform: translate(-50%, -50%)` are hidden for gallery captures:
+
+| Element | Constellation | Retro | Notes |
+|---------|--------------|-------|-------|
+| Stars (80 random dots) | Hidden | N/A | Uses % positioning |
+| Sun rays (16 curved) | N/A | Hidden | Uses % positioning |
+| Planets (2 fixed) | ✅ Visible | N/A | Fixed pixel offsets |
+| Paper texture | N/A | ✅ Visible | Full coverage overlay |
+| Hop path SVG | ✅ Visible | ✅ Visible | viewBox coordinates |
+| Frame borders | ✅ Visible | ✅ Visible | Fixed positioning |
 
 ---
 

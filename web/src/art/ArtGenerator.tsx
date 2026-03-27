@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import html2canvas from 'html2canvas'
+import { useAuth } from '../auth/AuthContext'
+import { routesApi } from '../auth/api'
 
 type ArtStyle = 'geometric' | 'neon' | 'constellation' | 'flow' | 'minimal' | 'retro'
 type Layout = 'portrait' | 'square' | 'large'
@@ -120,9 +122,11 @@ const InstagramIcon = () => (
 )
 
 export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
+  const { token } = useAuth()
   const artRef = useRef<HTMLDivElement>(null)
+  const hiddenRenderRef = useRef<HTMLDivElement>(null)
   const [style, setStyle] = useState<ArtStyle>('neon')
-  const [layout, setLayout] = useState<Layout>('portrait')
+  const [layout, setLayout] = useState<Layout>('square')
   const [customTitle, setCustomTitle] = useState('')
   const [includeStats, setIncludeStats] = useState(true)
   const [colorTheme, setColorTheme] = useState<ColorTheme>('default')
@@ -131,6 +135,8 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
   const [includeName, setIncludeName] = useState(false)
   const [exporting, setExporting] = useState(false)
   const [sharing, setSharing] = useState(false)
+  const [saveMessage, setSaveMessage] = useState('')
+  const [forGallery, setForGallery] = useState(false)
 
   useEffect(() => {
     const savedColorTheme = localStorage.getItem('routecanvas_colorTheme') as ColorTheme
@@ -262,6 +268,52 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
     }
   }
 
+  const handleSaveToGallery = async () => {
+    if (!traceData || !token) {
+      setSaveMessage('Please login to save to gallery')
+      return
+    }
+
+    if (!hiddenRenderRef.current) {
+      setSaveMessage('Art not ready')
+      return
+    }
+
+    try {
+      setForGallery(true)
+      await new Promise(resolve => setTimeout(resolve, 200))
+
+      let thumbnailDataUrl = ''
+      try {
+        const captureElement = hiddenRenderRef.current
+        if (!captureElement) throw new Error('Hidden render element not found')
+
+        const fullCanvas = await html2canvas(captureElement, {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: backgroundPalettes[backgroundColor],
+          logging: false
+        })
+
+        console.log('Canvas size:', fullCanvas.width, fullCanvas.height)
+        thumbnailDataUrl = fullCanvas.toDataURL('image/png', 0.9)
+        console.log('Thumbnail length:', thumbnailDataUrl.length)
+      } catch (canvasErr) {
+        console.error('Canvas capture error:', canvasErr)
+      } finally {
+        setForGallery(false)
+      }
+
+      const hopsData = JSON.stringify(traceData.hops)
+      await routesApi.shareRoute(token, traceData.destination, hopsData, true, thumbnailDataUrl || undefined)
+      setSaveMessage(thumbnailDataUrl ? '✓ Saved to gallery!' : '✓ Saved to gallery! (no preview)')
+      setTimeout(() => setSaveMessage(''), 3000)
+    } catch (err) {
+      console.error('Failed to save to gallery:', err)
+      setSaveMessage('Failed to save')
+    }
+  }
+
   const dims = layout === 'portrait' ? { w: 500, h: 667 } : layout === 'square' ? { w: 600, h: 600 } : { w: 800, h: 1067 }
 
   const stats = {
@@ -281,9 +333,13 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
   const getNeonColor = (i: number) => neonColors[i % neonColors.length]
   const getRetroColor = (i: number) => retroColors[i % retroColors.length]
 
-  const renderContent = () => {
+  const renderContent = (galleryMode = false) => {
     const hops = validHops.slice(0, 12)
-    
+
+    // Force square dimensions for gallery thumbnail
+    const effectiveDims = galleryMode ? { w: 600, h: 600 } : dims
+    const isSquare = effectiveDims.w === effectiveDims.h
+
     // ==================== GEOMETRIC ====================
     if (style === 'geometric') {
       return (
@@ -439,12 +495,14 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
           {/* Softer glowing frame */}
           <div style={{ position: 'absolute', top: 10, left: 10, right: 10, bottom: 10, border: '1px solid rgba(100,100,255,0.4)', borderRadius: 4, boxShadow: '0 0 40px rgba(100,100,255,0.2)', pointerEvents: 'none' }} />
           
-          {/* Stars with varying opacity */}
-          <svg width={420} height={280} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
-            {Array.from({ length: 80 }, (_, i) => (
-              <circle key={i} cx={Math.random() * 400 + 10} cy={Math.random() * 260 + 10} r={Math.random() * 1.5 + 0.5} fill="#fff" opacity={Math.random() * 0.6 + 0.2} />
-            ))}
-          </svg>
+          {/* Stars with varying opacity - hidden for gallery thumbnail */}
+          {!galleryMode && (
+            <svg width={420} height={280} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
+              {Array.from({ length: 80 }, (_, i) => (
+                <circle key={i} cx={Math.random() * 400 + 10} cy={Math.random() * 260 + 10} r={Math.random() * 1.5 + 0.5} fill="#fff" opacity={Math.random() * 0.6 + 0.2} />
+              ))}
+            </svg>
+          )}
           
           {/* Planets with soft glow */}
           <div style={{ position: 'absolute', top: 25, right: 40, width: 24, height: 24, borderRadius: '50%', background: 'linear-gradient(135deg, #FF6B9d, #B04AFF)', boxShadow: '0 0 30px rgba(176,74,255,0.6)', filter: 'blur(1px)' }} />
@@ -678,17 +736,19 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
           <div style={{ position: 'absolute', top: 8, left: 8, right: 8, bottom: 8, border: '6px solid #8B4513', borderRadius: 8, pointerEvents: 'none' }} />
           <div style={{ position: 'absolute', top: 14, left: 14, right: 14, bottom: 14, border: '2px solid #D4A500', borderRadius: 4, pointerEvents: 'none' }} />
           
-          {/* Curved sun rays */}
-          <svg width={420} height={280} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
-            {Array.from({ length: 16 }, (_, i) => {
-              const angle = (i * 22.5) * Math.PI / 180
-              const x1 = 210 + Math.cos(angle) * 80
-              const y1 = 140 + Math.sin(angle) * 80
-              const x2 = 210 + Math.cos(angle) * 110
-              const y2 = 140 + Math.sin(angle) * 110
-              return <path key={i} d={`M ${x1},${y1} Q ${210 + Math.cos(angle) * 95},${140 + Math.sin(angle) * 95} ${x2},${y2}`} fill="none" stroke="#D4A500" strokeWidth={2} opacity={0.25} />
-            })}
-          </svg>
+          {/* Curved sun rays - hidden for gallery thumbnail */}
+          {!galleryMode && (
+            <svg width={420} height={280} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
+              {Array.from({ length: 16 }, (_, i) => {
+                const angle = (i * 22.5) * Math.PI / 180
+                const x1 = 210 + Math.cos(angle) * 80
+                const y1 = 140 + Math.sin(angle) * 80
+                const x2 = 210 + Math.cos(angle) * 110
+                const y2 = 140 + Math.sin(angle) * 110
+                return <path key={i} d={`M ${x1},${y1} Q ${210 + Math.cos(angle) * 95},${140 + Math.sin(angle) * 95} ${x2},${y2}`} fill="none" stroke="#D4A500" strokeWidth={2} opacity={0.25} />
+              })}
+            </svg>
+          )}
           
           {/* Paper texture */}
           <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.015) 2px, rgba(0,0,0,0.015) 4px)', pointerEvents: 'none' }} />
@@ -832,8 +892,8 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
       
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}>
         <select value={layout} onChange={(e) => setLayout(e.target.value as Layout)} style={{ padding: '12px 16px', borderRadius: 10, border: '1px solid #444', background: '#1a1a1a', color: '#fff', fontFamily: 'Space Mono, monospace', fontSize: 12 }}>
-          <option value="portrait">Portrait (5×7)</option>
           <option value="square">Square (6×6)</option>
+          <option value="portrait">Portrait (5×7)</option>
           <option value="large">Large (8×10)</option>
         </select>
         <input type="text" value={customTitle} onChange={(e) => setCustomTitle(e.target.value)} placeholder="Custom title" style={{ padding: '12px 16px', borderRadius: 10, border: '1px solid #444', background: '#0a0a0a', color: '#fff', fontFamily: 'Space Mono, monospace', fontSize: 12, width: 160 }} />
@@ -848,13 +908,24 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
         </label>
       </div>
       
-      <div ref={artRef} style={{ width: dims.w, height: dims.h, maxWidth: '100%', maxHeight: '60vh', boxShadow: '0 20px 60px rgba(0,0,0,0.5)', borderRadius: 4, overflow: 'auto' }}>
+      <div ref={artRef} style={{ width: dims.w, height: dims.h, maxWidth: '100%', maxHeight: '70vh', aspectRatio: layout === 'portrait' ? '5/7' : layout === 'square' ? '1/1' : '8/10', boxShadow: '0 20px 60px rgba(0,0,0,0.5)', borderRadius: 4, overflow: 'hidden' }}>
         {renderContent()}
       </div>
       
-      <button onClick={handleExport} disabled={exporting || !traceData} style={{ padding: '14px 40px', fontSize: 14, fontWeight: 700, border: 'none', borderRadius: 12, background: 'linear-gradient(135deg, #00F0FF, #FF2D92)', color: '#fff', cursor: exporting ? 'wait' : 'pointer', opacity: exporting ? 0.6 : 1, fontFamily: 'Syne, sans-serif', letterSpacing: 2, textTransform: 'uppercase' }}>
-        {exporting ? 'Generating...' : 'Download Art'}
-      </button>
+      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
+        <button onClick={handleExport} disabled={exporting || !traceData} style={{ padding: '14px 40px', fontSize: 14, fontWeight: 700, border: 'none', borderRadius: 12, background: 'linear-gradient(135deg, #00F0FF, #FF2D92)', color: '#fff', cursor: exporting ? 'wait' : 'pointer', opacity: exporting ? 0.6 : 1, fontFamily: 'Syne, sans-serif', letterSpacing: 2, textTransform: 'uppercase' }}>
+          {exporting ? 'Generating...' : 'Download Art'}
+        </button>
+        <button onClick={handleSaveToGallery} disabled={!traceData} style={{ padding: '14px 40px', fontSize: 14, fontWeight: 700, border: '2px solid #00F0FF', borderRadius: 12, background: 'transparent', color: '#00F0FF', cursor: !traceData ? 'not-allowed' : 'pointer', opacity: !traceData ? 0.5 : 1, fontFamily: 'Syne, sans-serif', letterSpacing: 2, textTransform: 'uppercase' }}>
+          🖼️ Save to Gallery
+        </button>
+      </div>
+
+      {saveMessage && (
+        <div style={{ marginTop: 12, color: saveMessage.includes('✓') ? '#00FFA3' : '#ff4444', fontSize: 13, fontWeight: 600 }}>
+          {saveMessage}
+        </div>
+      )}
 
       <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
         <span style={{ color: '#666', fontSize: 12, fontFamily: 'Space Mono, monospace' }}>SHARE:</span>
@@ -873,6 +944,23 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
         <button onClick={() => handleShare('instagram')} disabled={sharing || !traceData} title="Share on Instagram" style={{ padding: '10px 14px', border: '1px solid #333', background: '#0a0a0a', color: '#fff', borderRadius: 8, cursor: sharing ? 'wait' : 'pointer', opacity: sharing ? 0.6 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <InstagramIcon />
         </button>
+      </div>
+
+      {/* Hidden div for thumbnail capture - always renders square for gallery */}
+      <div
+        ref={hiddenRenderRef}
+        style={{
+          position: 'absolute',
+          left: '-9999px',
+          top: '-9999px',
+          width: '600px',
+          height: '600px',
+          overflow: 'hidden'
+        }}
+      >
+        <div style={{ width: '600px', height: '600px' }}>
+          {renderContent(true)}
+        </div>
       </div>
     </div>
   )

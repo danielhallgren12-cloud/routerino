@@ -88,26 +88,26 @@ This roadmap outlines the development phases for RouteCanvas, from initial demo 
 
 ---
 
-## Phase 3: Social (Weeks 7-9)
+## Phase 3: Social (Weeks 7-9) ✅ COMPLETED
 
 **Goal:** Community features
 
-### Week 7: Public Gallery
+### Week 7: Public Gallery ✅
 
-- [ ] Create public gallery page
-- [ ] Add route publishing
-- [ ] Implement trending/popular sorting
-- [ ] Add pagination/infinite scroll
+- [x] Create public gallery page
+- [x] Add route publishing (Save to Gallery with square thumbnail)
+- [x] Implement trending/popular sorting
+- [x] Add pagination/infinite scroll
 
 **Deliverables:**
 - Browse public routes
 
-### Week 8: Social Features
+### Week 8: Social Features ✅
 
-- [ ] Like routes
-- [ ] Save favorites
+- [x] Like routes (heart button with like/unlike)
+- [x] Save favorites (liked routes stored per user)
 - [x] Share to social media (Twitter, Facebook, LinkedIn, Reddit, Instagram)
-- [ ] User profiles with stats
+- [x] User profiles with stats (public profile modal)
 
 **Deliverables:**
 - Full social features

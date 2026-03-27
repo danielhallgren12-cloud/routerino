@@ -5,11 +5,12 @@ import 'leaflet/dist/leaflet.css'
 import html2canvas from 'html2canvas'
 import { AuthProvider, useAuth } from './auth/AuthContext'
 import { LoginForm, RegisterForm } from './auth/forms'
-import { routesApi } from './auth/api'
+import { routesApi, galleryApi } from './auth/api'
 import { ArtGenerator } from './art/ArtGenerator'
 import Inventory from './components/Inventory'
 import BadgeCase from './components/BadgeCase'
 import FingerprintModal from './components/FingerprintModal'
+import Gallery from './pages/Gallery'
 
 interface Hop {
   hop: number
@@ -92,6 +93,7 @@ function App() {
   const [showInventory, setShowInventory] = useState(false)
   const [showBadgeCase, setShowBadgeCase] = useState(false)
   const [showFingerprintModal, setShowFingerprintModal] = useState(false)
+  const [showGallery, setShowGallery] = useState(false)
   const [newBadges, setNewBadges] = useState<{id: string, name: string, icon: string}[]>([])
   const [inventoryCategory, setInventoryCategory] = useState<string | null>(null)
   const [userCollection, setUserCollection] = useState<{
@@ -375,6 +377,9 @@ function App() {
             <span className="ip-label ipv4-label">IPv4</span>
             <span className="ip-label ipv6-label" style={{ paddingLeft: '6px' }}>IPv6</span>
             <span className="toggle-slider"></span>
+          </button>
+          <button onClick={() => setShowGallery(true)} className="gallery-btn">
+            🖼️ Gallery
           </button>
           {isAuthenticated ? (
             <>
@@ -759,6 +764,15 @@ function App() {
         <div className="modal-overlay" onClick={() => setShowBadgeCase(false)}>
           <div className="modal badgecase-wrapper" onClick={e => e.stopPropagation()}>
             <BadgeCase token={token} onClose={() => setShowBadgeCase(false)} />
+          </div>
+        </div>
+      )}
+
+      {showGallery && (
+        <div className="modal-overlay" onClick={() => setShowGallery(false)}>
+          <div className="modal gallery-wrapper" onClick={e => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => setShowGallery(false)}>×</button>
+            <Gallery onClose={() => setShowGallery(false)} />
           </div>
         </div>
       )}
