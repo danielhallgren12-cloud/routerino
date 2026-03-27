@@ -26,7 +26,7 @@ class User(Base):
     last_trace_date = Column(String, nullable=True)  # For streak tracking (YYYY-MM-DD)
     current_streak = Column(Integer, default=0)
     last_visit = Column(String, nullable=True)  # Last visit timestamp (ISO format)
-    new_items = Column(Text, default='[]')  # Items discovered since last visit
+    new_items = Column(Text, default='{}')  # Items discovered since last visit (dict of lists)
     item_discovery_counts = Column(Text, default='{}')  # Track how many times each item was seen
 
     routes = relationship("SavedRoute", back_populates="user", cascade="all, delete-orphan")

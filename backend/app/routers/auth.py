@@ -181,7 +181,10 @@ def collect_route(collect: CollectRequest, current_user: User = Depends(get_curr
     current_user.unique_fingerprints = json.dumps(append_unique(current_fingerprints, {collect.fingerprint_id}))
 
     # Accumulate new items
-    current_new_items = json.loads(current_user.new_items or '{}')
+    new_items_raw = current_user.new_items or '{}'
+    if new_items_raw == '[]':  # Handle legacy data
+        new_items_raw = '{}'
+    current_new_items = json.loads(new_items_raw)
     for key in new_items:
         if new_items[key]:
             if key not in current_new_items:
