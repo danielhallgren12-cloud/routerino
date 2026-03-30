@@ -11,6 +11,7 @@ import Inventory from './components/Inventory'
 import BadgeCase from './components/BadgeCase'
 import FingerprintModal from './components/FingerprintModal'
 import Gallery from './pages/Gallery'
+import RouteAtlas from './pages/RouteAtlas'
 
 interface Hop {
   hop: number
@@ -94,6 +95,7 @@ function App() {
   const [showBadgeCase, setShowBadgeCase] = useState(false)
   const [showFingerprintModal, setShowFingerprintModal] = useState(false)
   const [showGallery, setShowGallery] = useState(false)
+  const [showRouteAtlas, setShowRouteAtlas] = useState(false)
   const [newBadges, setNewBadges] = useState<{id: string, name: string, icon: string}[]>([])
   const [firstDiscoveries, setFirstDiscoveries] = useState<string[]>([])
   const [inventoryCategory, setInventoryCategory] = useState<string | null>(null)
@@ -384,6 +386,9 @@ if (token && data.fingerprint_id) {
           </button>
           <button onClick={() => setShowGallery(true)} className="gallery-btn">
             🖼️ Gallery
+          </button>
+          <button onClick={() => setShowRouteAtlas(true)} className="gallery-btn">
+            🗺️ Route Atlas
           </button>
           {isAuthenticated ? (
             <>
@@ -777,6 +782,15 @@ if (token && data.fingerprint_id) {
           <div className="modal gallery-wrapper" onClick={e => e.stopPropagation()}>
             <button className="modal-close" onClick={() => setShowGallery(false)}>×</button>
             <Gallery onClose={() => setShowGallery(false)} />
+          </div>
+        </div>
+      )}
+
+      {showRouteAtlas && (
+        <div className="modal-overlay" onClick={() => setShowRouteAtlas(false)}>
+          <div className="modal route-atlas-wrapper" onClick={e => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => setShowRouteAtlas(false)}>×</button>
+            <RouteAtlas />
           </div>
         </div>
       )}

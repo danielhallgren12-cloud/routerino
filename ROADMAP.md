@@ -53,9 +53,19 @@ This roadmap outlines the development phases for RouteCanvas, from initial demo 
 
 ---
 
-## Phase 4: Expansion (Planned)
+## Phase 4: Expansion (In Progress)
 
-### Week 9: Mobile App
+### Week 9: Route Atlas ✅
+
+- [x] Route Atlas feature - compare routes to same destination over time
+- [x] Visual map with multi-line overlay (bright colors on dark background)
+- [x] Parallel "bus lane" rendering for shared segments
+- [x] Path Breakdown section with bar charts
+- [x] Hop Details (Head-to-Head) with shared/unique hops
+- [x] Numbered hop badges (cyan for shared, path-colored for unique)
+- [x] Stats row (routes, variations, first/latest trace dates)
+
+### Week 9-10: Mobile App
 
 - [ ] Set up React Native + Expo project
 - [ ] Implement core features

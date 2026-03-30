@@ -109,6 +109,7 @@
 | PATCH | `/routes/{route_id}/visibility` | Update route visibility (public/private) | ✅ |
 | POST | `/routes/{route_id}/view` | Increment view count | ✅ |
 | POST | `/routes/{route_id}/report` | Report a route | ✅ |
+| GET | `/routes/by-destination` | Get all routes grouped by destination for Route Atlas | ✅ |
 
 #### Request/Response Examples
 

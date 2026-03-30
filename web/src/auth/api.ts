@@ -170,6 +170,18 @@ export const routesApi = {
     return response.json()
   },
 
+  async getRoutesByDestination(token: string) {
+    const response = await fetch(`${API_URL}/routes/by-destination`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    })
+    if (!response.ok) {
+      throw new Error('Failed to get routes by destination')
+    }
+    return response.json()
+  },
+
   async clearNewItems(token: string) {
     const response = await fetch(`${API_URL}/me/collection/clear-new`, {
       method: 'POST',

@@ -440,6 +440,35 @@ def get_routes(current_user: User = Depends(get_current_user), db: Session = Dep
     routes = db.query(SavedRoute).filter(SavedRoute.user_id == current_user.id).order_by(SavedRoute.created_at.desc()).all()
     return routes
 
+@router.get("/routes/by-destination")
+def get_routes_by_destination(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Get all routes grouped by destination for Route Atlas feature"""
+    routes = db.query(SavedRoute).filter(
+        SavedRoute.user_id == current_user.id
+    ).order_by(SavedRoute.created_at.desc()).all()
+    
+    # Group by destination
+    destinations: dict = {}
+    for route in routes:
+        dest = route.destination
+        if dest not in destinations:
+            destinations[dest] = []
+        destinations[dest].append({
+            "id": route.id,
+            "destination": route.destination,
+            "hops_data": json.loads(route.hops_data),
+            "created_at": route.created_at.isoformat() if route.created_at else None,
+        })
+    
+    # Filter to only destinations with 2+ routes
+    result = {
+        dest: routes_list 
+        for dest, routes_list in destinations.items() 
+        if len(routes_list) >= 2
+    }
+    
+    return {"destinations": result, "total_destinations": len(result)}
+
 @router.post("/routes", response_model=SavedRouteResponse)
 def save_route(route: SavedRouteCreate, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     db_route = SavedRoute(

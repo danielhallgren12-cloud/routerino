@@ -79,18 +79,42 @@
 | First Discoveries | ✅ Complete (world first tracking, "1 in X users" stats, FIRST badges on unique items, 5 first discovery badges) |
 | Route Uniqueness | ✅ Complete ("1 in X users have this route" displayed in fingerprints inventory) |
 
-### Phase 4 - Expansion (Planned)
+### Phase 4 - Expansion (In Progress)
 
 | Feature | Description |
 |---------|-------------|
 | Print-on-Demand | Order posters, T-shirts, canvases with route art |
 | Advanced Rarity | Global rarity (how many users have it), personal rarity stats |
 | Gamification | Badges, country counters, route uniqueness scores |
-| Compare Routes | Overlay routes from different times/locations |
+| Route Atlas | ✅ Complete - Compare routes to same destination over time with visual map overlay and hop-by-hop breakdown |
 
 ---
 
-## 6. The Route Art Vision
+## 7. Route Atlas Feature
+
+### Overview
+Route Atlas allows users to explore how their internet routing paths vary over time when tracing to the same destination multiple times. It provides a visual comparison of route variations and detailed hop-by-hop analysis.
+
+### Features
+- **Visual Map Overlay**: Multiple route paths displayed simultaneously with distinct bright colors
+- **Parallel "Bus Lane" Rendering**: Routes sharing the same hop-to-hop segment are drawn side-by-side for clarity
+- **Stats Dashboard**: Quick view of total routes, variations, first/latest trace dates
+- **Path Breakdown**: Bar charts showing ASN chain distribution with percentages
+- **Hop Details (Head-to-Head)**: 
+  - Shared hops (appearing in all routes) highlighted with cyan badge
+  - Unique hops per route variation with path-colored badges
+  - Hop number badges for easy reference (e.g., ① ② ③)
+  - Full hop info: IP address, city, country, ISP, ASN
+
+### Technical Implementation
+- **Backend Endpoint**: `GET /routes/by-destination` - Returns all user routes grouped by destination
+- **Frontend Component**: `RouteAtlas.tsx` - Full-page modal with react-leaflet map
+- **Shared Hop Detection**: Uses exact lat/lng coordinates (not IP/ASN) for accurate geographic matching
+- **Parallel Lane Algorithm**: Routes sharing exact hop segments get perpendicular offsets for visual separation
+
+---
+
+## 8. The Route Art Vision
 
 ### Why Route Art Creates Emotional Connection
 
