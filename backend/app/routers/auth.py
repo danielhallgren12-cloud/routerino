@@ -458,6 +458,7 @@ def get_routes_by_destination(current_user: User = Depends(get_current_user), db
             "destination": route.destination,
             "hops_data": json.loads(route.hops_data),
             "created_at": route.created_at.isoformat() if route.created_at else None,
+            "fingerprint_id": route.fingerprint_id,
         })
     
     # Filter to only destinations with 2+ routes
@@ -471,12 +472,26 @@ def get_routes_by_destination(current_user: User = Depends(get_current_user), db
 
 @router.post("/routes", response_model=SavedRouteResponse)
 def save_route(route: SavedRouteCreate, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    # Check for duplicate fingerprint in saved routes
+    if route.fingerprint_id:
+        fp_id = route.fingerprint_id if route.fingerprint_id.startswith('#') else f"#{route.fingerprint_id}"
+        existing = db.query(SavedRoute).filter(
+            SavedRoute.user_id == current_user.id,
+            SavedRoute.fingerprint_id == fp_id
+        ).first()
+        if existing:
+            raise HTTPException(
+                status_code=400,
+                detail=f"This route pattern ({fp_id}) is already saved"
+            )
+
     db_route = SavedRoute(
         user_id=current_user.id,
         destination=route.destination,
         hops_data=route.hops_data,
         is_public=route.is_public,
-        art_thumbnail=route.art_thumbnail
+        art_thumbnail=route.art_thumbnail,
+        fingerprint_id=route.fingerprint_id
     )
     db.add(db_route)
     db.commit()
@@ -506,7 +521,19 @@ def generate_share_id(length: int = 8) -> str:
 
 @router.post("/routes/share", response_model=SavedRouteResponse)
 def share_route(route: SavedRouteCreate, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    """Save route and generate a public shareable link"""
+    # Check for duplicate fingerprint in saved routes
+    if route.fingerprint_id:
+        fp_id = route.fingerprint_id if route.fingerprint_id.startswith('#') else f"#{route.fingerprint_id}"
+        existing = db.query(SavedRoute).filter(
+            SavedRoute.user_id == current_user.id,
+            SavedRoute.fingerprint_id == fp_id
+        ).first()
+        if existing:
+            raise HTTPException(
+                status_code=400,
+                detail=f"This route pattern ({fp_id}) is already saved"
+            )
+
     # Generate unique share_id
     share_id = generate_share_id()
     while db.query(SavedRoute).filter(SavedRoute.share_id == share_id).first():
@@ -518,7 +545,8 @@ def share_route(route: SavedRouteCreate, current_user: User = Depends(get_curren
         hops_data=route.hops_data,
         share_id=share_id,
         is_public=route.is_public,
-        art_thumbnail=route.art_thumbnail
+        art_thumbnail=route.art_thumbnail,
+        fingerprint_id=route.fingerprint_id
     )
     db.add(db_route)
     db.commit()

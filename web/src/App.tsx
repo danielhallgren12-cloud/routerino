@@ -196,22 +196,28 @@ if (token && data.fingerprint_id) {
     if (!traceData || !token) return
     try {
       const hopsData = JSON.stringify(traceData.hops)
-      await routesApi.saveRoute(token, traceData.destination, hopsData)
+      await routesApi.saveRoute(token, traceData.destination, hopsData, false, undefined, traceData.fingerprint_id)
       setSaveMessage('Route saved!')
       setTimeout(() => setSaveMessage(''), 3000)
-    } catch (err) { setError('Failed to save route') }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to save route'
+      setError(message.includes('already saved') ? message : 'Failed to save route')
+    }
   }
 
   const shareRoute = async () => {
     if (!traceData || !token) return
     try {
       const hopsData = JSON.stringify(traceData.hops)
-      const result = await routesApi.shareRoute(token, traceData.destination, hopsData)
+      const result = await routesApi.shareRoute(token, traceData.destination, hopsData, false, undefined, traceData.fingerprint_id)
       const shareUrl = `${window.location.origin}/share/${result.share_id}`
       await navigator.clipboard.writeText(shareUrl)
       setShareMessage('Link copied!')
       setTimeout(() => setShareMessage(''), 3000)
-    } catch (err) { setError('Failed to share route') }
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to share route'
+      setError(message.includes('already saved') ? message : 'Failed to share route')
+    }
   }
 
   const loadSavedRoutes = async () => {

@@ -56,6 +56,7 @@ class SavedRouteCreate(BaseModel):
     hops_data: str  # JSON string
     is_public: bool = False
     art_thumbnail: Optional[str] = None
+    fingerprint_id: Optional[str] = None
 
 class SavedRouteResponse(BaseModel):
     id: int
@@ -68,6 +69,7 @@ class SavedRouteResponse(BaseModel):
     art_thumbnail: Optional[str] = None
     user_id: Optional[int] = None
     username: Optional[str] = None
+    fingerprint_id: Optional[str] = None
 
     class Config:
         from_attributes = True

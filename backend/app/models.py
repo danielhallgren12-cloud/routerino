@@ -53,6 +53,7 @@ class SavedRoute(Base):
     hops_data = Column(Text, nullable=False)  # JSON string of hops
     share_id = Column(String, unique=True, index=True, nullable=True)  # Public share ID
     created_at = Column(DateTime, default=datetime.utcnow)
+    fingerprint_id = Column(String, nullable=True)  # Route fingerprint for duplicate detection
 
     # Gallery fields
     is_public = Column(Boolean, default=False)

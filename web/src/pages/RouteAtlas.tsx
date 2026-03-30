@@ -23,6 +23,7 @@ interface RouteData {
   destination: string
   hops_data: Hop[]
   created_at: string
+  fingerprint_id?: string
 }
 
 interface DestinationRoutes {
@@ -97,10 +98,11 @@ function buildSegmentMap(routes: RouteData[]): Map<string, SegmentInfo> {
   return segmentMap
 }
 
-function MapContent({ selectedDestination, destinations, pathInfos }: {
+function MapContent({ selectedDestination, destinations, pathInfos, selectedRouteIndices }: {
   selectedDestination: string | null
   destinations: DestinationRoutes
   pathInfos: PathInfo[]
+  selectedRouteIndices: Set<number>
 }) {
   const map = useMap()
 
@@ -112,8 +114,17 @@ function MapContent({ selectedDestination, destinations, pathInfos }: {
       map.removeLayer(layer)
     })
 
-    const routes = destinations[selectedDestination]
-    if (!routes || routes.length < 2) return
+    const allRoutes = destinations[selectedDestination]
+    if (!allRoutes || allRoutes.length < 2) return
+
+    const routes = allRoutes.filter((_, idx) => selectedRouteIndices.has(idx))
+    if (routes.length < 1) return
+
+    const routeIndexMap = new Map<number, number>()
+    routes.forEach((route, localIdx) => {
+      const globalIdx = allRoutes.indexOf(route)
+      routeIndexMap.set(globalIdx, localIdx)
+    })
 
     const segmentMap = buildSegmentMap(routes)
 
@@ -122,7 +133,9 @@ function MapContent({ selectedDestination, destinations, pathInfos }: {
       if (routeIndices.length === 0) return
 
       routeIndices.forEach((routeIdx) => {
-        const route = routes[routeIdx]
+        const localIdx = routeIndexMap.get(routeIdx)
+        if (localIdx === undefined) return
+        const route = routes[localIdx]
         const hops = route.hops_data.filter(h => h.lat && h.lng)
         if (hops.length < 2) return
 
@@ -140,7 +153,7 @@ function MapContent({ selectedDestination, destinations, pathInfos }: {
               const key = `${fromIp}|${toIp}`
               const segInfo = segmentMap.get(key)
               if (segInfo && segInfo.routesSharing.length > 1) {
-                const laneIdx = segInfo.routesSharing.indexOf(routeIdx)
+                const laneIdx = segInfo.routesSharing.indexOf(localIdx)
                 const totalLanes = segInfo.routesSharing.length
                 const centerLane = (totalLanes - 1) / 2
                 const normalizedLane = laneIdx - centerLane
@@ -215,9 +228,15 @@ function MapContent({ selectedDestination, destinations, pathInfos }: {
     if (allCoords.length > 0) {
       map.fitBounds(allCoords, { padding: [50, 50] })
     }
-  }, [selectedDestination, destinations, pathInfos, map])
+  }, [selectedDestination, destinations, pathInfos, selectedRouteIndices, map])
 
   return null
+}
+
+interface PathGroup {
+  label: string
+  routeIndices: number[]
+  count: number
 }
 
 export default function RouteAtlas() {
@@ -227,6 +246,12 @@ export default function RouteAtlas() {
   const [selectedDestination, setSelectedDestination] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [pathInfos, setPathInfos] = useState<PathInfo[]>([])
+  const [showRoutePicker, setShowRoutePicker] = useState(false)
+  const [pendingDestination, setPendingDestination] = useState<string | null>(null)
+  const [selectedRouteIndices, setSelectedRouteIndices] = useState<Set<number>>(new Set())
+  const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set())
+
+  const MAX_ROUTES = 8
 
   useEffect(() => {
     if (token) {
@@ -247,17 +272,9 @@ export default function RouteAtlas() {
     }
   }
 
-  const selectDestination = (destination: string) => {
-    setSelectedDestination(destination)
-    calculatePaths(destination)
-  }
-
-  const calculatePaths = (destination: string) => {
+  const getPathGroups = (destination: string): PathGroup[] => {
     const routes = destinations[destination]
-    if (!routes || routes.length < 2) {
-      setPathInfos([])
-      return
-    }
+    if (!routes) return []
 
     const asnChainCounts: Record<string, { count: number; routeIndices: number[] }> = {}
 
@@ -276,9 +293,121 @@ export default function RouteAtlas() {
     const sortedChains = Object.entries(asnChainCounts)
       .sort((a, b) => b[1].count - a[1].count)
 
+    return sortedChains.map(([asnChain, info]) => ({
+      label: destination,
+      routeIndices: info.routeIndices,
+      count: info.count
+    }))
+  }
+
+  const getTopRouteIndices = (destination: string, count: number = 3): number[] => {
+    const routes = destinations[destination]
+    if (!routes) return []
+
+    const asnChainCounts: Record<string, { count: number; routeIndices: number[] }> = {}
+
+    routes.forEach((route, idx) => {
+      const asns = route.hops_data
+        .filter(h => h.asn)
+        .map(h => h.asn)
+        .join(' → ')
+      if (!asnChainCounts[asns]) {
+        asnChainCounts[asns] = { count: 0, routeIndices: [] }
+      }
+      asnChainCounts[asns].count++
+      asnChainCounts[asns].routeIndices.push(idx)
+    })
+
+    const sortedChains = Object.entries(asnChainCounts)
+      .sort((a, b) => b[1].count - a[1].count)
+
+    const topIndices: number[] = []
+    for (const [, info] of sortedChains) {
+      for (const idx of info.routeIndices) {
+        if (topIndices.length < count) {
+          topIndices.push(idx)
+        }
+      }
+    }
+    return topIndices
+  }
+
+  const openRoutePicker = (destination: string) => {
+    setPendingDestination(destination)
+    const routes = destinations[destination] || []
+    if (routes.length <= 8) {
+      setSelectedRouteIndices(new Set(routes.map((_, i) => i)))
+      setShowRoutePicker(true)
+    } else {
+      const topIndices = getTopRouteIndices(destination, 3)
+      setSelectedRouteIndices(new Set(topIndices))
+      const allGroups = getPathGroups(destination)
+      setExpandedGroups(new Set(allGroups.slice(0, 2).map((_, i) => `group-${i}`)))
+      setShowRoutePicker(true)
+    }
+  }
+
+  const toggleRouteSelection = (routeIndex: number) => {
+    const newSelection = new Set(selectedRouteIndices)
+    if (newSelection.has(routeIndex)) {
+      newSelection.delete(routeIndex)
+    } else if (newSelection.size < MAX_ROUTES) {
+      newSelection.add(routeIndex)
+    }
+    setSelectedRouteIndices(newSelection)
+  }
+
+  const toggleGroup = (groupLabel: string) => {
+    const newExpanded = new Set(expandedGroups)
+    if (newExpanded.has(groupLabel)) {
+      newExpanded.delete(groupLabel)
+    } else {
+      newExpanded.add(groupLabel)
+    }
+    setExpandedGroups(newExpanded)
+  }
+
+  const confirmRouteSelection = () => {
+    if (!pendingDestination || selectedRouteIndices.size === 0) return
+    setSelectedDestination(pendingDestination)
+    calculatePaths(pendingDestination, selectedRouteIndices)
+    setShowRoutePicker(false)
+  }
+
+  const selectDestination = (destination: string) => {
+    openRoutePicker(destination)
+  }
+
+  const calculatePaths = (destination: string, routeIndices: Set<number>) => {
+    const routes = destinations[destination]
+    if (!routes || routeIndices.size === 0) {
+      setPathInfos([])
+      return
+    }
+
+    const selectedRoutes = routes.filter((_, idx) => routeIndices.has(idx))
+
+    const asnChainCounts: Record<string, { count: number; routeIndices: number[] }> = {}
+
+    selectedRoutes.forEach((route, localIdx) => {
+      const globalIdx = Array.from(routeIndices)[localIdx]
+      const asns = route.hops_data
+        .filter(h => h.asn)
+        .map(h => h.asn)
+        .join(' → ')
+      if (!asnChainCounts[asns]) {
+        asnChainCounts[asns] = { count: 0, routeIndices: [] }
+      }
+      asnChainCounts[asns].count++
+      asnChainCounts[asns].routeIndices.push(globalIdx)
+    })
+
+    const sortedChains = Object.entries(asnChainCounts)
+      .sort((a, b) => b[1].count - a[1].count)
+
     const infos: PathInfo[] = sortedChains.map(([asnChain], idx) => {
       const info = asnChainCounts[asnChain]
-      const percentage = Math.round((info.count / routes.length) * 100)
+      const percentage = Math.round((info.count / selectedRoutes.length) * 100)
       return {
         color: ROUTE_COLORS[idx % ROUTE_COLORS.length],
         asnChain,
@@ -316,8 +445,11 @@ export default function RouteAtlas() {
   const getHopComparison = () => {
     if (!selectedDestination || pathInfos.length === 0) return null
     
-    const routes = destinations[selectedDestination]
-    if (!routes) return null
+    const allRoutes = destinations[selectedDestination]
+    if (!allRoutes) return null
+
+    const routes = allRoutes.filter((_, idx) => selectedRouteIndices.has(idx))
+    if (routes.length < 1) return null
 
     const sharedKeys = new Set<string>()
     const hopMap: Record<string, HopInfo> = {}
@@ -356,8 +488,10 @@ export default function RouteAtlas() {
 
     const uniqueByPath: Record<string, string[]> = {}
     pathInfos.forEach(info => {
-      info.routeIndices.forEach(routeIdx => {
-        const route = routes[routeIdx]
+      info.routeIndices.forEach(globalRouteIdx => {
+        const localIdx = Array.from(selectedRouteIndices).indexOf(globalRouteIdx)
+        if (localIdx === -1) return
+        const route = routes[localIdx]
         const hopKeys = new Set(
           route.hops_data
             .filter(h => h.ip && h.ip !== '*' && h.lat && h.lng)
@@ -385,6 +519,87 @@ export default function RouteAtlas() {
 
   const hopComparison = getHopComparison()
 
+  const renderRoutePickerModal = () => {
+    if (!showRoutePicker || !pendingDestination) return null
+    const routes = destinations[pendingDestination] || []
+    const pathGroups = getPathGroups(pendingDestination)
+
+    const getHopCount = (routeIdx: number) => {
+      const route = routes[routeIdx]
+      return route?.hops_data?.filter(h => h.lat && h.lng).length || 0
+    }
+
+    const getFingerprint = (routeIdx: number) => {
+      const route = routes[routeIdx]
+      return route?.fingerprint_id || ''
+    }
+
+    return (
+      <div className="modal-overlay" onClick={() => setShowRoutePicker(false)}>
+        <div className="modal route-picker-modal" onClick={e => e.stopPropagation()}>
+          <button className="modal-close" onClick={() => setShowRoutePicker(false)}>×</button>
+          <h3>Select Routes to Compare</h3>
+          <p className="route-picker-info">
+            {pendingDestination} · Max {MAX_ROUTES} routes · {selectedRouteIndices.size} selected
+          </p>
+
+          <div className="route-picker-list">
+            {pathGroups.map((group, groupIdx) => {
+              const isExpanded = expandedGroups.has(`group-${groupIdx}`)
+              const selectedInGroup = group.routeIndices.filter(idx => selectedRouteIndices.has(idx)).length
+              const allSelected = group.routeIndices.every(idx => selectedRouteIndices.has(idx))
+              const someSelected = group.routeIndices.some(idx => selectedRouteIndices.has(idx))
+
+              return (
+                <div key={groupIdx} className="route-picker-group">
+                  <div className="route-picker-group-header" onClick={() => toggleGroup(`group-${groupIdx}`)}>
+                    <span className="group-toggle">{isExpanded ? '▼' : '▶'}</span>
+                    <span className="group-label">{group.label} ({selectedInGroup}/{group.count})</span>
+                  </div>
+                  {isExpanded && (
+                    <div className="route-picker-group-items">
+                      {group.routeIndices.map(routeIdx => {
+                        const route = routes[routeIdx]
+                        const isSelected = selectedRouteIndices.has(routeIdx)
+                        const isDisabled = !isSelected && selectedRouteIndices.size >= MAX_ROUTES
+                        const hopCount = getHopCount(routeIdx)
+                        const date = route?.created_at ? new Date(route.created_at).toLocaleString() : ''
+                        const fingerprint = getFingerprint(routeIdx)
+
+                        return (
+                          <label key={routeIdx} className={`route-picker-item ${isDisabled ? 'disabled' : ''}`}>
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              disabled={isDisabled}
+                              onChange={() => toggleRouteSelection(routeIdx)}
+                            />
+                            <span className="route-picker-date">{date} · {fingerprint}</span>
+                            <span className="route-picker-hops">{hopCount} hops</span>
+                          </label>
+                        )
+                      })}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+
+          <div className="route-picker-footer">
+            <button
+              className="compare-btn"
+              disabled={selectedRouteIndices.size === 0}
+              onClick={confirmRouteSelection}
+            >
+              Compare {selectedRouteIndices.size} Routes
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   if (loading) {
     return (
       <div className="route-atlas-loading">
@@ -410,6 +625,7 @@ export default function RouteAtlas() {
         </div>
       ) : (
         <div className="route-atlas-content">
+          {renderRoutePickerModal()}
           <div className="route-atlas-sidebar">
             <h3>Destinations ({totalDestinations})</h3>
             <div className="destination-list">
@@ -439,7 +655,7 @@ export default function RouteAtlas() {
                 <div className="route-atlas-compact-stats">
                   <span className="compact-stat">
                     <span className="compact-stat-label">Routes:</span>
-                    <span className="compact-stat-value">{destinations[selectedDestination]?.length || 0}</span>
+                    <span className="compact-stat-value">{selectedRouteIndices.size || destinations[selectedDestination]?.length || 0}</span>
                   </span>
                   <span className="compact-stat-sep">|</span>
                   <span className="compact-stat">
@@ -456,6 +672,16 @@ export default function RouteAtlas() {
                     <span className="compact-stat-label">Latest:</span>
                     <span className="compact-stat-value">{getRouteStats(selectedDestination)?.latestTrace?.split('T')[0] || 'N/A'}</span>
                   </span>
+                  {(selectedRouteIndices.size > 0 && selectedRouteIndices.size < (destinations[selectedDestination]?.length || 0)) && (
+                    <>
+                      <span className="compact-stat-sep">|</span>
+                      <span className="compact-stat">
+                        <span className="compact-stat-value" style={{ color: '#00d4ff' }}>
+                          Showing {selectedRouteIndices.size} of {destinations[selectedDestination]?.length} routes
+                        </span>
+                      </span>
+                    </>
+                  )}
                 </div>
 
                 <div className="route-atlas-map">
@@ -477,6 +703,7 @@ export default function RouteAtlas() {
                       selectedDestination={selectedDestination}
                       destinations={destinations}
                       pathInfos={pathInfos}
+                      selectedRouteIndices={selectedRouteIndices}
                     />
                   </MapContainer>
                 </div>

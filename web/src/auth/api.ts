@@ -70,17 +70,18 @@ export const routesApi = {
     return response.json()
   },
 
-  async saveRoute(token: string, destination: string, hopsData: string, isPublic: boolean = false, artThumbnail?: string) {
+  async saveRoute(token: string, destination: string, hopsData: string, isPublic: boolean = false, artThumbnail?: string, fingerprintId?: string) {
     const response = await fetch(`${API_URL}/routes`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ destination, hops_data: hopsData, is_public: isPublic, art_thumbnail: artThumbnail }),
+      body: JSON.stringify({ destination, hops_data: hopsData, is_public: isPublic, art_thumbnail: artThumbnail, fingerprint_id: fingerprintId }),
     })
     if (!response.ok) {
-      throw new Error('Failed to save route')
+      const error = await response.json()
+      throw new Error(error.detail || 'Failed to save route')
     }
     return response.json()
   },
@@ -111,17 +112,18 @@ export const routesApi = {
     return response.json()
   },
 
-  async shareRoute(token: string, destination: string, hopsData: string, isPublic: boolean = false, artThumbnail?: string) {
+  async shareRoute(token: string, destination: string, hopsData: string, isPublic: boolean = false, artThumbnail?: string, fingerprintId?: string) {
     const response = await fetch(`${API_URL}/routes/share`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ destination, hops_data: hopsData, is_public: isPublic, art_thumbnail: artThumbnail }),
+      body: JSON.stringify({ destination, hops_data: hopsData, is_public: isPublic, art_thumbnail: artThumbnail, fingerprint_id: fingerprintId }),
     })
     if (!response.ok) {
-      throw new Error('Failed to share route')
+      const error = await response.json()
+      throw new Error(error.detail || 'Failed to share route')
     }
     return response.json()
   },

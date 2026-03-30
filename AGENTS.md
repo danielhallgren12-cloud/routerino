@@ -194,6 +194,29 @@ To add linting to package.json:
    - Display user-friendly error messages
    - Log errors appropriately for debugging
 
+## Recent Commits (2026-03)
+- **8278ea2** - Add Route Atlas feature for comparing routes to same destination
+  - Visual map overlay with distinct bright colors, parallel 'bus lane' rendering
+  - Stats dashboard, Path Breakdown (ASN chain distribution), Hop Details
+  - Backend: GET /routes/by-destination endpoint
+- **0c1ac18** - Add First Discoveries and Route Uniqueness feature
+  - GlobalDiscovery model, first_discoveries column on User model
+  - /me/uniqueness endpoint, 5 new First Discovery badges (1, 10, 25, 50, 100)
+  - "FIRST" badge (cyan/pink gradient), "Only you" and "1 in X users" displays
+- **7491cd9** - Fix collection system - handle legacy new_items format
+- **f60f6c2** - Clean up ROADMAP.md
+
+## Recent Updates (2026-03-30)
+- **Route Atlas route picker**: Select up to 8 routes to compare with modal picker
+  - Routes grouped by destination (hostname only label)
+  - Max 8 routes selectable, top 3 by frequency pre-selected
+  - Fingerprint IDs shown in picker alongside timestamps
+  - "Show X more" collapsible sections for groups with many routes
+- **Duplicate fingerprint prevention**: Prevent saving duplicate routes
+  - Check against SavedRoute.fingerprint_id in database
+  - Block save/share with clear error message showing fingerprint ID
+  - SavedRoute model extended with fingerprint_id column
+
 ## Database Guidelines
 1. Always use migrations for schema changes
 2. Use SQLAlchemy models for all database interactions
