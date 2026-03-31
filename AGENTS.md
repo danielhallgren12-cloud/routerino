@@ -217,6 +217,25 @@ To add linting to package.json:
   - Block save/share with clear error message showing fingerprint ID
   - SavedRoute model extended with fingerprint_id column
 
+## PWA (Progressive Web App)
+- **App name**: Routerino
+- **Display**: Fullscreen
+- **Theme**: Cyan/pink gradient on dark background
+- **Icons**: Globe with "RI" letters, 192x192 and 512x512 PNG
+- **Service Worker**: Auto-update via vite-plugin-pwa
+
+### Files
+| File | Purpose |
+|------|---------|
+| `web/public/manifest.json` | PWA manifest |
+| `web/public/icons/icon-192.png` | Small icon |
+| `web/public/icons/icon-512.png` | Large icon |
+| `web/public/favicon.png` | Browser favicon |
+| `web/public/icons/icon.svg` | Source SVG for icons |
+
+### Deployment
+PWA requires HTTPS for service workers to work. Deploy to Vercel/Netlify for bug testing.
+
 ## Database Guidelines
 1. Always use migrations for schema changes
 2. Use SQLAlchemy models for all database interactions

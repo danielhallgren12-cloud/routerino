@@ -55,7 +55,7 @@ This roadmap outlines the development phases for RouteCanvas, from initial demo 
 
 ## Phase 4: Expansion (In Progress)
 
-### Week 9: Route Atlas ✅
+### Week 9: Route Atlas ✅ COMPLETE
 
 - [x] Route Atlas feature - compare routes to same destination over time
 - [x] Visual map with multi-line overlay (bright colors on dark background)
@@ -64,6 +64,12 @@ This roadmap outlines the development phases for RouteCanvas, from initial demo 
 - [x] Hop Details (Head-to-Head) with shared/unique hops
 - [x] Numbered hop badges (cyan for shared, path-colored for unique)
 - [x] Stats row (routes, variations, first/latest trace dates)
+- [x] Route picker modal - select up to 8 routes to compare
+  - Routes grouped by destination (hostname only label)
+  - Top 3 by frequency pre-selected
+  - Fingerprint IDs shown alongside timestamps
+  - "Show X more" collapsible sections for groups
+- [x] Duplicate fingerprint prevention - block saving duplicate routes
 
 ### Week 9-10: Mobile App
 
@@ -82,8 +88,8 @@ This roadmap outlines the development phases for RouteCanvas, from initial demo 
 ### Week 12+: Gamification and Advanced Features
 
 - [x] Route uniqueness scoring ("1 in X users have this route")
-- [ ] Compare routes feature
-- [ ] Advanced Rarity System (global rarity across users)
+- [x] Compare routes feature (Route Atlas with route picker, max 8 selection)
+- [x] Duplicate fingerprint prevention
 
 ---
 

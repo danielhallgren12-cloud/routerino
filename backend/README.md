@@ -26,3 +26,6 @@ python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 ## Database
 
 SQLite by default. Schema created automatically on first run.
+
+### Schema Notes
+- `saved_routes.fingerprint_id` - Used for duplicate route prevention

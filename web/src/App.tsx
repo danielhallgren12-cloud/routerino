@@ -380,7 +380,7 @@ if (token && data.fingerprint_id) {
   return (
     <div className="app">
       <header className="header">
-        <h1>RouteCanvas</h1>
+        <h1>Routerino</h1>
         <div className="header-auth">
           <button onClick={toggleMode} className={`mode-toggle ${mode === 'light' ? 'active' : ''}`} title={mode === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}>
             <span className="toggle-slider"></span>

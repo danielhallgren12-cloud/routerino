@@ -245,6 +245,7 @@ RouteCanvas/
 | view_count | INTEGER | Number of views (default: 0) |
 | art_thumbnail | TEXT | Base64-encoded 600x600 PNG thumbnail for gallery |
 | created_at | TIMESTAMP | Creation time |
+| fingerprint_id | VARCHAR | Route fingerprint for duplicate prevention (nullable) |
 
 **likes**
 | Column | Type | Description |

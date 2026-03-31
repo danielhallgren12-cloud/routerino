@@ -98,19 +98,27 @@ Route Atlas allows users to explore how their internet routing paths vary over t
 ### Features
 - **Visual Map Overlay**: Multiple route paths displayed simultaneously with distinct bright colors
 - **Parallel "Bus Lane" Rendering**: Routes sharing the same hop-to-hop segment are drawn side-by-side for clarity
+- **Route Picker Modal**: Select up to 8 routes to compare (top 3 by frequency pre-selected, fingerprint IDs shown)
 - **Stats Dashboard**: Quick view of total routes, variations, first/latest trace dates
 - **Path Breakdown**: Bar charts showing ASN chain distribution with percentages
-- **Hop Details (Head-to-Head)**: 
+- **Hop Details (Head-to-Head)**:
   - Shared hops (appearing in all routes) highlighted with cyan badge
   - Unique hops per route variation with path-colored badges
   - Hop number badges for easy reference (e.g., ① ② ③)
   - Full hop info: IP address, city, country, ISP, ASN
+- **Duplicate Prevention**: Cannot save routes with duplicate fingerprints
 
 ### Technical Implementation
 - **Backend Endpoint**: `GET /routes/by-destination` - Returns all user routes grouped by destination
 - **Frontend Component**: `RouteAtlas.tsx` - Full-page modal with react-leaflet map
+- **Route Picker Modal**: Select up to 8 routes to compare
+  - Routes grouped by destination hostname
+  - Top 3 by frequency pre-selected
+  - Fingerprint IDs displayed alongside timestamps
+  - "Show X more" collapsible sections for large groups
 - **Shared Hop Detection**: Uses exact lat/lng coordinates (not IP/ASN) for accurate geographic matching
 - **Parallel Lane Algorithm**: Routes sharing exact hop segments get perpendicular offsets for visual separation
+- **Duplicate Prevention**: Routes with matching fingerprints cannot be saved twice (checked via fingerprint_id)
 
 ---
 
