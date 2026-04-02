@@ -3,6 +3,11 @@ import html2canvas from 'html2canvas'
 import { useAuth } from '../auth/AuthContext'
 import { routesApi } from '../auth/api'
 
+const isMobileDevice = () => {
+  if (typeof window === 'undefined') return false
+  return window.innerWidth < 768 || /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+}
+
 type ArtStyle = 'geometric' | 'neon' | 'constellation' | 'flow' | 'minimal' | 'retro'
 type Layout = 'portrait' | 'square' | 'large'
 type ColorTheme = 'default' | 'sunset' | 'ocean' | 'forest' | 'mono'
@@ -137,8 +142,13 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
   const [sharing, setSharing] = useState(false)
   const [saveMessage, setSaveMessage] = useState('')
   const [forGallery, setForGallery] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+
+  const ms = (val: number) => isMobile ? val * 1.5 : val
+  const mfs = (val: number) => isMobile ? val * 0.8 : val
 
   useEffect(() => {
+    setIsMobile(isMobileDevice())
     const savedColorTheme = localStorage.getItem('routecanvas_colorTheme') as ColorTheme
     const savedCustomName = localStorage.getItem('routecanvas_customName')
     if (savedColorTheme) setColorTheme(savedColorTheme)
@@ -314,7 +324,7 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
     }
   }
 
-  const dims = layout === 'portrait' ? { w: 500, h: 667 } : layout === 'square' ? { w: 600, h: 600 } : { w: 800, h: 1067 }
+  const dims = { w: 500, h: 500 }
 
   const stats = {
     hops: validHops.length,
@@ -357,7 +367,7 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
             {customTitle || 'THE JOURNEY'}
           </h1>
           
-          <svg width={420} height={280} viewBox="0 0 420 280">
+          <svg width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="0 0 420 280">
             {hops.map((h, i) => {
               const x = 40 + (i * (340 / Math.max(hops.length - 1, 1)))
               const y = 140 + Math.sin(i * 0.8) * 60
@@ -428,7 +438,7 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
             {customTitle || 'THE JOURNEY'}
           </h1>
 
-          <svg width={420} height={280} viewBox="0 0 420 280">
+          <svg width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="0 0 420 280">
             <defs>
               <filter id="neonGlow" x="-100%" y="-100%" width="300%" height="300%">
                 <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
@@ -490,14 +500,22 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
     
     // ==================== CONSTELLATION ====================
     if (style === 'constellation') {
+      if (isMobileDevice()) {
+        return null
+      }
+
       return (
         <div style={{ background: backgroundPalettes[backgroundColor], width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', position: 'relative', boxSizing: 'border-box' }}>
           {/* Softer glowing frame */}
           <div style={{ position: 'absolute', top: 10, left: 10, right: 10, bottom: 10, border: '1px solid rgba(100,100,255,0.4)', borderRadius: 4, boxShadow: '0 0 40px rgba(100,100,255,0.2)', pointerEvents: 'none' }} />
           
+          <h1 style={{ fontFamily: 'Syne, sans-serif', fontSize: 44, fontWeight: 700, letterSpacing: 3, textTransform: 'uppercase', color: '#ffffff', marginBottom: 20, textShadow: '0 0 20px rgba(100,100,255,0.8), 0 0 40px rgba(100,100,255,0.4)' }}>
+            {customTitle || 'THE JOURNEY'}
+          </h1>
+
           {/* Stars with varying opacity - hidden for gallery thumbnail */}
           {!galleryMode && (
-            <svg width={420} height={280} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
+            <svg style={{ position: 'absolute', top: 0, left: 0 }} width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="0 0 420 280">
               {Array.from({ length: 80 }, (_, i) => (
                 <circle key={i} cx={Math.random() * 400 + 10} cy={Math.random() * 260 + 10} r={Math.random() * 1.5 + 0.5} fill="#fff" opacity={Math.random() * 0.6 + 0.2} />
               ))}
@@ -505,14 +523,10 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
           )}
           
           {/* Planets with soft glow */}
-          <div style={{ position: 'absolute', top: 25, right: 40, width: 24, height: 24, borderRadius: '50%', background: 'linear-gradient(135deg, #FF6B9d, #B04AFF)', boxShadow: '0 0 30px rgba(176,74,255,0.6)', filter: 'blur(1px)' }} />
+          <div style={{ position: 'absolute', top: 35, right: 30, width: 24, height: 24, borderRadius: '50%', background: 'linear-gradient(135deg, #FF6B9d, #B04AFF)', boxShadow: '0 0 30px rgba(176,74,255,0.6)', filter: 'blur(1px)' }} />
           <div style={{ position: 'absolute', bottom: 50, left: 35, width: 16, height: 16, borderRadius: '50%', background: 'linear-gradient(135deg, #00F0FF, #00FFA3)', boxShadow: '0 0 20px rgba(0,255,163,0.6)', filter: 'blur(1px)' }} />
-          
-          <h1 style={{ fontFamily: 'Syne, sans-serif', fontSize: 40, fontWeight: 600, letterSpacing: 5, textTransform: 'uppercase', color: '#e8e8ff', marginBottom: 20, textShadow: '0 0 30px rgba(100,100,255,0.6)' }}>
-            {customTitle || 'THE JOURNEY'}
-          </h1>
-          
-          <svg width={420} height={280} viewBox="0 0 420 280">
+
+          <svg width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="0 0 420 280">
             <defs>
               <filter id="constGlow" x="-50%" y="-50%" width="200%" height="200%">
                 <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
@@ -558,7 +572,7 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
               )
             })()}
           </svg>
-          
+
           <div style={{ display: 'flex', gap: 30, marginTop: 20, fontFamily: 'Space Mono, monospace', fontSize: 13, color: '#b0b0d0', letterSpacing: 1 }}>
             <span>{userLocation?.city?.toUpperCase() || 'START'}</span>
             <span style={{ color: '#555' }}>→</span>
@@ -593,7 +607,7 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
           <div style={{ position: 'absolute', top: 10, left: 10, right: 10, bottom: 10, border: '2px solid #d0c8c0', borderRadius: 4, pointerEvents: 'none' }} />
 
           {/* Curved corner flourishes - at actual SVG corners */}
-          <svg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }}>
+          <svg style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none' }} width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="0 0 475 475">
             {/* Top-left corner - curves inward from top edge to left edge */}
             <path d="M 10,50 Q 10,10 50,10" fill="none" stroke="#c0b8b0" strokeWidth={2} />
             {/* Top-right corner - curves inward from top edge to right edge */}
@@ -608,7 +622,7 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
             {customTitle || 'Journey'}
           </h1>
 
-          <svg width={440} height={280} viewBox="0 0 440 280">
+          <svg width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="0 0 440 280">
             <defs>
               <linearGradient id="flowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" stopColor={getColor(0)} stopOpacity={0.9}/>
@@ -677,7 +691,7 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
     if (style === 'minimal') {
       return (
         <div style={{ background: backgroundPalettes[backgroundColor], width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', position: 'relative', boxSizing: 'border-box' }}>
-          <svg width={420} height={280} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', opacity: 0.08 }}>
+          <svg style={{ position: 'absolute', top: 0, left: 0, opacity: 0.08 }} width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="0 0 420 260">
             <line x1={40} y1={260} x2={380} y2={260} stroke="#000" strokeWidth={1} />
             <circle cx={210} cy={140} r={4} fill="#000" />
             <circle cx={210} cy={140} r={160} fill="none" stroke="#000" strokeWidth={0.5} />
@@ -687,7 +701,7 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
             {customTitle || 'ROUTE'}
           </h1>
 
-          <svg width={420} height={260} viewBox="0 0 420 260">
+          <svg width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="0 0 420 260">
             {hops.map((h, i) => {
               const x = 40 + (i * (340 / Math.max(hops.length - 1, 1)))
               const y = 130 + Math.sin(i * 0.6) * 40
@@ -738,7 +752,7 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
           
           {/* Curved sun rays - hidden for gallery thumbnail */}
           {!galleryMode && (
-            <svg width={420} height={280} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
+            <svg style={{ position: 'absolute', top: 0, left: 0 }} width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="0 0 420 260">
               {Array.from({ length: 16 }, (_, i) => {
                 const angle = (i * 22.5) * Math.PI / 180
                 const x1 = 210 + Math.cos(angle) * 80
@@ -755,11 +769,11 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
           
           <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: 44, fontWeight: 700, letterSpacing: 4, color: '#8B4513', marginBottom: 18, textShadow: '2px 2px 0 #D4A500' }}>
             {customTitle || 'THE JOURNEY'}
-          </h1>
-          
-          <svg width={420} height={260} viewBox="0 0 420 260">
-            <defs>
-              <filter id="retroGlow" x="-50%" y="-50%" width="200%" height="200%">
+           </h1>
+           
+          <svg width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="0 0 420 260">
+             <defs>
+               <filter id="retroGlow" x="-50%" y="-50%" width="200%" height="200%">
                 <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
                 <feMerge>
                   <feMergeNode in="coloredBlur"/>
@@ -794,7 +808,7 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
                   <path d={pathD} fill="none" stroke="url(#retroTrailGrad)" strokeWidth={16} strokeLinecap="round" filter="url(#retroGlow)" opacity={0.25} />
                   <path d={pathD} fill="none" stroke="url(#retroTrailGrad)" strokeWidth={6} strokeLinecap="round" opacity={0.5} />
                   <path d={pathD} fill="none" stroke="url(#retroTrailGrad)" strokeWidth={2} strokeLinecap="round" />
-                  {retroHopPositions.map((p, i) => (
+                  {!isMobile && retroHopPositions.map((p, i) => (
                     <g key={i}>
                       <circle cx={p.x} cy={p.y} r={i === 0 || i === hops.length - 1 ? 15 : 10} fill={getRetroColor(i)} stroke="#8B4513" strokeWidth={2} />
                       <circle cx={p.x} cy={p.y} r={i === 0 || i === hops.length - 1 ? 7 : 5} fill="#f5e6d3" opacity={0.6} />
@@ -839,13 +853,35 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
       <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
         <button onClick={() => handleStyleChange('neon')} style={{ padding: '12px 20px', border: style === 'neon' ? '2px solid #FF2D92' : '1px solid #444', background: style === 'neon' ? 'rgba(255,45,146,0.15)' : 'transparent', color: style === 'neon' ? '#FF2D92' : '#888', borderRadius: 10, cursor: 'pointer', fontFamily: 'Syne, sans-serif', fontSize: 13, fontWeight: 600, letterSpacing: 1 }}>NEON</button>
         <button onClick={() => handleStyleChange('geometric')} style={{ padding: '12px 20px', border: style === 'geometric' ? '2px solid #00F0FF' : '1px solid #444', background: style === 'geometric' ? 'rgba(0,240,255,0.15)' : 'transparent', color: style === 'geometric' ? '#00F0FF' : '#888', borderRadius: 10, cursor: 'pointer', fontFamily: 'Syne, sans-serif', fontSize: 13, fontWeight: 600, letterSpacing: 1 }}>GEOMETRIC</button>
-        <button onClick={() => handleStyleChange('constellation')} style={{ padding: '12px 20px', border: style === 'constellation' ? '2px solid #a855f7' : '1px solid #444', background: style === 'constellation' ? 'rgba(168,85,247,0.15)' : 'transparent', color: style === 'constellation' ? '#a855f7' : '#888', borderRadius: 10, cursor: 'pointer', fontFamily: 'Syne, sans-serif', fontSize: 13, fontWeight: 600, letterSpacing: 1 }}>CONSTELLATION</button>
+        {!isMobileDevice() && <button onClick={() => handleStyleChange('constellation')} style={{ padding: '12px 20px', border: style === 'constellation' ? '2px solid #a855f7' : '1px solid #444', background: style === 'constellation' ? 'rgba(168,85,247,0.15)' : 'transparent', color: style === 'constellation' ? '#a855f7' : '#888', borderRadius: 10, cursor: 'pointer', fontFamily: 'Syne, sans-serif', fontSize: 13, fontWeight: 600, letterSpacing: 1 }}>CONSTELLATION</button>}
         <button onClick={() => handleStyleChange('flow')} style={{ padding: '12px 20px', border: style === 'flow' ? '2px solid #FF6B9d' : '1px solid #444', background: style === 'flow' ? 'rgba(255,107,157,0.15)' : 'transparent', color: style === 'flow' ? '#FF6B9d' : '#888', borderRadius: 10, cursor: 'pointer', fontFamily: 'Syne, sans-serif', fontSize: 13, fontWeight: 600, letterSpacing: 1 }}>FLOW</button>
         <button onClick={() => handleStyleChange('minimal')} style={{ padding: '12px 20px', border: style === 'minimal' ? '2px solid #333' : '1px solid #444', background: style === 'minimal' ? 'rgba(51,51,51,0.2)' : 'transparent', color: style === 'minimal' ? '#fff' : '#888', borderRadius: 10, cursor: 'pointer', fontFamily: 'Syne, sans-serif', fontSize: 13, fontWeight: 600, letterSpacing: 1 }}>MINIMAL</button>
         <button onClick={() => handleStyleChange('retro')} style={{ padding: '12px 20px', border: style === 'retro' ? '2px solid #D4A500' : '1px solid #444', background: style === 'retro' ? 'rgba(212,165,0,0.15)' : 'transparent', color: style === 'retro' ? '#D4A500' : '#888', borderRadius: 10, cursor: 'pointer', fontFamily: 'Syne, sans-serif', fontSize: 13, fontWeight: 600, letterSpacing: 1 }}>RETRO</button>
       </div>
 
       <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
+        <span style={{ color: '#666', fontSize: 10, fontFamily: 'Space Mono, monospace', marginRight: 4 }}>BG:</span>
+        {backgroundSwatches.filter(s => styleAllowedBackgrounds[style].includes(s.id)).map((swatch) => (
+          <button
+            key={swatch.id}
+            onClick={() => handleBackgroundColorChange(swatch.id)}
+            title={swatch.name}
+            style={{
+              width: 20,
+              height: 20,
+              borderRadius: '50%',
+              background: swatch.color,
+              border: backgroundColor === swatch.id ? '3px solid #fff' : '2px solid #444',
+              cursor: 'pointer',
+              padding: 0,
+              boxShadow: backgroundColor === swatch.id ? `0 0 8px ${swatch.color}` : 'none',
+              transform: backgroundColor === swatch.id ? 'scale(1.15)' : 'scale(1)',
+              transition: 'all 0.2s',
+              flexShrink: 0
+            }}
+          />
+        ))}
+        <span style={{ color: '#666', fontSize: 10, fontFamily: 'Space Mono, monospace', marginLeft: 8 }}>|</span>
         {colorSwatches.filter(s => styleAllowedColorThemes[style].includes(s.id)).map((swatch) => (
           <button
             key={swatch.id}
@@ -866,36 +902,8 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
           />
         ))}
       </div>
-
-      <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
-        <span style={{ color: '#666', fontSize: 10, fontFamily: 'Space Mono, monospace', marginRight: 4 }}>BG:</span>
-        {backgroundSwatches.filter(s => styleAllowedBackgrounds[style].includes(s.id)).map((swatch) => (
-          <button
-            key={swatch.id}
-            onClick={() => handleBackgroundColorChange(swatch.id)}
-            title={swatch.name}
-            style={{
-              width: 20,
-              height: 20,
-              borderRadius: '50%',
-              background: swatch.color,
-              border: backgroundColor === swatch.id ? '3px solid #fff' : '2px solid #444',
-              cursor: 'pointer',
-              padding: 0,
-              boxShadow: backgroundColor === swatch.id ? `0 0 8px ${swatch.color}` : 'none',
-              transform: backgroundColor === swatch.id ? 'scale(1.15)' : 'scale(1)',
-              transition: 'all 0.2s'
-            }}
-          />
-        ))}
-      </div>
       
       <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}>
-        <select value={layout} onChange={(e) => setLayout(e.target.value as Layout)} style={{ padding: '12px 16px', borderRadius: 10, border: '1px solid #444', background: '#1a1a1a', color: '#fff', fontFamily: 'Space Mono, monospace', fontSize: 12 }}>
-          <option value="square">Square (6×6)</option>
-          <option value="portrait">Portrait (5×7)</option>
-          <option value="large">Large (8×10)</option>
-        </select>
         <input type="text" value={customTitle} onChange={(e) => setCustomTitle(e.target.value)} placeholder="Custom title" style={{ padding: '12px 16px', borderRadius: 10, border: '1px solid #444', background: '#0a0a0a', color: '#fff', fontFamily: 'Space Mono, monospace', fontSize: 12, width: 160 }} />
         <label style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#888', fontSize: 11, fontFamily: 'Space Mono, monospace', cursor: 'pointer' }}>
           <input type="checkbox" checked={includeStats} onChange={(e) => setIncludeStats(e.target.checked)} />STATS
@@ -908,7 +916,10 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
         </label>
       </div>
       
-      <div ref={artRef} style={{ width: dims.w, height: dims.h, maxWidth: '100%', maxHeight: '70vh', aspectRatio: layout === 'portrait' ? '5/7' : layout === 'square' ? '1/1' : '8/10', boxShadow: '0 20px 60px rgba(0,0,0,0.5)', borderRadius: 4, overflow: 'hidden' }}>
+      <div ref={artRef} data-layout={layout} className="art-preview-wrapper" style={{
+        boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
+        borderRadius: 4
+      }}>
         {renderContent()}
       </div>
       

@@ -444,7 +444,7 @@ if (token && data.fingerprint_id) {
           {traceData && validHops.length > 0 && (
             <>
               <button onClick={() => setShowArtGenerator(true)} style={{ padding: '0.65rem 1rem', background: 'linear-gradient(135deg, #00F0FF, #FF2D92)', border: 'none', color: '#fff', fontWeight: 600 }}>🎨 Art Generator</button>
-              <div className="more-menu-container desktop-only">
+              <div className="more-menu-container">
                 <button className="more-button" onClick={() => setShowMoreMenu(!showMoreMenu)}>⋮ More</button>
                 {showMoreMenu && (
                   <div className="more-dropdown">
@@ -460,21 +460,14 @@ if (token && data.fingerprint_id) {
                   </div>
                 )}
               </div>
-              {isAuthenticated && (
-                <>
-                  <button onClick={shareRoute} className="share-button mobile-only">🔗 Share</button>
-                  <button onClick={saveRoute} className="save-button mobile-only">💾 Save</button>
-                  <button onClick={exportImage} className="export-button mobile-only">📸 Export</button>
-                </>
-              )}
               {(saveMessage || shareMessage) && <span className="save-message">{saveMessage || shareMessage}</span>}
             </>
           )}
           {loading && <div className="loading-note">A search takes approx 8-15 sec</div>}
-          <div className="preset-destinations" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem', width: '100%', flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '0.65rem', color: '#888', marginRight: '0.25rem' }}>Popular:</span>
+          <div className="preset-destinations">
+            <span className="preset-label">Popular:</span>
             {['google.com', 'cloudflare.com', 'github.com', 'amazon.com', 'facebook.com'].map(dest => (
-              <button key={dest} style={{ padding: '0.25rem 0.5rem', background: 'transparent', border: '1px solid #555', borderRadius: '4px', color: '#bbb', fontSize: '0.7rem', cursor: 'pointer', textTransform: 'capitalize' }} onClick={() => { setDestination(dest); runTrace(dest); }}>
+              <button key={dest} className="preset-button" onClick={() => { setDestination(dest); runTrace(dest); }}>
                 {dest.replace('.com', '')}
               </button>
             ))}
