@@ -302,7 +302,7 @@ if (token && data.fingerprint_id) {
   const allHops = traceData ? traceData.hops.filter(h => h.ip && h.ip !== '*') : []
 
   useEffect(() => {
-    if (!isPlaying || validHops.length === 0 || !userLocation) return
+    if (!isPlaying || validHops.length === 0) return
     animationRef.current.cancel = false
     const baseTravelTime = animationSpeed === 0.25 ? 4000 : animationSpeed === 0.5 ? 2500 : 1500
 
@@ -311,8 +311,10 @@ if (token && data.fingerprint_id) {
       let fromLat: number, fromLng: number, toLat: number, toLng: number
 
       if (hopIndex === -1) {
-        fromLat = userLocation.lat; fromLng = userLocation.lng
-        toLat = validHops[0].lat!; toLng = validHops[0].lng!
+        fromLat = userLocation?.lat ?? validHops[0].lat!
+        fromLng = userLocation?.lng ?? validHops[0].lng!
+        toLat = validHops[0].lat!
+        toLng = validHops[0].lng!
       } else if (hopIndex < validHops.length - 1) {
         fromLat = validHops[hopIndex].lat!; fromLng = validHops[hopIndex].lng!
         toLat = validHops[hopIndex + 1].lat!; toLng = validHops[hopIndex + 1].lng!
@@ -351,7 +353,7 @@ if (token && data.fingerprint_id) {
 
     animateHop(-1)
     return () => { animationRef.current.cancel = true }
-  }, [isPlaying, animationSpeed, validHops.length, userLocation])
+  }, [isPlaying, animationSpeed, validHops.length])
 
   useEffect(() => {
     if (traceData) { setAnimationHop(-1); setIsPlaying(false); setShowPacket(false) }
