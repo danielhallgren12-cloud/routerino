@@ -511,9 +511,28 @@ body {
   }
   
   .preset-destinations {
-    justify-content: center;
+    justify-content: flex-start;
+    gap: 0.35rem;
   }
-  
+
+  .preset-label {
+    display: inline !important;
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.8);
+    align-self: center;
+    flex: 0 0 auto;
+  }
+
+  .preset-button {
+    padding: 0.3rem 0.2rem !important;
+    font-size: 0.7rem !important;
+    flex: 1 1 calc(33% - 0.35rem);
+    max-width: calc(50% - 0.35rem);
+    border: none !important;
+    background: transparent !important;
+    text-align: center;
+  }
+
   .content-columns {
     display: flex;
     flex: 1;
@@ -1174,16 +1193,8 @@ body {
   margin-bottom: 2rem;
   letter-spacing: 0.15em;
   cursor: pointer;
-  /* Layer shadows for 3D depth */
-  text-shadow:
-    0 1px 0 rgba(0,240,255,0.8),
-    0 2px 0 rgba(0,240,255,0.6),
-    0 4px 8px rgba(0,240,255,0.4),
-    0 8px 20px rgba(255,0,170,0.3);
-  /* Enhanced glow for pop effect */
-  filter:
-    drop-shadow(0 0 8px rgba(0,240,255,0.7))
-    drop-shadow(0 0 20px rgba(255,0,170,0.4));
+  /* Strong glow for pop effect */
+  filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.6)) drop-shadow(0 0 25px rgba(255, 0, 170, 0.5));
 }
 
 .route-art-preview {
