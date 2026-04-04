@@ -37,25 +37,31 @@
   box-sizing: border-box;
 }
 
+@font-face {
+  font-family: 'Cyberway Riders';
+  src: url('/fonts/CyberwayRiders.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-  background: var(--bg-dark);
-  background-image: 
-    radial-gradient(ellipse at 20% 80%, rgba(0, 212, 255, 0.4) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 20%, rgba(255, 0, 170, 0.4) 0%, transparent 50%),
-    linear-gradient(180deg, transparent 0%, rgba(0, 212, 255, 0.15) 100%);
+  background: 
+    radial-gradient(ellipse at 10% 50%, rgba(0,212,255,0.35) 0%, transparent 40%),
+    radial-gradient(ellipse at 90% 50%, rgba(255,0,170,0.28) 0%, transparent 40%),
+    linear-gradient(90deg, transparent 0%, rgba(0,212,255,0.15) 50%, rgba(255,0,170,0.12) 100%, transparent 100%),
+    var(--bg-dark);
   color: var(--text);
   min-height: 100vh;
   overflow-x: hidden;
 }
 
 :root.light-mode body {
-  background-color: var(--bg-dark);
-  background-image: 
-    radial-gradient(ellipse at 20% 80%, rgba(0, 136, 204, 0.3) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 20%, rgba(204, 0, 119, 0.3) 0%, transparent 50%),
-    linear-gradient(180deg, transparent 0%, rgba(0, 136, 204, 0.1) 100%);
-  background-size: 100% 100%;
+  background: 
+    radial-gradient(ellipse at 10% 50%, rgba(0,136,204,0.25) 0%, transparent 40%),
+    radial-gradient(ellipse at 90% 50%, rgba(204,0,119,0.2) 0%, transparent 40%),
+    linear-gradient(90deg, transparent 0%, rgba(0,136,204,0.1) 50%, rgba(204,0,119,0.08) 100%, transparent 100%),
+    var(--bg-dark);
 }
 
 #root {
@@ -73,7 +79,7 @@ body {
 
 .header {
   padding: 1rem 2rem;
-  background: var(--bg-card);
+  background: transparent;
   border-bottom: 1px solid var(--border-color);
   display: flex;
   justify-content: space-between;
@@ -82,10 +88,13 @@ body {
 
 .header h1 {
   font-size: 1.5rem;
+  font-family: 'Cyberway Riders', sans-serif;
   background: linear-gradient(90deg, var(--primary), var(--secondary));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  letter-spacing: 0.1em;
+  cursor: pointer;
 }
 
 .header-auth {
@@ -586,7 +595,7 @@ body {
 
 .input-section {
   padding: 1.5rem 2rem;
-  background: var(--bg-card);
+  background: transparent;
   display: flex;
   gap: 1rem;
   align-items: center;
@@ -1135,21 +1144,46 @@ body {
 }
 
 .tracing-brand {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Cyberway Riders', sans-serif;
   font-size: 2rem;
-  font-weight: 700;
-  color: #fff;
+  font-weight: normal;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin-top: 2rem;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.15em;
+  cursor: pointer;
+  position: relative;
+  filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.3));
+}
+
+.tracing-brand:hover,
+.tracing-brand:active {
+  animation: glitch-hero 0.3s infinite;
 }
 
 .hero-brand {
-  font-family: 'Syne', sans-serif;
-  font-size: 2rem;
-  font-weight: 700;
-  color: #fff;
+  font-family: 'Cyberway Riders', sans-serif;
+  font-size: 3rem;
+  font-weight: normal;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin-bottom: 2rem;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.15em;
+  cursor: pointer;
+  /* Layer shadows for 3D depth */
+  text-shadow:
+    0 1px 0 rgba(0,240,255,0.8),
+    0 2px 0 rgba(0,240,255,0.6),
+    0 4px 8px rgba(0,240,255,0.4),
+    0 8px 20px rgba(255,0,170,0.3);
+  /* Enhanced glow for pop effect */
+  filter:
+    drop-shadow(0 0 8px rgba(0,240,255,0.7))
+    drop-shadow(0 0 20px rgba(255,0,170,0.4));
 }
 
 .route-art-preview {

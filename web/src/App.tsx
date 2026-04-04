@@ -510,7 +510,7 @@ if (token && data.fingerprint_id) {
                   </defs>
                   <path d="M 40 150 Q 100 50, 160 100 T 260 80 T 330 60" fill="none" stroke="url(#traceLineGrad)" strokeWidth="3" filter="url(#traceGlow)" className="tracing-path" />
                 </svg>
-                <div className="tracing-brand">routecanvas</div>
+                <div className="tracing-brand">Routerino</div>
                 <div className="tracing-status">Tracing your route...</div>
               </div>
             )}
@@ -588,7 +588,7 @@ if (token && data.fingerprint_id) {
             {!loading && !traceData && (
               <div className="hero-bg">
                 <div className="hero-content">
-                  <div className="hero-brand">routecanvas</div>
+                  <div className="hero-brand">Routerino</div>
                   <div className="route-art-preview">
                     <svg viewBox="0 0 400 200" className="art-svg">
                       <defs>
