@@ -28,6 +28,16 @@ const CATEGORIES: { key: Category; label: string; icon: string }[] = [
   { key: 'fingerprints', label: 'Fingerprints', icon: '🏷️' },
 ]
 
+const CATEGORY_PREFIX: Record<Category, string> = {
+  destinations: 'destination',
+  countries: 'country',
+  cities: 'city',
+  companies: 'company',
+  ips: 'ip',
+  asns: 'asn',
+  fingerprints: 'fingerprint',
+}
+
 const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: 'name-asc', label: 'Name (A-Z)' },
   { value: 'name-desc', label: 'Name (Z-A)' },
@@ -85,7 +95,7 @@ export default function Inventory({ token, collection, onClose, initialCategory 
     // Find item with highest discovery count
     const counts = items.map(item => ({
       item,
-      count: discoveryCounts[`${activeCategory.slice(0, -1)}:${item}`] || 1
+      count: discoveryCounts[`${CATEGORY_PREFIX[activeCategory]}:${item}`] || 1
     }))
     
     return counts.reduce((max, curr) => curr.count > max.count ? curr : max)
@@ -98,7 +108,7 @@ export default function Inventory({ token, collection, onClose, initialCategory 
     const rarities = items.map(item => ({
       item,
       rarity: getRarity(activeCategory, item),
-      count: discoveryCounts[`${activeCategory.slice(0, -1)}:${item}`] || 1
+      count: discoveryCounts[`${CATEGORY_PREFIX[activeCategory]}:${item}`] || 1
     }))
     
     // Get item with highest rarity (legendary > epic > rare > uncommon > common)
@@ -125,8 +135,8 @@ export default function Inventory({ token, collection, onClose, initialCategory 
           return 0
         case 'most-collected':
           // Sort by discovery count (highest first)
-          const countA = discoveryCounts[`${activeCategory.slice(0, -1)}:${a}`] || 1
-          const countB = discoveryCounts[`${activeCategory.slice(0, -1)}:${b}`] || 1
+          const countA = discoveryCounts[`${CATEGORY_PREFIX[activeCategory]}:${a}`] || 1
+          const countB = discoveryCounts[`${CATEGORY_PREFIX[activeCategory]}:${b}`] || 1
           return countB - countA
         default:
           return 0
@@ -195,7 +205,7 @@ export default function Inventory({ token, collection, onClose, initialCategory 
               const rarity = getRarity(activeCategory, item)
               const displayValue = activeCategory === 'countries' ? `${item} - ${getCountryName(item)}` : item
               const isNew = newCounts[activeCategory]?.includes(item) || false
-              const itemKey = `${activeCategory.slice(0, -1)}:${item}`
+              const itemKey = `${CATEGORY_PREFIX[activeCategory]}:${item}`
               const globalCount = uniqueness[itemKey] || 0
               const isFirst = globalCount === 1
               
@@ -219,7 +229,7 @@ export default function Inventory({ token, collection, onClose, initialCategory 
                            {RARITY_LABELS[rarity]}
                          </span>
                          <span className="item-count">
-                           Seen {(discoveryCounts[`${activeCategory.slice(0, -1)}:${item}`] || 1)}×
+                           Seen {(discoveryCounts[`${CATEGORY_PREFIX[activeCategory]}:${item}`] || 1)}×
                          </span>
                        </>
                      )}
