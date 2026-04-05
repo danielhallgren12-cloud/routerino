@@ -696,8 +696,8 @@ export default function RouteAtlas() {
                     dragging={true}
                   >
                     <TileLayer
-                      attribution='© OpenStreetMap'
-                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                      url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
                     />
                     <MapContent
                       selectedDestination={selectedDestination}

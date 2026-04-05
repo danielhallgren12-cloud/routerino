@@ -534,7 +534,7 @@ if (token && data.fingerprint_id) {
             {!loading && traceData && validHops.length > 0 && (
               <MapContainer ref={mapRef} center={[20, 0]} zoom={2} style={{ height: '100%', width: '100%' }} zoomControl={true} doubleClickZoom={false} scrollWheelZoom={true} touchZoom={true} dragging={true} preferCanvas={true}>
                 <MapEvents onZoomChange={setZoomLevel} />
-                <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' url={mode === 'dark' ? "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" : "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"} />
+                <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' url={mode === 'dark' ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" : "https://{s}.basemaps.cartocdn.com/positron/{z}/{x}/{y}{r}.png"} />
                 
                 {(() => {
                   const cityGroups: { [key: string]: Hop[] } = {}
