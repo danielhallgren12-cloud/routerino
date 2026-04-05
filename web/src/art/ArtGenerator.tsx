@@ -514,7 +514,7 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
           </h1>
 
           {/* Stars with varying opacity - hidden for gallery thumbnail */}
-          {!galleryMode && (
+          {!isMobileDevice() && (
             <svg style={{ position: 'absolute', top: 0, left: 0 }} width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="0 0 420 280">
               {Array.from({ length: 80 }, (_, i) => (
                 <circle key={i} cx={Math.random() * 400 + 10} cy={Math.random() * 260 + 10} r={Math.random() * 1.5 + 0.5} fill="#fff" opacity={Math.random() * 0.6 + 0.2} />
@@ -751,7 +751,7 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
           <div style={{ position: 'absolute', top: 14, left: 14, right: 14, bottom: 14, border: '2px solid #D4A500', borderRadius: 4, pointerEvents: 'none' }} />
           
           {/* Curved sun rays - hidden for gallery thumbnail */}
-          {!galleryMode && (
+          {!isMobileDevice() && (
             <svg style={{ position: 'absolute', top: 0, left: 0 }} width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="0 0 420 260">
               {Array.from({ length: 16 }, (_, i) => {
                 const angle = (i * 22.5) * Math.PI / 180
@@ -764,8 +764,10 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
             </svg>
           )}
           
-          {/* Paper texture */}
-          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.015) 2px, rgba(0,0,0,0.015) 4px)', pointerEvents: 'none' }} />
+          {/* Paper texture - hidden on mobile */}
+          {!isMobileDevice() && (
+            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.015) 2px, rgba(0,0,0,0.015) 4px)', pointerEvents: 'none' }} />
+          )}
           
           <h1 style={{ fontFamily: 'Playfair Display, serif', fontSize: 44, fontWeight: 700, letterSpacing: 4, color: '#8B4513', marginBottom: 18, textShadow: '2px 2px 0 #D4A500' }}>
             {customTitle || 'THE JOURNEY'}
