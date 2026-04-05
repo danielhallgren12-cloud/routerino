@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { galleryApi } from '../auth/api'
+import { galleryApi, routesApi } from '../auth/api'
 import { useAuth } from '../auth/AuthContext'
 import PublicProfile from './PublicProfile'
 
@@ -22,7 +22,7 @@ interface GalleryResponse {
 }
 
 export default function Gallery({ onClose }: { onClose: () => void }) {
-  const { token, isAuthenticated } = useAuth()
+  const { token, user, isAuthenticated } = useAuth()
   const [routes, setRoutes] = useState<GalleryRoute[]>([])
   const [loading, setLoading] = useState(true)
   const [page, setPage] = useState(1)
@@ -199,6 +199,21 @@ export default function Gallery({ onClose }: { onClose: () => void }) {
                     >
                       {likedRoutes.has(route.id) ? '❤️' : '🤍'} {route.like_count}
                     </button>
+                    {route.user_id === user?.id && (
+                      <button
+                        className="gallery-delete-btn"
+                        style={{ background: 'transparent', border: 'none', color: '#888', cursor: 'pointer', padding: '4px 8px' }}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          if (window.confirm('Are you sure you want to delete this route from the gallery?')) {
+                            routesApi.deleteRoute(token!, route.id).then(() => loadRoutes(1, false))
+                          }
+                        }}
+                        title="Delete from gallery"
+                      >
+                        🗑️
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>

@@ -79,12 +79,12 @@ function App() {
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number, city?: string, country?: string} | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [animationHop, setAnimationHop] = useState(-1)
-  const [animationSpeed, setAnimationSpeed] = useState(1)
+  const [animationSpeed, setAnimationSpeed] = useState(0.5)
   const [showPacket, setShowPacket] = useState(false)
   const [packetPosition, setPacketPosition] = useState<[number, number] | null>(null)
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login')
-  const [savedRoutes, setSavedRoutes] = useState<{id: number, destination: string, created_at: string}[]>([])
+  const [savedRoutes, setSavedRoutes] = useState<{id: number, destination: string, created_at: string, fingerprint_id?: string}[]>([])
   const [showRoutes, setShowRoutes] = useState(false)
   const [saveMessage, setSaveMessage] = useState('')
   const [shareMessage, setShareMessage] = useState('')
@@ -111,6 +111,22 @@ function App() {
   
   const animationRef = useRef<{ cancel: boolean }>({ cancel: false })
   const mapRef = useRef<L.Map | null>(null)
+  const profileMenuRef = useRef<HTMLDivElement>(null)
+  const moreMenuRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
+        setShowProfileMenu(false)
+      }
+      if (moreMenuRef.current && !moreMenuRef.current.contains(event.target as Node)) {
+        setShowMoreMenu(false)
+      }
+    }
+
+    document.addEventListener('click', handleClickOutside)
+    return () => document.removeEventListener('click', handleClickOutside)
+  }, [])
 
   const toggleMode = () => {
     const newMode = mode === 'dark' ? 'light' : 'dark'
@@ -401,7 +417,7 @@ if (token && data.fingerprint_id) {
           {isAuthenticated ? (
             <>
               <span className="user-greeting">Welcome, {user?.username}!</span>
-              <div className="profile-menu-container">
+              <div className="profile-menu-container" ref={profileMenuRef}>
                 <button onClick={() => setShowProfileMenu(!showProfileMenu)}>👤 Profile ▾</button>
                 {showProfileMenu && (
                   <div className="profile-dropdown">
@@ -446,7 +462,7 @@ if (token && data.fingerprint_id) {
           {traceData && validHops.length > 0 && (
             <>
               <button onClick={() => setShowArtGenerator(true)} style={{ padding: '0.65rem 1rem', background: 'linear-gradient(135deg, #00F0FF, #FF2D92)', border: 'none', color: '#fff', fontWeight: 600 }}>🎨 Art Generator</button>
-              <div className="more-menu-container">
+              <div className="more-menu-container" ref={moreMenuRef}>
                 <button className="more-button" onClick={() => setShowMoreMenu(!showMoreMenu)}>⋮ More</button>
                 {showMoreMenu && (
                   <div className="more-dropdown">
@@ -742,7 +758,7 @@ if (token && data.fingerprint_id) {
                 {savedRoutes.map(route => (
                   <li key={route.id}>
                     <span onClick={() => loadRoute(route)} className="route-destination">{route.destination}</span>
-                    <span className="route-date">{new Date(route.created_at).toLocaleDateString()}</span>
+                    <span className="route-date">{new Date(route.created_at).toLocaleDateString()} {route.fingerprint_id && <span className="route-fingerprint">{route.fingerprint_id}</span>}</span>
                     <button onClick={() => deleteSavedRoute(route.id)} className="delete-route">🗑️</button>
                   </li>
                 ))}

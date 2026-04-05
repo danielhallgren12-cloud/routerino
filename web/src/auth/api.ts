@@ -67,7 +67,8 @@ export const routesApi = {
     if (!response.ok) {
       throw new Error('Failed to get routes')
     }
-    return response.json()
+    const routes = await response.json()
+    return routes.filter((route: any) => !route.share_id)
   },
 
   async saveRoute(token: string, destination: string, hopsData: string, isPublic: boolean = false, artThumbnail?: string, fingerprintId?: string) {
@@ -181,7 +182,16 @@ export const routesApi = {
     if (!response.ok) {
       throw new Error('Failed to get routes by destination')
     }
-    return response.json()
+    const data = await response.json()
+    // Filter out gallery routes (those with share_id)
+    const filteredDestinations: Record<string, typeof data.destinations[string]> = {}
+    for (const [dest, routes] of Object.entries(data.destinations || {})) {
+      const privateRoutes = routes.filter((route: any) => !route.share_id)
+      if (privateRoutes.length > 0) {
+        filteredDestinations[dest] = privateRoutes
+      }
+    }
+    return { destinations: filteredDestinations, total_destinations: Object.keys(filteredDestinations).length }
   },
 
   async clearNewItems(token: string) {

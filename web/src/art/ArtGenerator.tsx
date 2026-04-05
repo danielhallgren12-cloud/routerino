@@ -860,6 +860,27 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
       </div>
 
       <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'center' }}>
+        <span style={{ color: '#666', fontSize: 10, fontFamily: 'Space Mono, monospace', marginRight: 4 }}>|</span>
+        {colorSwatches.filter(s => styleAllowedColorThemes[style].includes(s.id)).map((swatch) => (
+          <button
+            key={swatch.id}
+            onClick={() => handleColorThemeChange(swatch.id)}
+            title={swatch.name}
+            style={{
+              width: 24,
+              height: 24,
+              borderRadius: '50%',
+              background: swatch.color,
+              border: colorTheme === swatch.id ? '3px solid #fff' : '2px solid #444',
+              cursor: 'pointer',
+              padding: 0,
+              boxShadow: colorTheme === swatch.id ? `0 0 10px ${swatch.color}` : 'none',
+              transform: colorTheme === swatch.id ? 'scale(1.15)' : 'scale(1)',
+              transition: 'all 0.2s'
+            }}
+          />
+        ))}
+        <span style={{ color: '#666', fontSize: 10, fontFamily: 'Space Mono, monospace', marginLeft: 8, marginRight: 4 }}>|</span>
         <span style={{ color: '#666', fontSize: 10, fontFamily: 'Space Mono, monospace', marginRight: 4 }}>BG:</span>
         {backgroundSwatches.filter(s => styleAllowedBackgrounds[style].includes(s.id)).map((swatch) => (
           <button
@@ -878,26 +899,6 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
               transform: backgroundColor === swatch.id ? 'scale(1.15)' : 'scale(1)',
               transition: 'all 0.2s',
               flexShrink: 0
-            }}
-          />
-        ))}
-        <span style={{ color: '#666', fontSize: 10, fontFamily: 'Space Mono, monospace', marginLeft: 8 }}>|</span>
-        {colorSwatches.filter(s => styleAllowedColorThemes[style].includes(s.id)).map((swatch) => (
-          <button
-            key={swatch.id}
-            onClick={() => handleColorThemeChange(swatch.id)}
-            title={swatch.name}
-            style={{
-              width: 24,
-              height: 24,
-              borderRadius: '50%',
-              background: swatch.color,
-              border: colorTheme === swatch.id ? '3px solid #fff' : '2px solid #444',
-              cursor: 'pointer',
-              padding: 0,
-              boxShadow: colorTheme === swatch.id ? `0 0 10px ${swatch.color}` : 'none',
-              transform: colorTheme === swatch.id ? 'scale(1.15)' : 'scale(1)',
-              transition: 'all 0.2s'
             }}
           />
         ))}
