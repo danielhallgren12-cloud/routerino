@@ -414,16 +414,54 @@ body {
   }
   
   .content-columns .map-container {
-    min-height: 350px;
-    height: 50vh;
+    min-height: clamp(200px, 35vh, 350px);
+    height: clamp(200px, 40vh, 400px);
     flex: none;
   }
-  
+
   .content-columns .hop-list {
     min-width: 100%;
     flex: none;
   }
-  
+
+  .profile-routes-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: clamp(12px, 3vw, 20px);
+  }
+
+  .badgecase-modal {
+    padding: clamp(12px, 4vw, 20px);
+  }
+
+  .badgecase-stats {
+    gap: clamp(16px, 5vw, 32px);
+  }
+
+  .badge-stat-value {
+    font-size: clamp(1.5rem, 5vw, 2rem);
+  }
+
+  .badgecase-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: clamp(6px, 2vw, 12px);
+  }
+
+  .badge-icon {
+    font-size: clamp(1.5rem, 6vw, 2rem);
+  }
+
+  .new-badges-toast {
+    bottom: clamp(1rem, 5vw, 2rem);
+    right: clamp(1rem, 3vw, 2rem);
+    padding: clamp(12px, 3vw, 20px);
+  }
+
+  .first-discovery-toast {
+    bottom: clamp(1rem, 5vw, 2rem);
+    right: clamp(1rem, 3vw, 2rem);
+    padding: clamp(12px, 3vw, 20px);
+  }
+
   .hero-bg {
     min-height: 50vh;
   }
@@ -533,23 +571,56 @@ body {
     text-align: center;
   }
 
-  .content-columns {
-    display: flex;
-    flex: 1;
-    min-height: 0;
+  .header-auth .mode-toggle {
+    order: -1;
+    width: clamp(36px, 11vw, 44px);
+    height: clamp(20px, 6vw, 24px);
   }
-  
+
+  .toggle-slider {
+    width: clamp(14px, 4vw, 18px);
+    height: clamp(14px, 4vw, 18px);
+  }
+
+  .mode-toggle.active .toggle-slider {
+    left: clamp(18px, 5.5vw, 22px);
+  }
+
+  .toggle-slider::before {
+    width: clamp(8px, 2.5vw, 12px);
+    height: clamp(8px, 2.5vw, 12px);
+  }
+
   .content-columns .map-container {
-    min-height: 280px;
-    height: 45vh;
+    min-height: clamp(200px, 35vh, 280px);
+    height: clamp(200px, 40vh, 350px);
     flex: none;
   }
-  
+
   .content-columns .hop-list {
-    max-height: 300px;
+    max-height: clamp(150px, 30vh, 300px);
     flex: none;
   }
-  
+
+  .profile-routes-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: clamp(10px, 3vw, 16px);
+  }
+
+  .profile-route-card .route-card-info {
+    padding: clamp(10px, 3vw, 16px);
+  }
+
+  .inv-stat-label {
+    font-size: clamp(10px, 3vw, 12px);
+  }
+
+  .speed-controls button,
+  .theme-button {
+    flex: 1;
+    max-width: clamp(70px, 20vw, 100px);
+  }
+
   .hero-bg {
     min-height: 45vh;
   }
@@ -821,6 +892,27 @@ body {
   .share-button.mobile-only,
   .save-button.mobile-only {
     display: none;
+  }
+
+  .gallery-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: clamp(8px, 3vw, 16px);
+  }
+
+  .gallery-destination {
+    font-size: clamp(14px, 4vw, 17px);
+  }
+
+  .gallery-card-info {
+    padding: clamp(10px, 3vw, 16px);
+  }
+
+  .gallery-loading {
+    padding: clamp(30px, 10vw, 60px) clamp(12px, 4vw, 20px);
+  }
+
+  .gallery-end {
+    padding: clamp(20px, 6vw, 40px) clamp(12px, 4vw, 20px);
   }
 }
 
@@ -1380,7 +1472,7 @@ body {
 
 .fp-stat-icon { font-size: 0.8rem; margin-bottom: 0.15rem; }
 .fp-stat-value { font-size: 0.85rem; font-weight: 600; color: var(--text); }
-.fp-stat-label { font-size: 0.55rem; color: var(--text-muted); text-transform: uppercase; }
+.fp-stat-label { font-size: clamp(0.6rem, 2vw, 0.7rem); color: var(--text-muted); text-transform: uppercase; }
 
 /* Latency Graph */
 .latency-graph {
@@ -3221,9 +3313,18 @@ body {
   }
   
   .route-atlas-sidebar {
-    max-height: 200px;
+    max-height: clamp(150px, 30vh, 300px);
   }
-  
+
+  .route-atlas-map {
+    height: clamp(200px, 50vw, 400px);
+    min-height: clamp(200px, 40vw, 400px);
+  }
+
+  .route-atlas-placeholder {
+    min-height: clamp(200px, 50vh, 400px);
+  }
+
   .hops-header,
   .hop-row {
     grid-template-columns: 40px 100px 80px 50px 1fr;
@@ -3554,19 +3655,19 @@ body {
   }
 
   .art-preview-wrapper {
-    width: 320px !important;
-    height: 320px !important;
+    width: min(280px, 80vw) !important;
+    height: min(280px, 80vw) !important;
     margin: 0 auto !important;
   }
 
   .art-preview-wrapper > div {
-    width: 320px !important;
-    height: 320px !important;
+    width: min(280px, 80vw) !important;
+    height: min(280px, 80vw) !important;
   }
 
   .art-preview-wrapper > div svg {
-    width: 320px !important;
-    height: 320px !important;
+    width: min(280px, 80vw) !important;
+    height: min(280px, 80vw) !important;
   }
 
   .art-preview-wrapper > div h1 {
@@ -3711,8 +3812,8 @@ body {
 
   .item-new-badge,
   .item-first-badge {
-    font-size: 0.4rem;
-    padding: 0.05rem 0.15rem;
+    font-size: clamp(0.5rem, 1.8vw, 0.6rem);
+    padding: clamp(0.08rem, 0.5vw, 0.15rem);
     flex-shrink: 0;
   }
 
@@ -3779,7 +3880,7 @@ body {
   .item-rarity,
   .item-count,
   .item-uniqueness {
-    font-size: 0.6rem;
+    font-size: clamp(0.65rem, 2vw, 0.75rem);
     overflow: visible;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -3797,7 +3898,7 @@ body {
   .item-rarity,
   .item-count,
   .item-uniqueness {
-    font-size: 0.6rem;
+    font-size: clamp(0.65rem, 2vw, 0.75rem);
     overflow: visible;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -3805,8 +3906,8 @@ body {
 
   .item-new-badge,
   .item-first-badge {
-    font-size: 0.6rem;
-    padding: 0.1rem 0.2rem;
+    font-size: clamp(0.5rem, 1.8vw, 0.6rem);
+    padding: clamp(0.08rem, 0.5vw, 0.15rem);
     flex-shrink: 0;
   }
 
