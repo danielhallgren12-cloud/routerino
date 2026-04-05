@@ -9,8 +9,8 @@ from app.database import engine, Base
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
-    title="RouteCanvas API",
-    description="Backend API for RouteCanvas - Visual Traceroute Art",
+    title="Routerino API",
+    description="Backend API for Routerino - Visual Traceroute Art",
     version="0.1.0"
 )
 
@@ -36,7 +36,7 @@ app.include_router(auth.router, prefix="/api/v1", tags=["auth"])
 
 @app.get("/")
 def root():
-    return {"message": "RouteCanvas API", "status": "running"}
+    return {"message": "Routerino API", "status": "running"}
 
 @app.get("/health")
 def health():

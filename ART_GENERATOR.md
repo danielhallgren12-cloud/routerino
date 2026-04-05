@@ -1,4 +1,4 @@
-# RouteCanvas - Art Generator Specification
+# Routerino - Art Generator Specification
 
 ## Overview
 
@@ -303,7 +303,7 @@ When saving to gallery, a 600x600 square thumbnail is generated using html2canva
 - **Route66** - Simple route visualizations
 - **Pic-Time** - Photo printing service
 
-### RouteCanvas Differentiation
+### Routerino Differentiation
 - **Network-specific:** Unique focus on traceroute/IP routing
 - **Interactive:** Live map + static art
 - **Gamification:** Collection, fingerprints, badges
@@ -313,4 +313,4 @@ When saving to gallery, a 600x600 square thumbnail is generated using html2canva
 
 ## Conclusion
 
-The Art Generator transforms RouteCanvas from a traceroute tool into an artistic platform. By focusing on quality, personalization, and shareability, this feature serves as the foundation for viral growth and print-on-demand revenue.
+The Art Generator transforms Routerino from a traceroute tool into an artistic platform. By focusing on quality, personalization, and shareability, this feature serves as the foundation for viral growth and print-on-demand revenue.

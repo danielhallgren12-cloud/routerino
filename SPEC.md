@@ -1,8 +1,8 @@
-# RouteCanvas - Project Specification
+# Routerino - Project Specification
 
 ## 1. Project Overview
 
-**RouteCanvas** is a creative network visualization tool that transforms traceroutes into animated journeys and shareable art. Users enter a destination (domain or IP), and RouteCanvas displays the path their packets take across the internet as a visual journey between cities, with the option to apply artistic themes and export the result as art.
+**Routerino** is a creative network visualization tool that transforms traceroutes into animated journeys and shareable art. Users enter a destination (domain or IP), and Routerino displays the path their packets take across the internet as a visual journey between cities, with the option to apply artistic themes and export the result as art.
 
 **The Vision:** Transform traceroutes into personal route art that creates emotional connection - "This is MY digital journey from MY home to what I care about"
 

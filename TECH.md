@@ -1,4 +1,4 @@
-# RouteCanvas - Technical Documentation
+# Routerino - Technical Documentation
 
 ## 1. Technology Stack
 
@@ -180,7 +180,7 @@
 ## 3. Project Structure
 
 ```
-RouteCanvas/
+Routerino/
 +-- backend/
 |   +-- app/
 |   |   +-- __init__.py

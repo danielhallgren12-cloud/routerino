@@ -1,6 +1,6 @@
-# RouteCanvas Backend
+# Routerino Backend
 
-Python + FastAPI backend for RouteCanvas
+Python + FastAPI backend for Routerino
 
 ## Setup
 

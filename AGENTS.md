@@ -1,8 +1,8 @@
-# Development Guide for RouteCanvas
+# Development Guide for Routerino
 
 ## Project Structure
 ```
-RouteCanvas/
+Routerino/
 ├── backend/              # Python FastAPI backend
 │   ├── app/              # Main application code
 │   │   ├── main.py       # Entry point
@@ -48,8 +48,8 @@ python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 cd web
 npm install
 
-# Run development server with hot reload
-npm run dev
+# Run development server with hot reload (--host 0.0.0.0 for mobile testing)
+npm run dev -- --host 0.0.0.0
 
 # Build for production
 npm run build
@@ -194,19 +194,28 @@ To add linting to package.json:
    - Display user-friendly error messages
    - Log errors appropriately for debugging
 
-## Recent Commits (2026-03)
-- **8278ea2** - Add Route Atlas feature for comparing routes to same destination
-  - Visual map overlay with distinct bright colors, parallel 'bus lane' rendering
-  - Stats dashboard, Path Breakdown (ASN chain distribution), Hop Details
-  - Backend: GET /routes/by-destination endpoint
-- **0c1ac18** - Add First Discoveries and Route Uniqueness feature
-  - GlobalDiscovery model, first_discoveries column on User model
-  - /me/uniqueness endpoint, 5 new First Discovery badges (1, 10, 25, 50, 100)
-  - "FIRST" badge (cyan/pink gradient), "Only you" and "1 in X users" displays
-- **7491cd9** - Fix collection system - handle legacy new_items format
-- **f60f6c2** - Clean up ROADMAP.md
+## Recent Commits (2026-04)
+- **0d4810a** - Mobile fluid scaling: clamp() fixes for 14 UI elements across all device sizes
+  - Fluid scaling for art preview, map container, mode toggle, speed controls, gallery, profile, badge case, route atlas
+  - Toast notifications, inventory labels, hop number badges
+- **26d31c1** - Fix preset destination buttons mobile layout - Popular label and 2-row grid
+- **4471ebd** - Routerino logo update with Cyberway Riders font and 3D effects
+  - Cyberway Riders cyberpunk font integrated for Routerino logo
+  - Neon glow effects, gradient text, responsive sizing (1.5rem header, 3rem hero)
+- **419606f** - Additional mobile optimization fixes
+  - Constellation style disabled on mobile, art preview 320x320px square
+  - Background gradient to body level, header/input-section transparent backgrounds
+  - Animation play button uses first hop as fallback (cross-platform fix)
+- **f7b56ba** - Mobile optimization for Routerino PWA
+  - PWA manifest, icons (192x192, 512x512), service worker with skipWaiting/clientsClaim
+  - Gradient background (cyan left, magenta right), full-page coverage
 
-## Recent Updates (2026-03-30)
+## Recent Updates (2026-04)
+- **Mobile Optimization**: Full PWA support for Routerino with fluid scaling
+  - PWA manifest with app name "Routerino", fullscreen display, cyan/pink gradient theme
+  - Service worker with skipWaiting/clientsClaim for immediate updates
+  - Constellation style disabled on mobile devices
+  - Art preview scaled with min(280px, 80vw) for responsive fit
 - **Route Atlas route picker**: Select up to 8 routes to compare with modal picker
   - Routes grouped by destination (hostname only label)
   - Max 8 routes selectable, top 3 by frequency pre-selected

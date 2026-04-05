@@ -1,8 +1,8 @@
-# RouteCanvas - Project Roadmap
+# Routerino - Project Roadmap
 
 ## Overview
 
-This roadmap outlines the development phases for RouteCanvas, from initial demo to full-featured platform.
+This roadmap outlines the development phases for Routerino, from initial demo to full-featured platform.
 
 ---
 
@@ -71,12 +71,21 @@ This roadmap outlines the development phases for RouteCanvas, from initial demo 
   - "Show X more" collapsible sections for groups
 - [x] Duplicate fingerprint prevention - block saving duplicate routes
 
-### Week 9-10: Mobile App
+### Week 9-10: Mobile App ✅ COMPLETE
 
-- [ ] Set up React Native + Expo project
-- [ ] Implement core features
-- [ ] Ensure cross-platform compatibility
-- [ ] Test and polish
+- [x] PWA setup with manifest, icons, service worker (skipWaiting/clientsClaim)
+- [x] Mobile fluid scaling with clamp() for 14+ UI elements
+- [x] Constellation style disabled on mobile (decorative elements caused issues)
+- [x] Preset destination buttons: Popular label + 2-row grid layout
+- [x] Art preview scaled responsively with min(280px, 80vw)
+- [x] Mode toggle, speed/theme buttons with fluid widths
+- [x] Map container and hop list with dynamic heights
+- [x] Gallery grid, profile routes grid responsive (160px min columns)
+- [x] Badge case modal, inventory labels, toast notifications with fluid sizing
+- [x] Route Atlas map and sidebar responsive heights
+- [x] Cyberway Riders cyberpunk font for Routerino logo
+- [x] Routerino logo with neon glow effects and gradient text
+- [x] Background gradient (cyan/magenta) applied to body level
 
 ### Week 10-11: Print-on-Demand
 
