@@ -71,7 +71,7 @@ This roadmap outlines the development phases for Routerino, from initial demo to
   - "Show X more" collapsible sections for groups
 - [x] Duplicate fingerprint prevention - block saving duplicate routes
 
-### Week 9-10: Mobile App ✅ COMPLETE
+### Week 9-10: Mobile Web PWA ✅ COMPLETE
 
 - [x] PWA setup with manifest, icons, service worker (skipWaiting/clientsClaim)
 - [x] Mobile fluid scaling with clamp() for 14+ UI elements
@@ -89,7 +89,7 @@ This roadmap outlines the development phases for Routerino, from initial demo to
 
 ### Week 10-11: Print-on-Demand
 
-- [ ] Integrate print-on-demand API
+- [ ] Integrate print-on-demand API (Printful, Printify, or similar)
 - [ ] Product selection (poster, T-shirt, canvas)
 - [ ] Order processing
 - [ ] Payment integration
@@ -133,18 +133,13 @@ This roadmap outlines the development phases for Routerino, from initial demo to
 - [x] Download fingerprint card as image
 - [x] Share to social media (Twitter, Facebook, LinkedIn, Reddit, Instagram)
 
-### 3. Mobile App
-- [ ] Set up React Native + Expo project
-- [ ] Implement core features
-- [ ] Ensure cross-platform compatibility
-
-### 4. Print-on-Demand
+### 3. Print-on-Demand
 - [ ] Integrate print-on-demand API (Printful, Printify, or similar)
 - [ ] Product selection (poster, T-shirt, canvas)
 - [ ] Order processing
 - [ ] Payment integration
 
-### 5. Advanced Rarity System (Future)
+### 4. Advanced Rarity System (Future)
 **Status:** On Hold - requires significant infrastructure
 
 **Vision:** Global rarity tracking across all users
@@ -160,4 +155,4 @@ This roadmap outlines the development phases for Routerino, from initial demo to
 
 ---
 
-*Last updated: 2026-03-27*
+*Last updated: 2026-04-05*

@@ -243,7 +243,7 @@ Colors cycle for routes with many hops.
 - [x] Stats toggle works correctly
 - [x] Export quality is print-worthy (300 DPI equivalent)
 - [x] Save to Gallery produces square 600x600 thumbnails
-- [ ] Works on mobile (responsive)
+- [x] Works on mobile (responsive)
 
 ---
 
@@ -314,3 +314,5 @@ When saving to gallery, a 600x600 square thumbnail is generated using html2canva
 ## Conclusion
 
 The Art Generator transforms Routerino from a traceroute tool into an artistic platform. By focusing on quality, personalization, and shareability, this feature serves as the foundation for viral growth and print-on-demand revenue.
+
+*Last updated: 2026-04-05*

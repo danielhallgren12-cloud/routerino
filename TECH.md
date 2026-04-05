@@ -627,4 +627,4 @@ For faster traceroute on Windows, use WSL (Windows Subsystem for Linux):
 
 ---
 
-*Last updated: 2026-03-27*
+*Last updated: 2026-04-05*
