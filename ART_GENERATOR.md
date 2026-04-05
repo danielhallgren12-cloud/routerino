@@ -271,10 +271,10 @@ All art customization features have been implemented:
 
 ## Technical Debt / Known Issues
 
-- [x] Constellation stars render incorrectly in gallery thumbnail (html2canvas off-screen positioning)
-  - **Fix:** Stars are hidden when `galleryMode=true` for thumbnail capture
-  - **Affected:** Constellation style (stars), Retro style (sun rays)
-  - **Not affected:** Planets (fixed pixel positions), hop path, frames
+- [~] Constellation stars, retro sun rays and paper texture now render in desktop gallery saves
+  - **Fix:** Changed from `!galleryMode` to `!isMobileDevice()` check
+  - **Affected:** Constellation (stars), Retro (sun rays, paper texture)
+  - **Not affected:** Mobile (remains hidden as intended)
 - [ ] html2canvas can be buggy with advanced CSS (gradients, shadows)
 - [ ] Glow effects may not render perfectly in export
 - [ ] Large layout exports may be slow or memory-intensive

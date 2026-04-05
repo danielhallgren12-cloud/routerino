@@ -195,6 +195,9 @@ To add linting to package.json:
    - Log errors appropriately for debugging
 
 ## Recent Commits (2026-04)
+- **9b04540** - Show constellation stars, retro sun rays and paper texture in desktop gallery saves
+- **c56b94b** - Fix FIRST badge and Seen counter for cities, countries, companies - CATEGORY_PREFIX mapping
+- **2c1feec** - Reorder fingerprint stats: ASNs and Destinations swapped to prevent text overlap in fullscreen
 - **0d4810a** - Mobile fluid scaling: clamp() fixes for 14 UI elements across all device sizes
   - Fluid scaling for art preview, map container, mode toggle, speed controls, gallery, profile, badge case, route atlas
   - Toast notifications, inventory labels, hop number badges
@@ -225,6 +228,8 @@ To add linting to package.json:
   - Check against SavedRoute.fingerprint_id in database
   - Block save/share with clear error message showing fingerprint ID
   - SavedRoute model extended with fingerprint_id column
+- **Share Link fix**: Share Link now works for duplicate routes (only Save Route blocks duplicates)
+- **Inventory fixes**: FIRST badge and Seen counter now work correctly for all categories (CATEGORY_PREFIX mapping bug fixed)
 
 ## PWA (Progressive Web App)
 - **App name**: Routerino

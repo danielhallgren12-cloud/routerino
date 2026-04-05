@@ -144,4 +144,4 @@ Users will want to buy prints because:
 
 ---
 
-*Last updated: 2026-04-05*
+*Last updated: 2026-04-05 (gallery improvements, inventory fixes)*

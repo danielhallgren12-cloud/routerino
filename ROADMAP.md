@@ -86,6 +86,8 @@ This roadmap outlines the development phases for Routerino, from initial demo to
 - [x] Cyberway Riders cyberpunk font for Routerino logo
 - [x] Routerino logo with neon glow effects and gradient text
 - [x] Background gradient (cyan/magenta) applied to body level
+- [x] Gallery delete button for own gallery routes
+- [x] Inventory FIRST badge and Seen counter now work for all categories (CATEGORY_PREFIX mapping fix)
 
 ### Week 10-11: Print-on-Demand
 
