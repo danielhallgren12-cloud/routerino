@@ -342,6 +342,7 @@ body {
   max-height: calc(100vh - 200px);
   min-width: 280px;
   max-width: 400px;
+  background: transparent;
 }
 
 @media (max-width: 900px) {
@@ -995,8 +996,8 @@ body {
   align-items: center;
   gap: 3rem;
   padding: 0.75rem;
-  background: var(--bg-card);
-  border-bottom: 1px solid #333;
+  background: transparent;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
   flex-wrap: wrap;
 }
 
@@ -1017,11 +1018,12 @@ body {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  background: transparent;
 }
 
 .playback-controls button {
   padding: 0.4rem 0.6rem;
-  background: var(--bg-dark);
+  background: rgba(10, 10, 15, 0.6);
   border: 1px solid var(--border-color);
   border-radius: 6px;
   color: var(--text);
@@ -1032,7 +1034,7 @@ body {
 
 .playback-controls button:hover:not(:disabled) {
   border-color: var(--primary);
-  background: rgba(0, 212, 255, 0.1);
+  background: rgba(0, 212, 255, 0.2);
 }
 
 .playback-controls button:disabled {
@@ -1048,7 +1050,7 @@ body {
 
 .speed-controls button {
   padding: 0.3rem 0.6rem;
-  background: var(--bg-dark);
+  background: rgba(10, 10, 15, 0.6);
   border: 1px solid var(--border-color);
   border-radius: 4px;
   color: var(--text-muted);
@@ -1063,7 +1065,7 @@ body {
 
 .speed-controls button.active {
   background: var(--primary);
-  color: var(--bg-dark);
+  color: #0a0a0f;
   border-color: var(--primary);
 }
 
@@ -1315,7 +1317,7 @@ body {
 
 .hop-list {
   padding: 1rem 2rem;
-  background: var(--bg-card);
+  background: transparent;
   max-height: 300px;
   overflow-y: auto;
 }
@@ -1335,7 +1337,7 @@ body {
 .view-toggle {
   display: flex;
   gap: 0.25rem;
-  background: var(--bg-dark);
+  background: rgba(10, 10, 15, 0.6);
   padding: 0.25rem;
   border-radius: 6px;
 }
@@ -1393,8 +1395,8 @@ body {
 
 /* Network Fingerprint */
 .fingerprint-card {
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(99, 102, 241, 0.15));
-  border: 1px solid rgba(139, 92, 246, 0.3);
+  background: var(--bg-dark);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 0.75rem;
   margin-bottom: 0.75rem;
