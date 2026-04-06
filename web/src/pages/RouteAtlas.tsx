@@ -32,6 +32,7 @@ interface DestinationRoutes {
 
 interface PathInfo {
   color: string
+  dashPattern: string
   asnChain: string
   count: number
   percentage: number
@@ -40,16 +41,27 @@ interface PathInfo {
 
 const ROUTE_COLORS = [
   '#3b82f6',
-  '#ec4899',
+  '#ef4444',
   '#f97316',
-  '#14b8a6',
-  '#8b5cf6',
   '#eab308',
   '#22c55e',
-  '#ef4444',
+  '#14b8a6',
+  '#8b5cf6',
+  '#ec4899',
 ]
 
-const OFFSET_DISTANCE = 0.00003
+const ROUTE_DASH_PATTERNS = [
+  '12, 6',   
+  '6, 12',   
+  '18, 6',   
+  '8, 8',    
+  '15, 5',   
+  '5, 10',   
+  '10, 10',  
+  '4, 8',    
+]
+
+const OFFSET_DISTANCE = 0.00002
 
 function calculatePerpendicularOffset(
   pointA: [number, number],
@@ -173,8 +185,9 @@ function MapContent({ selectedDestination, destinations, pathInfos, selectedRout
 
         L.polyline(coordsWithOffset, {
           color: pathInfo.color,
-          weight: 4,
-          opacity: 0.85,
+          weight: 5,
+          opacity: 0.9,
+          dashArray: pathInfo.dashPattern,
         }).addTo(map)
 
         hops.forEach((hop) => {
@@ -219,6 +232,9 @@ function MapContent({ selectedDestination, destinations, pathInfos, selectedRout
         fillOpacity: 0.4,
       })
       marker.bindPopup(`${key}: ${data.count} appearances`)
+      marker.on('click', () => {
+        map.setView([data.lat, data.lng], Math.min(map.getZoom() + 3, 18))
+      })
       marker.addTo(map)
     })
 
@@ -410,6 +426,7 @@ export default function RouteAtlas() {
       const percentage = Math.round((info.count / selectedRoutes.length) * 100)
       return {
         color: ROUTE_COLORS[idx % ROUTE_COLORS.length],
+        dashPattern: ROUTE_DASH_PATTERNS[idx % ROUTE_DASH_PATTERNS.length],
         asnChain,
         count: info.count,
         percentage,
