@@ -7,7 +7,7 @@
 | Frontend | Cloudflare Pages | €0 | Free, unlimited bandwidth |
 | Backend | Hetzner VPS | €3-5/mo | Always on, full control |
 | Database | Neon PostgreSQL | €0 | 3GB free, managed |
-| Domain | routerino.com | ~€10-15/yr | |
+| Domain | Porkbun (routerino.com) | ~€10-15/yr | |
 
 ## DNS Structure
 
@@ -65,17 +65,18 @@
 
 ## Discussion Points (Future)
 
-### Print-on-Demand / Webshop
+### Print-on-Demand / Webshop - ON HOLD
+- **Status:** Currently on hold
 - **Affiliate** (easy, 2-3h work, low payout)
 - **Etsy/Printful** (medium, 5-10h work, better margins)
 - **Digital Downloads via Gumroad** (medium, 10-15h, sells exact user's trace)
 - **Premium Subscription** (complex, 30-50h, recurring revenue)
 
 ### Monetization Conclusion
-- Start with **Donations** (PayPal.me/Ko-fi)
-- **Digital Downloads** via Gumroad for exact traces
-- **Premium** only if clear value proposition found
-- Affiliate as supplementary
+- Start with **Donations** (PayPal.me)
+- **Digital Downloads** via Gumroad for exact traces (future)
+- **Premium** only if clear value proposition found (future)
+- Affiliate as supplementary (future)
 
 ### Linux Prerequisites for VPS
 - Ubuntu/Debian

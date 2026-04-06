@@ -11,7 +11,7 @@
 - **Visual Traceroute**: Transform standard traceroute output into an animated journey on a world map
 - **Route Art**: Apply artistic themes (neon, retro, minimal) to create unique shareable images
 - **Personal Connection**: Emphasize user's home location as start point + their search destination as end point
-- **Print-on-Demand**: High-quality exports for ordering prints (posters, canvases)
+- **Print-on-Demand**: High-quality exports for ordering prints (posters, canvases) - *currently on hold*
 
 ## 3. Target Users
 
@@ -26,7 +26,7 @@
 1. **Educational**: Help users understand how their data travels across the internet
 2. **Creative**: Provide a unique artistic outlet through route visualization
 3. **Portfolio-worthy**: Demonstrate full-stack development skills for IT career
-4. **Practical**: Generate side income through print-on-demand products
+4. **Practical**: Generate side income through print-on-demand products - *future goal*
 
 ---
 
@@ -83,7 +83,7 @@
 
 | Feature | Description |
 |---------|-------------|
-| Print-on-Demand | Order posters, T-shirts, canvases with route art |
+| Print-on-Demand | Order posters, T-shirts, canvases with route art - **ON HOLD** |
 | Advanced Rarity | Global rarity (how many users have it), personal rarity stats |
 | Gamification | Badges, country counters, route uniqueness scores |
 | Route Atlas | ✅ Complete - Compare routes to same destination over time with visual map overlay and hop-by-hop breakdown |
@@ -144,4 +144,4 @@ Users will want to buy prints because:
 
 ---
 
-*Last updated: 2026-04-05 (gallery improvements, inventory fixes)*
+*Last updated: 2026-04-06 (print-on-demand on hold)*

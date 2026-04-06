@@ -6,13 +6,10 @@
 
 | Layer | Technology | Rationale |
 |-------|------------|-----------|
-| Mobile App | React Native (Expo) | Native mobile experience, mature ecosystem |
-| Web App | React + Capacitor | Shared components, single codebase |
+| Web App | React + Vite | Modern SPA, fast development |
 | Backend | Python + FastAPI | Modern async framework, great for network tools |
-| Database | SQLite (demo) → PostgreSQL (prod) | Simple start, scalable later |
-| Caching | Redis | Session management, rate limiting |
+| Database | SQLite → Neon PostgreSQL | Simple start, scalable to managed PostgreSQL |
 | Maps | Leaflet + OpenStreetMap | Free, no API keys, lightweight |
-| Maps (Mobile) | react-native-maps | Native map component for React Native |
 
 ### Frontend Stack
 
@@ -22,14 +19,6 @@
 - Vite (build tool)
 - Leaflet (maps)
 - html2canvas (image export)
-- CSS Modules or Tailwind CSS
-
-**Mobile:**
-- React Native (Expo)
-- TypeScript
-- Expo Router (navigation)
-- react-native-maps
-- expo-camera / expo-image-picker (future)
 
 ### Backend Stack
 
@@ -316,21 +305,6 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 const route = L.polyline(coordinates, { color: themeColor }).addTo(map);
 ```
 
-### Map Visualization (Mobile)
-
-```typescript
-// Using react-native-maps
-import MapView from 'react-native-maps';
-
-<MapView
-  initialRegion={{ latitude: 20, longitude: 0, latitudeDelta: 100, longitudeDelta: 100 }}
->
-  {hops.map((hop) => (
-    <Marker key={hop.hop} coordinate={{ latitude: hop.lat, longitude: hop.lng }} />
-  ))}
-</MapView>
-```
-
 ### Art Themes
 
 | Theme | Style | Status |
@@ -412,11 +386,6 @@ CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0"]
 - Netlify
 - Cloudflare Pages
 
-### Mobile (App)
-
-- Expo EAS Build
-- App Store / Google Play
-
 ---
 
 ## 8. Development Setup
@@ -425,8 +394,6 @@ CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0"]
 
 - Node.js 18+
 - Python 3.10+
-- Docker (optional)
-- Expo CLI
 
 ### Local Development
 
@@ -442,11 +409,6 @@ uvicorn app.main:app --reload
 cd web
 npm install
 npm run dev
-
-# Mobile
-cd mobile
-npm install
-npx expo start
 ```
 
 ---

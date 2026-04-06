@@ -195,25 +195,24 @@ To add linting to package.json:
    - Log errors appropriately for debugging
 
 ## Recent Commits (2026-04)
+- **062f1d5** - Add footer with PayPal donate, email and GitHub links
+- **1b3ddb0** - Update .gitignore: exclude web/dist/ and *.db files
+- **02bdb34** - Remove web/dist from git tracking - Vercel builds from source
+- **24e4ebd** - Route Atlas: dashed line patterns for route differentiation + clickable city markers for half-zoom
+- **60743db** - Visual improvements: CartoDB Dark Matter map tiles, transparent UI backgrounds, fingerprint-card dark styling
+- **0317cfa** - Upgrade map tiles: CartoDB Dark Matter for dark mode, Positron for light mode, Route Atlas
 - **9b04540** - Show constellation stars, retro sun rays and paper texture in desktop gallery saves
 - **c56b94b** - Fix FIRST badge and Seen counter for cities, countries, companies - CATEGORY_PREFIX mapping
 - **2c1feec** - Reorder fingerprint stats: ASNs and Destinations swapped to prevent text overlap in fullscreen
 - **0d4810a** - Mobile fluid scaling: clamp() fixes for 14 UI elements across all device sizes
-  - Fluid scaling for art preview, map container, mode toggle, speed controls, gallery, profile, badge case, route atlas
-  - Toast notifications, inventory labels, hop number badges
 - **26d31c1** - Fix preset destination buttons mobile layout - Popular label and 2-row grid
 - **4471ebd** - Routerino logo update with Cyberway Riders font and 3D effects
-  - Cyberway Riders cyberpunk font integrated for Routerino logo
-  - Neon glow effects, gradient text, responsive sizing (1.5rem header, 3rem hero)
 - **419606f** - Additional mobile optimization fixes
-  - Constellation style disabled on mobile, art preview 320x320px square
-  - Background gradient to body level, header/input-section transparent backgrounds
-  - Animation play button uses first hop as fallback (cross-platform fix)
 - **f7b56ba** - Mobile optimization for Routerino PWA
-  - PWA manifest, icons (192x192, 512x512), service worker with skipWaiting/clientsClaim
-  - Gradient background (cyan left, magenta right), full-page coverage
 
 ## Recent Updates (2026-04)
+- **Route Atlas improvements**: Dashed line patterns for route differentiation (8 unique dash arrays), clickable city markers for half-zoom, vertical offset for overlapping routes
+- **Footer added**: PayPal donate button, email (danielhallgren12@gmail.com), GitHub link (danielhallgren12-cloud)
 - **Mobile Optimization**: Full PWA support for Routerino with fluid scaling
   - PWA manifest with app name "Routerino", fullscreen display, cyan/pink gradient theme
   - Service worker with skipWaiting/clientsClaim for immediate updates
@@ -230,6 +229,12 @@ To add linting to package.json:
   - SavedRoute model extended with fingerprint_id column
 - **Share Link fix**: Share Link now works for duplicate routes (only Save Route blocks duplicates)
 - **Inventory fixes**: FIRST badge and Seen counter now work correctly for all categories (CATEGORY_PREFIX mapping bug fixed)
+
+## Deployment (Current)
+- **Frontend**: Cloudflare Pages (routerino.com)
+- **Backend**: Hetzner VPS (Python/FastAPI)
+- **Database**: Neon PostgreSQL (€0 tier)
+- **Domain**: Porkbun (routerino.com)
 
 ## PWA (Progressive Web App)
 - **App name**: Routerino

@@ -89,12 +89,13 @@ This roadmap outlines the development phases for Routerino, from initial demo to
 - [x] Gallery delete button for own gallery routes
 - [x] Inventory FIRST badge and Seen counter now work for all categories (CATEGORY_PREFIX mapping fix)
 
-### Week 10-11: Print-on-Demand
+### Week 10-11: Print-on-Demand - ON HOLD
 
-- [ ] Integrate print-on-demand API (Printful, Printify, or similar)
-- [ ] Product selection (poster, T-shirt, canvas)
-- [ ] Order processing
-- [ ] Payment integration
+- [ ] ~~Integrate print-on-demand API (Printful, Printify, or similar)~~
+- [ ] ~~Product selection (poster, T-shirt, canvas)~~
+- [ ] ~~Order processing~~
+- [ ] ~~Payment integration~~
+- **Status:** Currently on hold - donations via PayPal active
 
 ### Week 12+: Gamification and Advanced Features
 
@@ -135,11 +136,12 @@ This roadmap outlines the development phases for Routerino, from initial demo to
 - [x] Download fingerprint card as image
 - [x] Share to social media (Twitter, Facebook, LinkedIn, Reddit, Instagram)
 
-### 3. Print-on-Demand
-- [ ] Integrate print-on-demand API (Printful, Printify, or similar)
-- [ ] Product selection (poster, T-shirt, canvas)
-- [ ] Order processing
-- [ ] Payment integration
+### 3. Print-on-Demand - ON HOLD
+- [ ] ~~Integrate print-on-demand API (Printful, Printify, or similar)~~
+- [ ] ~~Product selection (poster, T-shirt, canvas)~~
+- [ ] ~~Order processing~~
+- [ ] ~~Payment integration~~
+- **Status:** Currently on hold - donations via PayPal active
 
 ### 4. Advanced Rarity System (Future)
 **Status:** On Hold - requires significant infrastructure
@@ -157,4 +159,4 @@ This roadmap outlines the development phases for Routerino, from initial demo to
 
 ---
 
-*Last updated: 2026-04-05*
+*Last updated: 2026-04-06 (print-on-demand marked on hold, footer added)*

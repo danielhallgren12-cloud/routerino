@@ -4,6 +4,8 @@
 
 The Art Generator is a feature that creates beautiful, shareable, and printable artwork from traceroute data. It transforms network journey data into artistic visualizations that users can download, share on social media, or print as wall art.
 
+*Note: Print-on-Demand functionality is currently on hold. Users can export and download high-quality images for personal use.*
+
 ---
 
 ## Vision
@@ -263,9 +265,9 @@ All art customization features have been implemented:
 - [x] Gallery button with shimmer effect in header
 - [x] Square 600x600 thumbnail generation for gallery
 
-### Phase 4 - Expansion
-- [ ] Print-on-demand integration
-- [ ] User profiles and gallery
+### Phase 4 - Expansion - ON HOLD
+- [ ] ~~Print-on-demand integration~~
+- [ ] ~~User profiles and gallery~~
 
 ---
 
