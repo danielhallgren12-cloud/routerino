@@ -1,4 +1,4 @@
-const API_URL = '/api/v1'
+const API_URL = 'https://api.routerino.com/api/v1'
 
 export interface User {
   id: number

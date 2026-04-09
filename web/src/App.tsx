@@ -5,7 +5,7 @@ import 'leaflet/dist/leaflet.css'
 import html2canvas from 'html2canvas'
 import { AuthProvider, useAuth } from './auth/AuthContext'
 import { LoginForm, RegisterForm } from './auth/forms'
-import { routesApi, galleryApi } from './auth/api'
+import { routesApi, galleryApi, API_URL } from './auth/api'
 import { ArtGenerator } from './art/ArtGenerator'
 import Inventory from './components/Inventory'
 import BadgeCase from './components/BadgeCase'
@@ -157,7 +157,7 @@ function App() {
     setTraceData(null)
     
     try {
-      const response = await fetch('/api/v1/trace', {
+      const response = await fetch(`${API_URL}/trace`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache' },
         body: JSON.stringify({ destination: target, max_hops: 20, ip_version: ipVersion, _nonce: Math.random() })
