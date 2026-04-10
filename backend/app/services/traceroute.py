@@ -77,7 +77,7 @@ def run_traceroute(destination: str, max_hops: int = 30, ip_version: str = "ipv4
             # Note: Windows tracert doesn't support TCP, but -d makes it faster
             cmd = ["tracert", ip_flag, "-h", "20", "-w", "200", "-d", destination]
         else:
-            cmd = ["traceroute", ip_flag, "-m", "20", "-n", "-T", destination]
+            cmd = ["traceroute", ip_flag, "-m", "20", "-n", "-U", destination]
         
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=20)
         output = result.stdout
