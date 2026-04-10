@@ -77,7 +77,7 @@ def run_traceroute(destination: str, max_hops: int = 30, ip_version: str = "ipv4
             # Note: Windows tracert doesn't support TCP, but -d makes it faster
             cmd = ["tracert", ip_flag, "-h", "20", "-w", "200", "-d", destination]
         else:
-            cmd = ["traceroute", ip_flag, "-m", "20", "-n", "-U", destination]
+            cmd = ["traceroute", ip_flag, "-m", "20", "-n", "-T", destination]
         
         result = subprocess.run(cmd, capture_output=True, text=True, timeout=20)
         output = result.stdout
@@ -161,5 +161,21 @@ def run_traceroute(destination: str, max_hops: int = 30, ip_version: str = "ipv4
         pass
     except Exception as e:
         pass
-    
-    return [h for h in hops if h.get("ip") and h.get("ip") != "*"]
+
+def is_private_ip(ip: str) -> bool:
+    if ip.startswith("10."):
+        return True
+    if ip.startswith("192.168."):
+        return True
+    if ip.startswith("172."):
+        second_octet = int(ip.split(".")[1])
+        if 16 <= second_octet <= 31:
+            return True
+    return False
+
+filtered = [h for h in hops if h.get("ip") and h.get("ip") != "*" and not is_private_ip(h.get("ip", ""))]
+
+for i, hop in enumerate(filtered, start=1):
+    hop["hop"] = i
+
+return filtered

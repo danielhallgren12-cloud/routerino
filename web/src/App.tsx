@@ -481,7 +481,6 @@ if (token && data.fingerprint_id) {
               {(saveMessage || shareMessage) && <span className="save-message">{saveMessage || shareMessage}</span>}
             </>
           )}
-          {loading && <div className="loading-note">A search takes approx 8-15 sec</div>}
           <div className="preset-destinations">
             <span className="preset-label">Popular:</span>
             {['google.com', 'cloudflare.com', 'github.com', 'amazon.com', 'facebook.com'].map(dest => (
