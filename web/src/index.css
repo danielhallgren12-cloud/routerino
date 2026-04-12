@@ -3980,6 +3980,14 @@ body {
 }
 
 .footer-donate {
+  margin-top: 0.75rem;
+}
+
+.footer-row-2 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
   margin-bottom: 1rem;
 }
 
@@ -3989,9 +3997,9 @@ body {
   gap: 0.4rem;
   background: #0070ba;
   color: #fff;
-  padding: 0.5rem 1rem;
+  padding: 0.4rem 0.8rem;
   border-radius: 6px;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 600;
   text-decoration: none;
   transition: background 0.2s;
@@ -4027,17 +4035,29 @@ body {
   font-size: 0.8rem;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   .footer {
-    padding: 1.5rem 1rem;
-  }
-
-  .footer-brand {
-    font-size: 1.25rem;
+    padding: 1rem 0.75rem;
   }
 
   .footer-links {
-    flex-direction: column;
-    gap: 0.75rem;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .footer-row-2 {
+    flex-direction: row;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .footer-donate-btn {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.6rem;
+  }
+
+  .footer-copyright {
+    font-size: 0.7rem;
   }
 }
