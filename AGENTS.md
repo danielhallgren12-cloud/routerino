@@ -195,6 +195,12 @@ To add linting to package.json:
    - Log errors appropriately for debugging
 
 ## Recent Commits (2026-04)
+- **ec2d42d** - Add comprehensive README with secure deployment instructions
+- **fb6b2c1** - Compact footer with icon links, transparent border, no overlap on mobile
+- **d15b1f1** - Compact footer for mobile: smaller donate button, GitHub and donate on same row
+- **682ab97** - Fix API URL: use api.routerino.com instead of relative path for trace
+- **1e10b54** - Fix traceroute: use UDP instead of TCP to avoid root requirement, fix API_URL export and frontend trace call
+- **3c0acfc** - Enable TCP traceroute, filter private IPs, remove loading text
 - **062f1d5** - Add footer with PayPal donate, email and GitHub links
 - **1b3ddb0** - Update .gitignore: exclude web/dist/ and *.db files
 - **02bdb34** - Remove web/dist from git tracking - Vercel builds from source
@@ -229,12 +235,18 @@ To add linting to package.json:
   - SavedRoute model extended with fingerprint_id column
 - **Share Link fix**: Share Link now works for duplicate routes (only Save Route blocks duplicates)
 - **Inventory fixes**: FIRST badge and Seen counter now work correctly for all categories (CATEGORY_PREFIX mapping bug fixed)
+- **TCP traceroute enabled**: Uses setcap for raw socket permissions, faster and more reliable
+- **IP filtering**: Private IPs (172.16-31.x.x, 10.x.x.x, 192.168.x.x) filtered from traces
+- **Compact footer**: Icon-based footer with GitHub, Email, and Donate on same row
+- **Transparent footer border**: Removed visual divider line for cleaner look
+- **README updated**: Comprehensive documentation with secure deployment instructions
 
 ## Deployment (Current)
-- **Frontend**: Cloudflare Pages (routerino.com)
-- **Backend**: Hetzner VPS (Python/FastAPI)
+- **Frontend**: Cloudflare Pages (www.routerino.com)
+- **Backend**: Hetzner VPS (Python/FastAPI) - port 8000
 - **Database**: Neon PostgreSQL (€0 tier)
 - **Domain**: Porkbun (routerino.com)
+- **SSL**: Let's Encrypt via Certbot
 
 ## PWA (Progressive Web App)
 - **App name**: Routerino
@@ -253,7 +265,7 @@ To add linting to package.json:
 | `web/public/icons/icon.svg` | Source SVG for icons |
 
 ### Deployment
-PWA requires HTTPS for service workers to work. Deploy to Vercel/Netlify for bug testing.
+PWA requires HTTPS for service workers to work.
 
 ## Database Guidelines
 1. Always use migrations for schema changes
