@@ -465,6 +465,7 @@ body {
 
   .hero-bg {
     min-height: 50vh;
+    padding-bottom: 1rem;
   }
   
   .animation-controls {
@@ -1164,6 +1165,8 @@ body {
   justify-content: center;
   background: transparent;
   overflow-y: auto;
+  padding-bottom: 2rem;
+  box-sizing: border-box;
 }
 
 :root.light-mode .hero-bg {
@@ -3975,8 +3978,11 @@ body {
   background: transparent;
   padding: 2rem 1rem;
   text-align: center;
-  border-top: 1px solid var(--border-color);
+  border-top: 1px solid transparent;
   margin-top: auto;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 100;
 }
 
 .footer-donate {
@@ -4035,29 +4041,53 @@ body {
   font-size: 0.8rem;
 }
 
+.footer-row-1 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: nowrap;
+}
+
+.footer-icon-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 1.2rem;
+  transition: color 0.2s;
+  flex-shrink: 0;
+}
+
+.footer-icon-link:hover {
+  color: var(--primary);
+}
+
 @media (max-width: 768px) {
   .footer {
-    padding: 1rem 0.75rem;
+    padding: 0.75rem 0.5rem;
+    flex-shrink: 0;
   }
 
-  .footer-links {
-    justify-content: center;
+  .footer-row-1 {
+    gap: 1.25rem;
     margin-bottom: 0.5rem;
+    flex-wrap: wrap;
   }
 
-  .footer-row-2 {
-    flex-direction: row;
-    justify-content: center;
-    gap: 2rem;
-    margin-bottom: 0.75rem;
+  .footer-icon-link {
+    font-size: 1rem;
   }
 
   .footer-donate-btn {
-    font-size: 0.75rem;
-    padding: 0.3rem 0.6rem;
+    font-size: 0.7rem;
+    padding: 0.25rem 0.5rem;
+    flex-shrink: 0;
   }
 
   .footer-copyright {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
   }
 }
