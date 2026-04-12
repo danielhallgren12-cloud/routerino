@@ -1,6 +1,7 @@
 # Routerino - Visual Route Art Game
 
-![Screenshot placeholder - add your screenshot here]()
+<img width="676" height="462" alt="Skärmbild 2026-04-12 135618" src="https://github.com/user-attachments/assets/f3453147-9cc9-4c7d-8009-814daceb4c42" />
+
 
 Transform network routes into beautiful visual art. Trace internet paths to any destination and watch as data packets travel across the globe on an interactive map.
 
