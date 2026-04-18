@@ -195,8 +195,10 @@ To add linting to package.json:
    - Log errors appropriately for debugging
 
 ## Recent Commits (2026-04)
+- **d55127d** - Add PWA screenshots, OG tags, and optimized caching for tiles and API
+- **9644adc** - Update AGENTS.md: add recent commits, new features, fix deployment info
+- **8b79232** - Update README with screenshot for visual context
 - **ec2d42d** - Add comprehensive README with secure deployment instructions
-- **fb6b2c1** - Compact footer with icon links, transparent border, no overlap on mobile
 - **d15b1f1** - Compact footer for mobile: smaller donate button, GitHub and donate on same row
 - **682ab97** - Fix API URL: use api.routerino.com instead of relative path for trace
 - **1e10b54** - Fix traceroute: use UDP instead of TCP to avoid root requirement, fix API_URL export and frontend trace call
@@ -217,7 +219,10 @@ To add linting to package.json:
 - **f7b56ba** - Mobile optimization for Routerino PWA
 
 ## Recent Updates (2026-04)
-- **Route Atlas improvements**: Dashed line patterns for route differentiation (8 unique dash arrays), clickable city markers for half-zoom, vertical offset for overlapping routes
+- **OG tags for social preview**: Added og:title, og:description, og:image, og:url, og:type, og:site_name + Twitter card tags
+- **PWA screenshots**: 8 screenshots added to manifest.json for better PWA installation experience
+- **Optimized caching**: CartoDB tiles cached (30 days, CacheFirst), API responses cached (1 hour, NetworkFirst)
+- **Google Play preparation**: Feature graphic, screenshots, AAB package ready for submission
 - **Footer added**: PayPal donate button, email (danielhallgren12@gmail.com), GitHub link (danielhallgren12-cloud)
 - **Mobile Optimization**: Full PWA support for Routerino with fluid scaling
   - PWA manifest with app name "Routerino", fullscreen display, cyan/pink gradient theme
@@ -252,17 +257,22 @@ To add linting to package.json:
 - **App name**: Routerino
 - **Display**: Fullscreen
 - **Theme**: Cyan/pink gradient on dark background
-- **Icons**: Globe with "RI" letters, 192x192 and 512x512 PNG
+- **Categories**: games, utilities
+- **Icons**: Globe with "RI" letters, 192x192 and 512x512 PNG (maskable)
+- **Screenshots**: 8 screenshots for app store listing
 - **Service Worker**: Auto-update via vite-plugin-pwa
+- **Caching**: CartoDB tiles (30 days), API responses (1 hour), Google Fonts (1 year)
 
 ### Files
 | File | Purpose |
 |------|---------|
-| `web/public/manifest.json` | PWA manifest |
+| `web/public/manifest.json` | PWA manifest with screenshots |
 | `web/public/icons/icon-192.png` | Small icon |
 | `web/public/icons/icon-512.png` | Large icon |
 | `web/public/favicon.png` | Browser favicon |
 | `web/public/icons/icon.svg` | Source SVG for icons |
+| `web/public/social-preview.png` | Social sharing preview image (1200x631) |
+| `web/public/routerino*.png` | Screenshots for app stores |
 
 ### Deployment
 PWA requires HTTPS for service workers to work.
