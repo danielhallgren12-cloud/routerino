@@ -21,5 +21,63 @@
       "purpose": "any maskable"
     }
   ],
-  "categories": ["utilities", "lifestyle", "entertainment"]
+  "categories": ["games", "utilities"],
+  "screenshots": [
+    {
+      "src": "/routerino1_1080_1925.png",
+      "sizes": "1080x1925",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Trace routes on an interactive world map"
+    },
+    {
+      "src": "/routerino2_1080_1925.png",
+      "sizes": "1080x1925",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Network fingerprint and route data"
+    },
+    {
+      "src": "/routerino3_1080_1925.png",
+      "sizes": "1080x1925",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Detailed route information"
+    },
+    {
+      "src": "/routerino4_1080_1925.png",
+      "sizes": "1080x1925",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Route Atlas - compare multiple routes"
+    },
+    {
+      "src": "/routerino5_1080_1925.png",
+      "sizes": "1080x1925",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Badge collection system"
+    },
+    {
+      "src": "/routerino6_1080_1925.png",
+      "sizes": "1080x1925",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Inventory - view all discovered items"
+    },
+    {
+      "src": "/routerino7_1080_1925.png",
+      "sizes": "1080x1925",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Art generator - create artwork from traces"
+    },
+    {
+      "src": "/routerino8_1080_1925.png",
+      "sizes": "1080x1925",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Public gallery - explore other traces"
+    }
+  ]
 }

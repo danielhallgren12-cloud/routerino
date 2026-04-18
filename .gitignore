@@ -5,5 +5,6 @@ __pycache__/
 .DS_Store
 *.log
 *.db
+OUTREACH_POSTS.md
 
 web/dist/

@@ -25,6 +25,29 @@ export default defineConfig({
                 maxAgeSeconds: 60 * 60 * 24 * 365
               }
             }
+          },
+          {
+            urlPattern: /^https:\/\/.+\.basemaps\.cartocdn\.com\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'cartodb-tiles-cache',
+              expiration: {
+                maxEntries: 500,
+                maxAgeSeconds: 60 * 60 * 24 * 30
+              }
+            }
+          },
+          {
+            urlPattern: /^https:\/\/api\.routerino\.com\/.*/i,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'api-cache',
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 60
+              },
+              networkTimeoutSeconds: 10
+            }
           }
         ]
       }
