@@ -103,16 +103,11 @@ export default function FingerprintModal({ fingerprintId, destination, hops, use
       if (platform === 'twitter') {
         window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank', 'width=550,height=420')
       } else if (platform === 'facebook') {
-        window.open(`https://www.facebook.com/sharer/sharer.php?quote=${encodeURIComponent(text)}`, '_blank', 'width=550,height=420')
+        window.open(`https://www.facebook.com/sharer/sharer.php?quote=${encodeURIComponent(text)}&u=${encodeURIComponent('https://www.routerino.com')}`, '_blank', 'width=550,height=420')
       } else if (platform === 'linkedin') {
-        window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`, '_blank', 'width=550,height=420')
+        window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent('https://www.routerino.com')}`, '_blank', 'width=550,height=420')
       } else if (platform === 'reddit') {
-        window.open(`https://www.reddit.com/submit?title=${encodeURIComponent(text)}&url=${encodeURIComponent(window.location.href)}`, '_blank', 'width=550,height=420')
-      } else if (platform === 'instagram') {
-        const imageUrl = await getShareUrl()
-        if (imageUrl) {
-          window.open(`https://www.instagram.com/create/selection/?img=${encodeURIComponent(imageUrl)}&caption=${encodeURIComponent(text)}`, '_blank')
-        }
+        window.open(`https://www.reddit.com/submit?title=${encodeURIComponent(text)}&url=${encodeURIComponent('https://www.routerino.com')}`, '_blank', 'width=550,height=420')
       }
     } finally {
       setSharing(false)
@@ -181,7 +176,7 @@ export default function FingerprintModal({ fingerprintId, destination, hops, use
           </div>
           
           <div className="fingerprint-share-footer">
-            routecanvas.app
+            routerino.com
           </div>
         </div>
         
@@ -207,9 +202,7 @@ export default function FingerprintModal({ fingerprintId, destination, hops, use
             <button onClick={() => handleShare('reddit')} disabled={sharing} title="Share on Reddit" className="fps-social-btn">
               <RedditIcon />
             </button>
-            <button onClick={() => handleShare('instagram')} disabled={sharing} title="Share on Instagram" className="fps-social-btn">
-              <InstagramIcon />
-            </button>
+            
           </div>
         </div>
       </div>

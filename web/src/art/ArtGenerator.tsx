@@ -238,23 +238,14 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
         const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`
         window.open(twitterUrl, '_blank', 'width=550,height=420')
       } else if (platform === 'facebook') {
-        const imageUrl = await getShareUrl()
-        const facebookUrl = imageUrl
-          ? `https://www.facebook.com/sharer/sharer.php?quote=${encodeURIComponent(text)}&u=${encodeURIComponent(imageUrl)}`
-          : `https://www.facebook.com/sharer/sharer.php?quote=${encodeURIComponent(text)}`
+        const facebookUrl = `https://www.facebook.com/sharer/sharer.php?quote=${encodeURIComponent(text)}&u=${encodeURIComponent('https://www.routerino.com')}`
         window.open(facebookUrl, '_blank', 'width=550,height=420')
       } else if (platform === 'linkedin') {
-        const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`
+        const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent('https://www.routerino.com')}`
         window.open(linkedinUrl, '_blank', 'width=550,height=420')
       } else if (platform === 'reddit') {
-        const redditUrl = `https://www.reddit.com/submit?title=${encodeURIComponent(text)}&url=${encodeURIComponent(window.location.href)}`
+        const redditUrl = `https://www.reddit.com/submit?title=${encodeURIComponent(text)}&url=${encodeURIComponent('https://www.routerino.com')}`
         window.open(redditUrl, '_blank', 'width=550,height=420')
-      } else if (platform === 'instagram') {
-        const imageUrl = await getShareUrl()
-        if (imageUrl) {
-          const instagramUrl = `https://www.instagram.com/create/selection/?img=${encodeURIComponent(imageUrl)}&caption=${encodeURIComponent(text)}`
-          window.open(instagramUrl, '_blank')
-        }
       }
     } finally {
       setSharing(false)
@@ -397,7 +388,7 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
           )}
           
           <div style={{ position: 'absolute', bottom: 14, right: 18, fontFamily: 'Space Mono, monospace', fontSize: 9, color: '#999' }}>
-            routecanvas.app
+            routerino.com
           </div>
           {includeName && customName && (
             <div style={{ position: 'absolute', bottom: 14, left: 18, fontFamily: 'Space Mono, monospace', fontSize: 9, color: '#999' }}>
@@ -487,7 +478,7 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
           )}
           
           <div style={{ position: 'absolute', bottom: 14, right: 18, fontFamily: 'Space Mono, monospace', fontSize: 9, color: '#555' }}>
-            routecanvas.app
+            routerino.com
           </div>
           {includeName && customName && (
             <div style={{ position: 'absolute', bottom: 14, left: 18, fontFamily: 'Space Mono, monospace', fontSize: 9, color: '#555' }}>
@@ -588,7 +579,7 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
           )}
           
           <div style={{ position: 'absolute', bottom: 14, right: 18, fontFamily: 'Space Mono, monospace', fontSize: 9, color: '#555' }}>
-            routecanvas.app
+            routerino.com
           </div>
           {includeName && customName && (
             <div style={{ position: 'absolute', bottom: 14, left: 18, fontFamily: 'Space Mono, monospace', fontSize: 9, color: '#555' }}>
@@ -676,7 +667,7 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
           )}
           
           <div style={{ position: 'absolute', bottom: 14, right: 18, fontFamily: 'Space Mono, monospace', fontSize: 9, color: '#aaa' }}>
-            routecanvas.app
+            routerino.com
           </div>
           {includeName && customName && (
             <div style={{ position: 'absolute', bottom: 14, left: 18, fontFamily: 'Space Mono, monospace', fontSize: 9, color: '#aaa' }}>
@@ -731,7 +722,7 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
           )}
           
           <div style={{ position: 'absolute', bottom: 14, right: 18, fontFamily: 'system-ui, sans-serif', fontSize: 9, color: '#bbb', letterSpacing: 1 }}>
-            routecanvas.app
+            routerino.com
           </div>
           {includeName && customName && (
             <div style={{ position: 'absolute', bottom: 14, left: 18, fontFamily: 'system-ui, sans-serif', fontSize: 9, color: '#bbb', letterSpacing: 1 }}>
@@ -836,7 +827,7 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
           )}
           
           <div style={{ position: 'absolute', bottom: 12, right: 18, fontFamily: 'Georgia, serif', fontSize: 9, color: '#8B4513', letterSpacing: 0.5, opacity: 0.7 }}>
-            routecanvas.app
+            routerino.com
           </div>
           {includeName && customName && (
             <div style={{ position: 'absolute', bottom: 12, left: 18, fontFamily: 'Georgia, serif', fontSize: 9, color: '#8B4513', letterSpacing: 0.5, opacity: 0.7 }}>
@@ -955,9 +946,7 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
         <button onClick={() => handleShare('reddit')} disabled={sharing || !traceData} title="Share on Reddit" style={{ padding: '10px 14px', border: '1px solid #333', background: '#0a0a0a', color: '#fff', borderRadius: 8, cursor: sharing ? 'wait' : 'pointer', opacity: sharing ? 0.6 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <RedditIcon />
         </button>
-        <button onClick={() => handleShare('instagram')} disabled={sharing || !traceData} title="Share on Instagram" style={{ padding: '10px 14px', border: '1px solid #333', background: '#0a0a0a', color: '#fff', borderRadius: 8, cursor: sharing ? 'wait' : 'pointer', opacity: sharing ? 0.6 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <InstagramIcon />
-        </button>
+        
       </div>
 
       {/* Hidden div for thumbnail capture - always renders square for gallery */}
