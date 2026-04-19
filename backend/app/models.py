@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, Boolean, UniqueConstraint
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Text, Boolean, UniqueConstraint, Index
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from app.database import Base
@@ -64,6 +64,13 @@ class SavedRoute(Base):
     user = relationship("User", back_populates="routes")
     likes = relationship("Like", back_populates="route", cascade="all, delete-orphan")
 
+    __table_args__ = (
+        Index('idx_saved_route_user_id', 'user_id'),
+        Index('idx_saved_route_is_public', 'is_public'),
+        Index('idx_saved_route_fingerprint', 'fingerprint_id'),
+        Index('idx_saved_route_created', 'created_at'),
+    )
+
 class Like(Base):
     __tablename__ = "likes"
 
@@ -72,10 +79,11 @@ class Like(Base):
     route_id = Column(Integer, ForeignKey("saved_routes.id"), nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
-    __table_args__ = (UniqueConstraint('user_id', 'route_id', name='unique_user_route_like'),)
-
-    user = relationship("User", back_populates="likes")
-    route = relationship("SavedRoute", back_populates="likes")
+    __table_args__ = (
+        UniqueConstraint('user_id', 'route_id', name='unique_user_route_like'),
+        Index('idx_like_user_id', 'user_id'),
+        Index('idx_like_route_id', 'route_id'),
+    )
 
 class Report(Base):
     __tablename__ = "reports"

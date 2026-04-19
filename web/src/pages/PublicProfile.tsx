@@ -55,17 +55,14 @@ export default function PublicProfile({ username, onClose }: { username: string;
   }
 
   const checkLikeStatus = async () => {
-    if (!token || !profile) return
-    const liked = new Set<number>()
-    for (const route of profile.public_routes) {
-      try {
-        const status = await galleryApi.getLikeStatus(token, route.id)
-        if (status.liked) liked.add(route.id)
-      } catch (err) {
-        console.error('Failed to check like status:', err)
-      }
+    if (!token || !profile || profile.public_routes.length === 0) return
+    try {
+      const ids = profile.public_routes.map(r => r.id)
+      const status = await galleryApi.getLikesStatus(token, ids)
+      setLikedRoutes(new Set(status.liked_routes))
+    } catch (err) {
+      console.error('Failed to check like status:', err)
     }
-    setLikedRoutes(liked)
   }
 
   const handleLike = async (routeId: number) => {

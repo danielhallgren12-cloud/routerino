@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import html2canvas from 'html2canvas'
 import { useAuth } from '../auth/AuthContext'
 import { routesApi } from '../auth/api'
@@ -144,8 +144,7 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
   const [forGallery, setForGallery] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
 
-  const ms = (val: number) => isMobile ? val * 1.5 : val
-  const mfs = (val: number) => isMobile ? val * 0.8 : val
+  const validHops = useMemo(() => traceData ? traceData.hops.filter(h => h.ip && h.ip !== '*') : [], [traceData])
 
   useEffect(() => {
     setIsMobile(isMobileDevice())
@@ -183,8 +182,6 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
   const handleIncludeNameChange = (include: boolean) => {
     setIncludeName(include)
   }
-
-  const validHops = traceData ? traceData.hops.filter(h => h.ip && h.ip !== '*') : []
 
   const generateImage = async (): Promise<Blob | null> => {
     if (!artRef.current) return null

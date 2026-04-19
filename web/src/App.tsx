@@ -170,25 +170,24 @@ function App() {
       
       const data = await response.json()
       setTraceData(data)
-      
-if (token && data.fingerprint_id) {
-          try {
-            const hopsData = JSON.stringify(data.hops)
-            const collection = await routesApi.collectRoute(token, data.destination, hopsData, data.fingerprint_id)
-            setUserCollection(collection)
-            if (collection.new_items) {
-              setNewDiscoveries(collection.new_items)
-            }
-            if (collection.first_discoveries_this_trace?.length > 0) {
-              setFirstDiscoveries(collection.first_discoveries_this_trace)
-            }
-            // Check for new badges
-            const badgeResult = await routesApi.checkBadges(token)
-            if (badgeResult.new_badges && badgeResult.new_badges.length > 0) {
-              setNewBadges(badgeResult.new_badges)
-            }
-          } catch (err) { console.error('Failed to collect route:', err) }
-        }
+
+      if (token && data.fingerprint_id) {
+        try {
+          const hopsData = JSON.stringify(data.hops)
+          const collection = await routesApi.collectRoute(token, data.destination, hopsData, data.fingerprint_id)
+          setUserCollection(collection)
+          if (collection.new_items) {
+            setNewDiscoveries(collection.new_items)
+          }
+          if (collection.first_discoveries_this_trace?.length > 0) {
+            setFirstDiscoveries(collection.first_discoveries_this_trace)
+          }
+          const badgeResult = await routesApi.checkBadges(token)
+          if (badgeResult.new_badges && badgeResult.new_badges.length > 0) {
+            setNewBadges(badgeResult.new_badges)
+          }
+        } catch (err) { console.error('Failed to collect route:', err) }
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Trace failed - please try again')
     } finally {
@@ -285,7 +284,11 @@ if (token && data.fingerprint_id) {
         } catch {
           setUserLocation({ lat: latitude, lng: longitude, city: 'Unknown', country: '' })
         }
-      }, () => {}
+      },
+      (error) => {
+        console.warn('Geolocation failed:', error.message)
+        setUserLocation({ lat: 0, lng: 0, city: 'Unknown', country: '' })
+      }
     )
   }, [])
 

@@ -306,6 +306,21 @@ export const galleryApi = {
     return response.json()
   },
 
+  async getLikesStatus(token: string, routeIds: number[]) {
+    const response = await fetch(`${API_URL}/routes/likes/status`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ route_ids: routeIds }),
+    })
+    if (!response.ok) {
+      throw new Error('Failed to get like statuses')
+    }
+    return response.json()
+  },
+
   async updateVisibility(token: string, routeId: number, isPublic: boolean) {
     const response = await fetch(`${API_URL}/routes/${routeId}/visibility`, {
       method: 'PATCH',

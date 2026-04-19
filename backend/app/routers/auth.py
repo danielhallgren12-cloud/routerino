@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from pydantic import BaseModel
 from sqlalchemy.orm import Session, joinedload
-from datetime import timedelta, date
+from datetime import timedelta, date, datetime
 from typing import List
 import json
 import string
@@ -21,6 +21,19 @@ from app.schemas import (
 router = APIRouter()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
+
+_rate_limit_store = {}
+
+def _check_rate_limit(user_id: int, max_traces_per_minute: int = 10) -> tuple[bool, str]:
+    now = datetime.now()
+    if user_id not in _rate_limit_store:
+        _rate_limit_store[user_id] = []
+    times = [t for t in _rate_limit_store[user_id] if (now - t).total_seconds() < 60]
+    _rate_limit_store[user_id] = times
+    if len(times) >= max_traces_per_minute:
+        return False, f"Rate limit exceeded. Max {max_traces_per_minute} traces per minute."
+    _rate_limit_store[user_id].append(now)
+    return True, ""
 
 class CollectRequest(BaseModel):
     destination: str
@@ -83,6 +96,9 @@ def get_user_collection(current_user: User = Depends(get_current_user)):
 @router.post("/trace/collect")
 def collect_route(collect: CollectRequest, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     """Update user's collection with new trace data"""
+    allowed, msg = _check_rate_limit(current_user.id)
+    if not allowed:
+        raise HTTPException(status_code=429, detail=msg)
     hops = json.loads(collect.hops_data)
 
     # Extract unique items from this trace
@@ -729,6 +745,21 @@ def get_like_status(
         Like.route_id == route_id
     ).first()
     return {"liked": existing_like is not None}
+
+@router.post("/routes/likes/status")
+def get_likes_status(
+    route_ids: List[int],
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Batch check if current user has liked multiple routes"""
+    if len(route_ids) > 50:
+        raise HTTPException(status_code=400, detail="Max 50 route IDs per request")
+    liked_routes = db.query(Like.route_id).filter(
+        Like.user_id == current_user.id,
+        Like.route_id.in_(route_ids)
+    ).all()
+    return {"liked_routes": [r.route_id for r in liked_routes]}
 
 @router.patch("/routes/{route_id}/visibility")
 def update_route_visibility(
