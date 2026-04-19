@@ -232,21 +232,36 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
   const handleShare = async (platform: 'twitter' | 'facebook' | 'linkedin' | 'reddit' | 'instagram') => {
     setSharing(true)
     try {
-      const text = getShareText()
-
       if (platform === 'twitter') {
-        const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`
+        const twitterUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent('https://www.routerino.com')}`
         window.open(twitterUrl, '_blank', 'width=550,height=420')
       } else if (platform === 'facebook') {
-        const facebookUrl = `https://www.facebook.com/sharer/sharer.php?quote=${encodeURIComponent(text)}&u=${encodeURIComponent('https://www.routerino.com')}`
+        const facebookUrl = `https://www.facebook.com/sharer/sharer.php?quote=${encodeURIComponent('')}&u=${encodeURIComponent('https://www.routerino.com')}`
         window.open(facebookUrl, '_blank', 'width=550,height=420')
       } else if (platform === 'linkedin') {
         const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent('https://www.routerino.com')}`
         window.open(linkedinUrl, '_blank', 'width=550,height=420')
       } else if (platform === 'reddit') {
-        const redditUrl = `https://www.reddit.com/submit?title=${encodeURIComponent(text)}&url=${encodeURIComponent('https://www.routerino.com')}`
+        const redditUrl = `https://www.reddit.com/submit?url=${encodeURIComponent('https://www.routerino.com')}`
         window.open(redditUrl, '_blank', 'width=550,height=420')
       }
+    } finally {
+      setSharing(false)
+    }
+  }
+
+  const handleShareLink = async () => {
+    if (!traceData) return
+    setSharing(true)
+    try {
+      const hopsData = JSON.stringify(traceData.hops)
+      const result = await routesApi.shareRoute(token, traceData.destination, hopsData, false, undefined, traceData.fingerprint_id)
+      const shareUrl = `${window.location.origin}/share/${result.share_id}`
+      await navigator.clipboard.writeText(shareUrl)
+      setSaveMessage('Link copied!')
+      setTimeout(() => setSaveMessage(''), 3000)
+    } catch (err) {
+      console.error('Share failed:', err)
     } finally {
       setSharing(false)
     }
@@ -932,22 +947,27 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
         </div>
       )}
 
-      <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-        <span style={{ color: '#666', fontSize: 12, fontFamily: 'Space Mono, monospace' }}>SHARE:</span>
-        <button onClick={() => handleShare('twitter')} disabled={sharing || !traceData} title="Share on X (Twitter)" style={{ padding: '10px 14px', border: '1px solid #333', background: '#0a0a0a', color: '#fff', borderRadius: 8, cursor: sharing ? 'wait' : 'pointer', opacity: sharing ? 0.6 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <TwitterIcon />
+      {isMobileDevice() ? (
+        <button onClick={handleShareLink} disabled={sharing || !traceData} style={{ padding: '10px 14px', background: 'linear-gradient(135deg, #00F0FF, #FF2D92)', border: 'none', color: '#fff', borderRadius: 8, cursor: sharing ? 'wait' : 'pointer', opacity: sharing ? 0.6 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Syne, sans-serif', fontWeight: 600 }}>
+          🔗 Share Link
         </button>
-        <button onClick={() => handleShare('facebook')} disabled={sharing || !traceData} title="Share on Facebook" style={{ padding: '10px 14px', border: '1px solid #333', background: '#0a0a0a', color: '#fff', borderRadius: 8, cursor: sharing ? 'wait' : 'pointer', opacity: sharing ? 0.6 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <FacebookIcon />
-        </button>
-        <button onClick={() => handleShare('linkedin')} disabled={sharing || !traceData} title="Share on LinkedIn" style={{ padding: '10px 14px', border: '1px solid #333', background: '#0a0a0a', color: '#fff', borderRadius: 8, cursor: sharing ? 'wait' : 'pointer', opacity: sharing ? 0.6 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <LinkedInIcon />
-        </button>
-        <button onClick={() => handleShare('reddit')} disabled={sharing || !traceData} title="Share on Reddit" style={{ padding: '10px 14px', border: '1px solid #333', background: '#0a0a0a', color: '#fff', borderRadius: 8, cursor: sharing ? 'wait' : 'pointer', opacity: sharing ? 0.6 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <RedditIcon />
-        </button>
-        
-      </div>
+      ) : (
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+          <span style={{ color: '#666', fontSize: 12, fontFamily: 'Space Mono, monospace' }}>SHARE:</span>
+          <button onClick={() => handleShare('twitter')} disabled={sharing || !traceData} title="Share on X (Twitter)" style={{ padding: '10px 14px', border: '1px solid #333', background: '#0a0a0a', color: '#fff', borderRadius: 8, cursor: sharing ? 'wait' : 'pointer', opacity: sharing ? 0.6 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <TwitterIcon />
+          </button>
+          <button onClick={() => handleShare('facebook')} disabled={sharing || !traceData} title="Share on Facebook" style={{ padding: '10px 14px', border: '1px solid #333', background: '#0a0a0a', color: '#fff', borderRadius: 8, cursor: sharing ? 'wait' : 'pointer', opacity: sharing ? 0.6 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <FacebookIcon />
+          </button>
+          <button onClick={() => handleShare('linkedin')} disabled={sharing || !traceData} title="Share on LinkedIn" style={{ padding: '10px 14px', border: '1px solid #333', background: '#0a0a0a', color: '#fff', borderRadius: 8, cursor: sharing ? 'wait' : 'pointer', opacity: sharing ? 0.6 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <LinkedInIcon />
+          </button>
+          <button onClick={() => handleShare('reddit')} disabled={sharing || !traceData} title="Share on Reddit" style={{ padding: '10px 14px', border: '1px solid #333', background: '#0a0a0a', color: '#fff', borderRadius: 8, cursor: sharing ? 'wait' : 'pointer', opacity: sharing ? 0.6 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <RedditIcon />
+          </button>
+        </div>
+      )}
 
       {/* Hidden div for thumbnail capture - always renders square for gallery */}
       <div

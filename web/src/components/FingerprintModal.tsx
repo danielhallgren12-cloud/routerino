@@ -1,6 +1,11 @@
 import { useState, useRef } from 'react'
 import html2canvas from 'html2canvas'
 
+const isMobileDevice = () => {
+  if (typeof window === 'undefined') return false
+  return window.innerWidth < 768 || /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+}
+
 interface FingerprintModalProps {
   fingerprintId: string
   destination: string
@@ -98,18 +103,29 @@ export default function FingerprintModal({ fingerprintId, destination, hops, use
   const handleShare = async (platform: 'twitter' | 'facebook' | 'linkedin' | 'reddit' | 'instagram') => {
     setSharing(true)
     try {
-      const text = getShareText()
-
       if (platform === 'twitter') {
-        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank', 'width=550,height=420')
+        window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent('https://www.routerino.com')}`, '_blank', 'width=550,height=420')
       } else if (platform === 'facebook') {
-        window.open(`https://www.facebook.com/sharer/sharer.php?quote=${encodeURIComponent(text)}&u=${encodeURIComponent('https://www.routerino.com')}`, '_blank', 'width=550,height=420')
+        window.open(`https://www.facebook.com/sharer/sharer.php?quote=${encodeURIComponent('')}&u=${encodeURIComponent('https://www.routerino.com')}`, '_blank', 'width=550,height=420')
       } else if (platform === 'linkedin') {
         window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent('https://www.routerino.com')}`, '_blank', 'width=550,height=420')
       } else if (platform === 'reddit') {
-        window.open(`https://www.reddit.com/submit?title=${encodeURIComponent(text)}&url=${encodeURIComponent('https://www.routerino.com')}`, '_blank', 'width=550,height=420')
+        window.open(`https://www.reddit.com/submit?url=${encodeURIComponent('https://www.routerino.com')}`, '_blank', 'width=550,height=420')
       }
     } finally {
+      setSharing(false)
+    }
+  }
+
+  const handleShareLink = async () => {
+    setSharing(true)
+    try {
+      const shareUrl = `https://www.routerino.com/share/${fingerprintId}`
+      await navigator.clipboard.writeText(shareUrl)
+      setSharing(false)
+      // Show feedback by briefly changing button text
+      setTimeout(() => setSharing(false), 2000)
+    } catch (err) {
       setSharing(false)
     }
   }
@@ -181,29 +197,34 @@ export default function FingerprintModal({ fingerprintId, destination, hops, use
         </div>
         
         <div className="fingerprint-share-actions">
-          <button 
-            onClick={handleDownload} 
+          <button
+            onClick={handleDownload}
             disabled={downloading}
             className="fps-download-btn"
           >
             {downloading ? 'Generating...' : 'Download'}
           </button>
-          
-          <div className="fps-social-buttons">
-            <button onClick={() => handleShare('twitter')} disabled={sharing} title="Share on X" className="fps-social-btn">
-              <TwitterIcon />
+
+          {isMobileDevice() ? (
+            <button onClick={handleShareLink} disabled={sharing} className="fps-social-btn" style={{ background: 'linear-gradient(135deg, #00F0FF, #FF2D92)', border: 'none' }}>
+              🔗 Share Link
             </button>
-            <button onClick={() => handleShare('facebook')} disabled={sharing} title="Share on Facebook" className="fps-social-btn">
-              <FacebookIcon />
-            </button>
-            <button onClick={() => handleShare('linkedin')} disabled={sharing} title="Share on LinkedIn" className="fps-social-btn">
-              <LinkedInIcon />
-            </button>
-            <button onClick={() => handleShare('reddit')} disabled={sharing} title="Share on Reddit" className="fps-social-btn">
-              <RedditIcon />
-            </button>
-            
-          </div>
+          ) : (
+            <div className="fps-social-buttons">
+              <button onClick={() => handleShare('twitter')} disabled={sharing} title="Share on X" className="fps-social-btn">
+                <TwitterIcon />
+              </button>
+              <button onClick={() => handleShare('facebook')} disabled={sharing} title="Share on Facebook" className="fps-social-btn">
+                <FacebookIcon />
+              </button>
+              <button onClick={() => handleShare('linkedin')} disabled={sharing} title="Share on LinkedIn" className="fps-social-btn">
+                <LinkedInIcon />
+              </button>
+              <button onClick={() => handleShare('reddit')} disabled={sharing} title="Share on Reddit" className="fps-social-btn">
+                <RedditIcon />
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
