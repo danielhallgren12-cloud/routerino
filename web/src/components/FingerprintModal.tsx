@@ -59,6 +59,7 @@ export default function FingerprintModal({ fingerprintId, destination, hops, use
   const cardRef = useRef<HTMLDivElement>(null)
   const [sharing, setSharing] = useState(false)
   const [downloading, setDownloading] = useState(false)
+  const [shareLinkMessage, setShareLinkMessage] = useState('')
 
   const validHops = hops.filter(h => h.ip && h.ip !== '*')
   const countries = new Set(validHops.filter(h => h.country).map(h => h.country))
@@ -122,11 +123,14 @@ export default function FingerprintModal({ fingerprintId, destination, hops, use
     try {
       const shareUrl = `https://www.routerino.com/share/${fingerprintId}`
       await navigator.clipboard.writeText(shareUrl)
-      setSharing(false)
-      // Show feedback by briefly changing button text
-      setTimeout(() => setSharing(false), 2000)
+      setShareLinkMessage('Link copied!')
+      setTimeout(() => {
+        setSharing(false)
+        setShareLinkMessage('')
+      }, 2000)
     } catch (err) {
       setSharing(false)
+      setShareLinkMessage('')
     }
   }
 
@@ -207,7 +211,7 @@ export default function FingerprintModal({ fingerprintId, destination, hops, use
 
           {isMobileDevice() ? (
             <button onClick={handleShareLink} disabled={sharing} className="fps-social-btn" style={{ background: 'linear-gradient(135deg, #00F0FF, #FF2D92)', border: 'none' }}>
-              🔗 Share Link
+              {shareLinkMessage || '🔗 Share Link'}
             </button>
           ) : (
             <div className="fps-social-buttons">

@@ -942,7 +942,7 @@ export function ArtGenerator({ traceData, userLocation }: ArtGeneratorProps) {
       </div>
 
       {saveMessage && (
-        <div style={{ marginTop: 12, color: saveMessage.includes('✓') ? '#00FFA3' : '#ff4444', fontSize: 13, fontWeight: 600 }}>
+        <div style={{ marginTop: 12, color: saveMessage.includes('✓') || saveMessage.includes('Link copied') ? '#00FFA3' : '#ff4444', fontSize: 13, fontWeight: 600 }}>
           {saveMessage}
         </div>
       )}
