@@ -25,7 +25,13 @@ async def add_no_cache_headers(request, call_next):
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://192.168.10.56:5173"],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://192.168.10.56:5173",
+        "https://www.routerino.com",
+        "https://api.routerino.com"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
