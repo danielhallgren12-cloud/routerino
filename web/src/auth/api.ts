@@ -313,7 +313,7 @@ export const galleryApi = {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ route_ids: routeIds }),
+      body: JSON.stringify(routeIds),
     })
     if (!response.ok) {
       throw new Error('Failed to get like statuses')
