@@ -79,6 +79,9 @@ class Like(Base):
     route_id = Column(Integer, ForeignKey("saved_routes.id"), nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
+    user = relationship("User", back_populates="likes")
+    route = relationship("SavedRoute", back_populates="likes")
+
     __table_args__ = (
         UniqueConstraint('user_id', 'route_id', name='unique_user_route_like'),
         Index('idx_like_user_id', 'user_id'),
