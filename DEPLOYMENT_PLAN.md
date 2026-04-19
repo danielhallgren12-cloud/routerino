@@ -50,8 +50,13 @@
 2. [ ] Connect FastAPI to Neon PostgreSQL
 3. [ ] Test API endpoints
 
-## Pre-Deployment Fixes (DONE)
+## Pre-Deployment Fixes (ALL DONE)
 - [x] CORS configuration (add deployed domains)
+- [x] Rate limiting (10 traces/minute on collect_route endpoint)
+- [x] Database indexes (user_id, is_public, fingerprint_id, route_id)
+- [x] SECRET_KEY validation with DEBUG fallback
+- [x] Like model relationships (user and route back_populates)
+- [x] geo_cache max size (10000) with LRU eviction
 
 ## Cost Summary
 
@@ -87,6 +92,7 @@
 - Let's Encrypt (SSL)
 
 ## Notes
-- SQLite can be used initially, migrate to PostgreSQL later
-- Rate limiting should be added before production
+- Rate limiting added: 10 traces per minute per user
+- geo_cache capped at 10000 entries with LRU eviction
+- Like model now has proper relationships for SQLAlchemy
 - Full deployment takes ~2-3 hours

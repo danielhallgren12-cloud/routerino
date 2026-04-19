@@ -195,30 +195,30 @@ To add linting to package.json:
    - Log errors appropriately for debugging
 
 ## Recent Commits (2026-04)
+- **7b0cda0** - fix: add production CORS origins for www.routerino.com and api.routerino.com
+- **67b3a1a** - fix: send route_ids as JSON array instead of object for batch like-status API
+- **39cdc3a** - fix: add missing relationships to Like model
+- **49c55f1** - fix: code review fixes - Groups A, B, C3, D, E
+- **d8bf8a2** - Fix share link feedback: green text and show 'Link copied' in FingerprintModal
+- **861f77d** - Share link button on mobile, URL-only shares on desktop, fixed stats spacing
+- **e02d099** - Fix share functionality: replace routecanvas.app with routerino.com, fix Facebook/LinkedIn/Reddit share URLs, remove Instagram
+- **965d4b6** - Update AGENTS.md: add PWA screenshots, OG tags, optimized caching, Google Play prep
 - **d55127d** - Add PWA screenshots, OG tags, and optimized caching for tiles and API
-- **9644adc** - Update AGENTS.md: add recent commits, new features, fix deployment info
-- **8b79232** - Update README with screenshot for visual context
-- **ec2d42d** - Add comprehensive README with secure deployment instructions
-- **d15b1f1** - Compact footer for mobile: smaller donate button, GitHub and donate on same row
-- **682ab97** - Fix API URL: use api.routerino.com instead of relative path for trace
-- **1e10b54** - Fix traceroute: use UDP instead of TCP to avoid root requirement, fix API_URL export and frontend trace call
-- **3c0acfc** - Enable TCP traceroute, filter private IPs, remove loading text
-- **062f1d5** - Add footer with PayPal donate, email and GitHub links
-- **1b3ddb0** - Update .gitignore: exclude web/dist/ and *.db files
-- **02bdb34** - Remove web/dist from git tracking - Vercel builds from source
-- **24e4ebd** - Route Atlas: dashed line patterns for route differentiation + clickable city markers for half-zoom
-- **60743db** - Visual improvements: CartoDB Dark Matter map tiles, transparent UI backgrounds, fingerprint-card dark styling
-- **0317cfa** - Upgrade map tiles: CartoDB Dark Matter for dark mode, Positron for light mode, Route Atlas
-- **9b04540** - Show constellation stars, retro sun rays and paper texture in desktop gallery saves
-- **c56b94b** - Fix FIRST badge and Seen counter for cities, countries, companies - CATEGORY_PREFIX mapping
-- **2c1feec** - Reorder fingerprint stats: ASNs and Destinations swapped to prevent text overlap in fullscreen
-- **0d4810a** - Mobile fluid scaling: clamp() fixes for 14 UI elements across all device sizes
-- **26d31c1** - Fix preset destination buttons mobile layout - Popular label and 2-row grid
-- **4471ebd** - Routerino logo update with Cyberway Riders font and 3D effects
-- **419606f** - Additional mobile optimization fixes
-- **f7b56ba** - Mobile optimization for Routerino PWA
 
 ## Recent Updates (2026-04)
+- **Code Review Fixes (Groups A, B, C3, D, E)**: Comprehensive stability and performance improvements
+  - B1: SECRET_KEY validation with DEBUG fallback for local development
+  - B2: Exception handling in traceroute.py (no silent crashes)
+  - B3: await collectRoute to prevent race conditions
+  - B4: Database indexes on user_id, is_public, fingerprint_id, route_id
+  - C3: Rate limiting (10 traces/minute) on collect_route endpoint
+  - D: Batch like-status endpoint POST /routes/likes/status
+  - E: geo_cache max size (10000) with LRU eviction
+  - A1: JSON parse try-catch in AuthContext
+  - A2: Geolocation error feedback in App
+  - A3: Memoized validHops in ArtGenerator
+- **Like Model Fix**: Added missing user and route relationships to Like model
+- **CORS Fix**: Added production origins (www.routerino.com, api.routerino.com) to allow_origins
 - **OG tags for social preview**: Added og:title, og:description, og:image, og:url, og:type, og:site_name + Twitter card tags
 - **PWA screenshots**: 8 screenshots added to manifest.json for better PWA installation experience
 - **Optimized caching**: CartoDB tiles cached (30 days, CacheFirst), API responses cached (1 hour, NetworkFirst)

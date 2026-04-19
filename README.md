@@ -168,7 +168,38 @@ server {
 ### Backend (.env)
 
 ```bash
+DEBUG=false
+SECRET_KEY=your-secret-key-minimum-32-characters
 DATABASE_URL=postgresql://neondb_owner:password@ep-host.neon.tech/neondb?sslmode=require
+```
+
+### Backend Systemd Service (Recommended for Production)
+
+Create `/etc/systemd/system/routerino.service`:
+
+```ini
+[Unit]
+Description=Routerino FastAPI Backend
+After=network.target
+
+[Service]
+User=your-user
+WorkingDirectory=/path/to/routerino/backend
+Environment="DEBUG=false"
+Environment="SECRET_KEY=your-secret-key"
+Environment="DATABASE_URL=postgresql://..."
+ExecStart=/path/to/routerino/backend/venv/bin/python3 -m uvicorn app.main:app --host 0.0.0.0 --port 8000
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Enable and start:
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable routerino
+sudo systemctl start routerino
 ```
 
 ## API Documentation
@@ -205,13 +236,17 @@ Request body:
 | `/routes` | GET | Get user's saved routes |
 | `/routes` | POST | Save a route |
 | `/routes/{id}` | GET | Get route details |
-| `/routes/{id}` | DELETE | Delete a route |
+| `/routes/{id}` | DELETE | DELETE route |
+| `/routes/likes/status` | POST | Batch check like status (max 50 per request) |
+| `/routes/{id}/like` | POST | Like/unlike a route |
+| `/routes/{id}/view` | POST | Increment view count |
 
 ### Gallery
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
 | `/gallery` | GET | List public routes |
+| `/gallery/random` | GET | Get random public routes |
 | `/routes/by-destination` | GET | Routes to specific destination |
 
 ### Badges
