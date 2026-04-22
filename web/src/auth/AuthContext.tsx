@@ -17,6 +17,8 @@ interface AuthContextType {
   fetchUniqueness: (token: string) => Promise<void>
 }
 
+const API_URL = 'https://api.routerino.com/api/v1'
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -45,7 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const fetchUniqueness = async (authToken: string) => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/me/uniqueness`, {
+      const response = await fetch(`${API_URL}/me/uniqueness`, {
         headers: {
           'Authorization': `Bearer ${authToken}`,
         },
