@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { routesApi } from '../auth/api'
 import { getRarity, RARITY_COLORS, RARITY_LABELS, Rarity } from '../utils/rarity'
 import { getCountryName } from '../utils/countryNames'
