@@ -64,7 +64,7 @@ function MapEvents({ onZoomChange }: { onZoomChange: (zoom: number) => void }) {
 }
 
 function App() {
-  const { user, token, logout, isAuthenticated } = useAuth()
+  const { user, token, logout, isAuthenticated, uniqueness, fetchUniqueness } = useAuth()
   const [destination, setDestination] = useState('')
   const [loading, setLoading] = useState(false)
   const [loadingDots, setLoadingDots] = useState(0)
@@ -295,6 +295,7 @@ function App() {
   useEffect(() => {
     if (token) {
       routesApi.getCollection(token).then(setUserCollection).catch(err => console.error('Failed to load collection:', err))
+      fetchUniqueness(token)
     } else {
       setUserCollection(null)
     }
@@ -783,7 +784,7 @@ function App() {
       {showInventory && token && userCollection && (
         <div className="modal-overlay" onClick={() => { setShowInventory(false); setInventoryCategory(null) }}>
           <div className="modal inventory-modal-container" onClick={e => e.stopPropagation()}>
-            <Inventory token={token} collection={userCollection} onClose={() => { setShowInventory(false); setInventoryCategory(null) }} initialCategory={inventoryCategory} />
+            <Inventory token={token} collection={userCollection} uniqueness={uniqueness} onClose={() => { setShowInventory(false); setInventoryCategory(null) }} initialCategory={inventoryCategory} />
           </div>
         </div>
       )}

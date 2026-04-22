@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import { routesApi } from '../auth/api'
 import { getRarity, RARITY_COLORS, RARITY_LABELS, Rarity } from '../utils/rarity'
 import { getCountryName } from '../utils/countryNames'
@@ -11,6 +11,7 @@ interface InventoryProps {
     new_items?: { destinations: string[]; countries: string[]; cities: string[]; companies: string[]; ips: string[]; asns: string[]; fingerprints: string[] };
     items?: { destinations: string[]; countries: string[]; cities: string[]; companies: string[]; ips: string[]; asns: string[]; fingerprints: string[] };
   }
+  uniqueness?: Record<string, number>
   onClose: () => void
   initialCategory?: string | null
 }
@@ -55,19 +56,11 @@ const RARITY_ORDER: Record<Rarity, number> = {
   legendary: 5,
 }
 
-export default function Inventory({ token, collection, onClose, initialCategory }: InventoryProps) {
+export default function Inventory({ token, collection, uniqueness = {}, onClose, initialCategory }: InventoryProps) {
   const [activeCategory, setActiveCategory] = useState<Category>((initialCategory as Category) || 'destinations')
   const [items, setItems] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const [sortBy, setSortBy] = useState<SortOption>('name-asc')
-  const [uniqueness, setUniqueness] = useState<Record<string, number>>({})
-
-  useEffect(() => {
-    // Fetch uniqueness stats
-    routesApi.getUniqueness(token)
-      .then(data => setUniqueness(data))
-      .catch(err => console.error('Failed to load uniqueness:', err))
-  }, [token])
 
   useEffect(() => {
     if (collection.items && collection.items[activeCategory]) {
